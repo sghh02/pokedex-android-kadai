@@ -743,7 +743,7 @@ git switch -c feature/2-api</code></pre></figure>
 <h3 id="3-1-phase-1-基本機能-必須">3.1 Phase 1: 基本機能（必須）</h3>
 <div class="table-wrap"><table><thead><tr><th>機能</th><th>内容</th></tr></thead><tbody><tr><td>ポケモン一覧表示</td><td>カントー地方151匹を2列グリッドで表示。図鑑番号・画像・名前</td></tr><tr><td>ポケモン詳細表示</td><td>タイプ・身長・体重・画像を表示。戻る操作に対応</td></tr><tr><td>オフライン対応</td><td>一度取得したデータをローカル保存し、オフラインでも表示</td></tr></tbody></table></div>
 <h3 id="3-2-phase-2-拡張機能-加点">3.2 Phase 2: 拡張機能（加点）</h3>
-<div class="table-wrap"><table><thead><tr><th>機能</th><th>内容</th></tr></thead><tbody><tr><td>ローディング・エラーハンドリング</td><td>状態の出し分け、再試行、Pull to refresh（#11）</td></tr><tr><td>検索機能</td><td>名前の部分一致、図鑑番号、タイプでの絞り込み（#12）</td></tr><tr><td>詳細情報の拡張</td><td>日本語名、特性、進化チェーン（簡易版）（#13）</td></tr><tr><td>設定画面と手動更新</td><td>ボトムナビでの切り替え、手動更新、最終更新日時の表示（#14）</td></tr></tbody></table></div>
+<div class="table-wrap"><table><thead><tr><th>機能</th><th>内容</th></tr></thead><tbody><tr><td>ローディング・エラーハンドリング</td><td>状態の出し分け、再試行、Pull to refresh（#11）</td></tr><tr><td>検索機能</td><td>名前の部分一致、図鑑番号、タイプでの絞り込み（#12）</td></tr><tr><td>詳細情報の拡張</td><td>日本語名、特性、進化チェーン（簡易版）（#13）</td></tr><tr><td>設定画面と更新</td><td>ボトムナビでの切り替え、起動時の自動更新（午前10時以降・1日1回）、手動更新、最終更新日時の表示（#14）</td></tr></tbody></table></div>
 <h2 id="4-データベース設計">4. データベース設計</h2>
 <p>Room で次のスキーマを構成します。日付はエポックミリ秒（<code>INTEGER</code>）で保持します。</p>
 <figure class="code"><div class="code-head"><span>sql</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-sql">-- ポケモン基本情報
@@ -858,7 +858,7 @@ CREATE INDEX idx_cache_last_accessed ON pokemon_detail_cache(last_accessed);</co
 </li>
 <li>詳細情報の拡張（日本語名・特性・進化チェーン）（#13）
 </li>
-<li>設定画面と手動更新（#14）
+<li>設定画面・起動時の自動更新・手動更新（#14）
 </li></ol>
 <h2 id="8-評価基準">8. 評価基準</h2>
 <h3 id="8-1-必須要件-70点">8.1 必須要件（70点）</h3>
@@ -879,7 +879,7 @@ CREATE INDEX idx_cache_last_accessed ON pokemon_detail_cache(last_accessed);</co
 </li>
 <li class="task"><label><input type="checkbox"><span><strong>詳細情報の拡張</strong>（#13）: 日本語名・特性・進化チェーン</span></label>
 </li>
-<li class="task"><label><input type="checkbox"><span><strong>設定画面と手動更新</strong>（#14）: ボトムナビ、手動更新、最終更新日時</span></label>
+<li class="task"><label><input type="checkbox"><span><strong>設定画面と更新</strong>（#14）: ボトムナビ、起動時の自動更新、手動更新、最終更新日時</span></label>
 </li></ul>
 <p>なお <strong>コード品質</strong>（Kotlin らしい記述、MVVM／単方向データフロー）は、上記すべてに共通してレビューで見る観点です。単独の配点項目ではありません。</p>
 <h3 id="8-3-ボーナス要件-α">8.3 ボーナス要件（+α）</h3>
@@ -2073,45 +2073,49 @@ interface PokemonRepository {
 <figure class="diagram"><pre class="mermaid">sequenceDiagram
     participant User
     participant SplashScreen
-    participant SplashViewModel
+    participant PokemonListScreen
+    participant PokemonListViewModel
     participant PokemonRepository
     participant PokemonDao
     participant PokeApiService
-    participant PokemonListScreen
 
     User-&gt;&gt;SplashScreen: アプリ起動
-    SplashScreen-&gt;&gt;SplashViewModel: startInitialLoad()
-    SplashViewModel-&gt;&gt;PokemonDao: count()
+    SplashScreen-&gt;&gt;SplashScreen: delay(500ms)
+    Note over SplashScreen: 表示するだけ。取得はしない
+    SplashScreen-&gt;&gt;PokemonListScreen: 画面遷移
+    PokemonListScreen-&gt;&gt;PokemonListViewModel: 生成（init で初回取得を判定）
+
+    PokemonListViewModel-&gt;&gt;PokemonRepository: isEmpty()
+    PokemonRepository-&gt;&gt;PokemonDao: count()
 
     alt DBが空（初回起動）
-        SplashViewModel-&gt;&gt;PokemonRepository: refresh()
-        Note over SplashViewModel,PokemonRepository: applicationScope で開始する。完了は待たない
+        PokemonListViewModel-&gt;&gt;PokemonRepository: refresh()
+        PokemonListScreen--&gt;&gt;User: ローディング表示
+        PokemonRepository-&gt;&gt;PokeApiService: 151匹ぶんの詳細取得（同時実行10）
+        PokeApiService--&gt;&gt;PokemonRepository: レスポンス
+        PokemonRepository-&gt;&gt;PokemonDao: upsertAll()
+        Note over PokemonDao,PokemonListScreen: Flow 経由で一覧が自動更新される
+
+        alt 取得に失敗
+            PokemonRepository--&gt;&gt;PokemonListViewModel: Result.failure
+            PokemonListScreen--&gt;&gt;User: エラー表示＋再試行ボタン
+        end
     else データあり
-        Note over SplashViewModel: 何もしない。日次の更新は AutoUpdateEffect が受け持つ
-    end
-
-    SplashScreen-&gt;&gt;SplashScreen: delay(500ms)
-    SplashScreen-&gt;&gt;PokemonListScreen: 画面遷移
-    SplashScreen-&gt;&gt;User: 一覧画面表示
-
-    Note over PokemonRepository,PokemonDao: 取得は画面遷移後も継続し、保存されると一覧が自動で更新される
-    PokemonRepository-&gt;&gt;PokeApiService: 151匹ぶんの詳細取得（同時実行10）
-    PokeApiService--&gt;&gt;PokemonRepository: レスポンス
-    PokemonRepository-&gt;&gt;PokemonDao: upsertAll()</pre></figure>
+        PokemonListScreen--&gt;&gt;User: 保存済みデータで一覧表示
+        Note over PokemonListViewModel: 日次の更新は AutoUpdateEffect が受け持つ
+    end</pre></figure>
 <h4 id="4-1-3-実装仕様">4.1.3 実装仕様</h4>
 <h5 id="splashscreen-composable">SplashScreen（Composable）</h5>
 <figure class="code"><div class="code-head"><span>kotlin</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-kotlin">// ui/splash/SplashScreen.kt
 private const val MINIMUM_DISPLAY_MS = 500L   // 要件: 0.5〜1秒
 
 @Composable
-fun SplashScreen(
-    onFinished: () -&gt; Unit,
-    viewModel: SplashViewModel = viewModel(factory = LocalAppContainer.current.viewModelFactory),
-) {
+fun SplashScreen(onFinished: () -&gt; Unit) {
     LaunchedEffect(Unit) {
-        // 取得の完了は待たない。151匹ぶんの通信は数十秒かかるため、
-        // ここで await すると要件の「0.5〜1秒で遷移」を満たせなくなる。
-        viewModel.startInitialLoad()
+        // 表示するだけ。データ取得はここでは行わない。
+        // 151匹ぶんの通信は数十秒かかるため待てず、かといって投げっぱなしにすると
+        // 失敗が誰にも届かない。取得は一覧の ViewModel に任せ、
+        // 待機とエラーを一覧画面の状態として素直に表現する。
         delay(MINIMUM_DISPLAY_MS)
         onFinished()
     }
@@ -2124,32 +2128,7 @@ fun SplashScreen(
     }
 }
 
-class SplashViewModel(
-    private val repository: PokemonRepository,
-    private val policy: AutoUpdatePolicy,
-    private val applicationScope: CoroutineScope,   // 画面が消えても続くスコープ
-) : ViewModel() {
-
-    /**
-     * 取得を開始するだけで、完了は待たない。
-     *
-     * viewModelScope ではなく applicationScope を使う。スプラッシュは遷移直後に
-     * バックスタックから外れ、その時点で viewModelScope はキャンセルされるため、
-     * 「バックグラウンドで取得を続ける」が成立しなくなる。
-     */
-    fun startInitialLoad() {
-        applicationScope.launch {
-            // ここが受け持つのは「初回起動でDBが空のとき」だけ。
-            // 日次の自動更新は AutoUpdateEffect に一本化する（二重に走らせない）。
-            if (!repository.isEmpty()) return@launch
-            repository.refresh()
-                .onSuccess { policy.recordSuccess() }
-                .onFailure { Log.w(TAG, &quot;初期データの取得に失敗。保存済みデータで継続する&quot;, it) }
-        }
-    }
-
-    private companion object { const val TAG = &quot;SplashViewModel&quot; }
-}</code></pre></figure>
+// スプラッシュに ViewModel は不要。遷移後は一覧画面の状態だけを見ればよい。</code></pre></figure>
 <h5 id="application-と依存の組み立て">Application と依存の組み立て</h5>
 <figure class="code"><div class="code-head"><span>kotlin</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-kotlin">// PokedexApplication.kt — アプリ全体の初期化と依存の組み立て
 class PokedexApplication : Application() {
@@ -2194,9 +2173,6 @@ class AppContainer(context: Context) {
 
     val networkMonitor = NetworkMonitor(context)
 
-    /** 画面のライフサイクルから独立して走らせたい処理に使う */
-    val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
-
     /** 自動更新の判定に使う小さな設定領域 */
     private val preferences: DataStore&lt;Preferences&gt; =
         PreferenceDataStoreFactory.create { context.preferencesDataStoreFile(&quot;settings&quot;) }
@@ -2214,8 +2190,7 @@ class AppContainer(context: Context) {
 
     /** ViewModel に依存を渡すためのファクトリ */
     val viewModelFactory = viewModelFactory {
-        initializer { SplashViewModel(pokemonRepository, autoUpdatePolicy, applicationScope) }
-        initializer { PokemonListViewModel(pokemonRepository, networkMonitor) }
+        initializer { PokemonListViewModel(pokemonRepository, autoUpdatePolicy, networkMonitor) }
         initializer { PokemonDetailViewModel(pokemonRepository) }
     }
 }
@@ -2229,7 +2204,11 @@ val LocalAppContainer = staticCompositionLocalOf&lt;AppContainer&gt; {
 setContent {
     val container = (application as PokedexApplication).container
     CompositionLocalProvider(LocalAppContainer provides container) {
-        PokedexTheme { PokedexNavHost() }
+        PokedexTheme {
+            // 日次の自動更新（午前10時以降・1日1回）はここで起動する
+            AutoUpdateEffect(container.autoUpdatePolicy, container.pokemonRepository)
+            PokedexNavHost()
+        }
     }
 }</code></pre></figure>
 <hr>
@@ -2293,13 +2272,15 @@ fun PokemonListScreen(
             isRefreshing = uiState.isRefreshing,
             onRefresh = viewModel::refresh,
         ) {
+            // by で受けた uiState は委譲プロパティなのでスマートキャストが効かない。
+            // ローカルに束ねてから分岐する。
+            val state = uiState
             when {
-                // 初回起動はスプラッシュ側で取得が走っている最中なので、待機を示す
-                uiState.isInitialLoading -&gt; LoadingIndicator()
-                uiState.errorMessage != null -&gt;
-                    ErrorMessage(uiState.errorMessage, onRetry = viewModel::refresh)
-                uiState.isSearchEmpty -&gt; EmptyMessage(&quot;該当するポケモンがいません&quot;)
-                else -&gt; PokemonGrid(uiState.pokemonList, onPokemonClick)
+                state.isInitialLoading -&gt; LoadingIndicator()
+                state.errorMessage != null -&gt;
+                    ErrorMessage(state.errorMessage, onRetry = viewModel::refresh)
+                state.isSearchEmpty -&gt; EmptyMessage(&quot;該当するポケモンがいません&quot;)
+                else -&gt; PokemonGrid(state.pokemonList, onPokemonClick)
             }
         }
     }
@@ -2329,9 +2310,9 @@ data class PokemonListUiState(
     val isOffline: Boolean = false,
     val errorMessage: String? = null,
 ) {
-    /** 初回取得中。スプラッシュは取得を待たずに遷移するので、一覧側で待機を示す */
+    /** まだ1件も無く、取得中。初回起動でここに入る */
     val isInitialLoading: Boolean
-        get() = pokemonList.isEmpty() &amp;&amp; query.isBlank() &amp;&amp; errorMessage == null
+        get() = pokemonList.isEmpty() &amp;&amp; isRefreshing &amp;&amp; errorMessage == null
 
     /** 検索したが該当が無い。データが無いだけの状態と区別する */
     val isSearchEmpty: Boolean
@@ -2341,12 +2322,19 @@ data class PokemonListUiState(
 @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
 class PokemonListViewModel(
     private val repository: PokemonRepository,
+    private val policy: AutoUpdatePolicy,
     networkMonitor: NetworkMonitor,
 ) : ViewModel() {
 
     private val query = MutableStateFlow(&quot;&quot;)
     private val isRefreshing = MutableStateFlow(false)
     private val errorMessage = MutableStateFlow&lt;String?&gt;(null)
+
+    init {
+        // 初回起動（DBが空）はここで取得する。待機も失敗も uiState に出るので、
+        // ユーザーはスピナーを見て待てるし、失敗すれば再試行ボタンから復帰できる。
+        viewModelScope.launch { if (repository.isEmpty()) refresh() }
+    }
 
     private val pokemonList = query
         .debounce(300)              // 入力のたびに検索が走らないようにする
@@ -2369,7 +2357,9 @@ class PokemonListViewModel(
         viewModelScope.launch {
             isRefreshing.value = true
             errorMessage.value = null
-            repository.refresh().onFailure { errorMessage.value = it.toUserMessage() }
+            repository.refresh()
+                .onSuccess { policy.recordSuccess() }
+                .onFailure { errorMessage.value = it.toUserMessage() }
             isRefreshing.value = false
         }
     }
@@ -2813,13 +2803,14 @@ class AutoUpdatePolicy(private val prefs: DataStore&lt;Preferences&gt;) {
     }
 }
 
-// MainActivity — アプリがフォアグラウンドに来たときに判定する
+// MainActivity の setContent（4.1 の例）で PokedexNavHost と並べて呼ぶ。
+// フォアグラウンドに来るたびに判定する。
 @Composable
 fun AutoUpdateEffect(policy: AutoUpdatePolicy, repository: PokemonRepository) {
     val lifecycleOwner = LocalLifecycleOwner.current
     LaunchedEffect(lifecycleOwner) {
         lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-            // 空のときの初回取得は SplashViewModel が済ませている
+            // 空のときの初回取得は一覧の ViewModel が済ませている
             if (!repository.isEmpty() &amp;&amp; policy.shouldUpdate()) {
                 repository.refresh().onSuccess { policy.recordSuccess() }
             }
