@@ -194,6 +194,11 @@ figure.diagram{
   padding:20px; overflow-x:auto;
 }
 figure.diagram pre{margin:0}
+/* mermaid は display:none の中では採寸できないため、描画中だけ画面外に出す */
+.doc.measuring{
+  display:block !important; position:fixed !important;
+  left:-99999px !important; top:0 !important; width:47rem !important;
+}
 figure.diagram svg{max-width:none; height:auto}
 
 /* ---------- チェックリスト ---------- */
@@ -3116,13 +3121,23 @@ function goToAnchor(anchor, smooth){
   return true;
 }
 
+let pendingAnchor = null;
 function applyHash(){
   const raw = decodeURIComponent(location.hash.slice(1));
   if (!raw) { show(NAV[0].id); return; }
-  if (goToAnchor(raw)) return;
+  if (goToAnchor(raw)) { pendingAnchor = raw; return; }
   const doc = NAV.find(d => stem(d.file) === raw);      // 文書だけを指す形も許す
   show(doc ? doc.id : NAV[0].id);
 }
+
+/** フォントや図の読み込みでレイアウトがずれるので、落ち着いてから位置を合わせ直す */
+function resettleAnchor(){
+  if (!pendingAnchor) return;
+  const el = document.getElementById(pendingAnchor);
+  if (el) el.scrollIntoView({block: "start"});
+}
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(resettleAnchor);
+window.addEventListener("load", resettleAnchor);
 window.addEventListener("hashchange", applyHash);
 
 /* 文書間リンクを画面切り替えに繋ぐ */
@@ -3333,4 +3348,34 @@ toggle.addEventListener("click", () => {
 });
 
 applyHash();
+
+/* ---------- 図の描画 ----------
+   アーティファクト上では閲覧側が mermaid を描画するため、この読み込みは失敗してよい。
+   GitHub Pages では自前で読み込んで描画する。 */
+(function renderDiagrams(){
+  const blocks = document.querySelectorAll("pre.mermaid");
+  if (!blocks.length) return;
+
+  const script = document.createElement("script");
+  script.src = "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js";
+  script.onload = async () => {
+    if (document.querySelector("figure.diagram svg")) return;   // 既に描画済みなら何もしない
+    const dark = document.documentElement.dataset.theme === "dark"
+      || (document.documentElement.dataset.theme !== "light"
+          && window.matchMedia("(prefers-color-scheme: dark)").matches);
+    mermaid.initialize({startOnLoad: false, theme: dark ? "dark" : "default", securityLevel: "loose"});
+
+    // 非表示の文書は採寸できないので、描画のあいだだけ画面外に出す
+    const docs = Array.prototype.slice.call(document.querySelectorAll(".doc"));
+    const hiddenBefore = docs.map(d => d.hidden);
+    docs.forEach(d => { if (d.hidden) { d.hidden = false; d.classList.add("measuring"); } });
+    try { await mermaid.run({nodes: blocks}); }
+    catch (e) { console.warn("図の描画に失敗しました", e); }
+    docs.forEach((d, i) => { d.classList.remove("measuring"); d.hidden = hiddenBefore[i]; });
+
+    resettleAnchor();
+  };
+  script.onerror = () => {};   // 読み込めない環境では素のテキストのまま
+  document.head.appendChild(script);
+})();
 </script>
