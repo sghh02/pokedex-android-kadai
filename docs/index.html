@@ -1,0 +1,3336 @@
+<title>ポケモン図鑑アプリ 最終課題</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Old+Mincho:wght@500;700;900&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+:root{
+  --paper:#F2F5F1; --surface:#FFFFFF; --surface-2:#E8EDE6; --surface-3:#DFE6DC;
+  --ink:#16201A; --ink-2:#4C574E; --ink-3:#727D74;
+  --line:#D2DACE; --line-soft:#E2E8DF;
+  --accent:#A81E36; --accent-ink:#8E1A2E; --accent-soft:#F5DFE3;
+  --lens:#1B6A80; --lens-soft:#DCEBEF;
+  --done:#4A7530; --done-soft:#E2EDD8;
+  --shadow:0 1px 2px rgba(22,32,26,.06), 0 8px 24px -12px rgba(22,32,26,.18);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#121711; --surface:#191F18; --surface-2:#212820; --surface-3:#2A322A;
+    --ink:#E7ECE5; --ink-2:#A9B4A7; --ink-3:#7E897D;
+    --line:#2E372D; --line-soft:#252D25;
+    --accent:#E8798D; --accent-ink:#F0A2B0; --accent-soft:#3B1F26;
+    --lens:#6FBACF; --lens-soft:#16303A;
+    --done:#93C765; --done-soft:#1E2C17;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#121711; --surface:#191F18; --surface-2:#212820; --surface-3:#2A322A;
+  --ink:#E7ECE5; --ink-2:#A9B4A7; --ink-3:#7E897D;
+  --line:#2E372D; --line-soft:#252D25;
+  --accent:#E8798D; --accent-ink:#F0A2B0; --accent-soft:#3B1F26;
+  --lens:#6FBACF; --lens-soft:#16303A;
+  --done:#93C765; --done-soft:#1E2C17;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family:"Zen Kaku Gothic New","Hiragino Sans","Noto Sans JP",system-ui,sans-serif;
+  font-size:16px; line-height:1.95; -webkit-font-smoothing:antialiased;
+}
+a{color:var(--accent-ink)}
+:focus-visible{outline:2px solid var(--accent); outline-offset:2px; border-radius:3px}
+
+/* ---------- 骨格 ---------- */
+.shell{display:grid; grid-template-columns:288px minmax(0,1fr); min-height:100vh}
+.rail{
+  grid-column:1; border-right:1px solid var(--line); background:var(--surface);
+  position:sticky; top:0; height:100vh; overflow-y:auto; overscroll-behavior:contain;
+}
+.main{grid-column:2; min-width:0; display:flex; flex-direction:column; align-items:center}
+
+/* ---------- 銘板 ---------- */
+.plate{padding:26px 22px 20px; border-bottom:1px solid var(--line)}
+.plate .lens{display:flex; align-items:center; gap:10px; margin-bottom:14px}
+.lens i{
+  width:15px; height:15px; border-radius:50%; display:block;
+  background:radial-gradient(circle at 32% 30%, #fff 0 12%, var(--lens) 55%, #0d3a47 100%);
+  box-shadow:0 0 0 3px var(--lens-soft);
+}
+.lens b{width:7px; height:7px; border-radius:50%; display:block; background:var(--accent); opacity:.85}
+.lens b:nth-of-type(2){background:var(--done)}
+.lens b:nth-of-type(3){background:var(--lens)}
+.plate h1{
+  font-family:"Zen Old Mincho",serif; font-weight:900; font-size:1.32rem;
+  line-height:1.45; margin:0 0 4px; letter-spacing:.01em; text-wrap:balance;
+}
+.plate p{margin:0; font-size:.76rem; color:var(--ink-3); letter-spacing:.06em}
+
+/* ---------- 目次 ---------- */
+nav{padding:14px 12px 60px}
+.doclist{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:2px}
+.docbtn{
+  width:100%; text-align:left; background:none; border:0; cursor:pointer; color:inherit;
+  font-family:inherit; font-size:.9rem; padding:9px 12px 9px 13px; border-radius:7px;
+  display:grid; grid-template-columns:auto 1fr; gap:2px 10px; align-items:baseline;
+  border-left:3px solid transparent; transition:background .15s;
+}
+.docbtn:hover{background:var(--surface-2)}
+.docbtn .n{
+  font-family:"JetBrains Mono",monospace; font-size:.7rem; color:var(--ink-3);
+  font-variant-numeric:tabular-nums;
+}
+.docbtn .t{font-weight:500}
+.docbtn .b{grid-column:2; font-size:.72rem; color:var(--ink-3); line-height:1.5}
+.docbtn[aria-current="true"]{background:var(--accent-soft); border-left-color:var(--accent)}
+.docbtn[aria-current="true"] .t{color:var(--accent-ink); font-weight:700}
+.docbtn[aria-current="true"] .n{color:var(--accent-ink)}
+
+.toc{list-style:none; margin:4px 0 10px; padding:0 0 0 15px; border-left:1px solid var(--line-soft)}
+.toc a{
+  display:block; padding:4px 10px; font-size:.78rem; line-height:1.5;
+  color:var(--ink-2); text-decoration:none; border-radius:5px;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+.toc a:hover{background:var(--surface-2); color:var(--ink)}
+.toc a.lv3{padding-left:22px; font-size:.74rem; color:var(--ink-3)}
+.toc a.here{color:var(--accent-ink); background:var(--accent-soft); font-weight:700}
+
+/* ---------- 本文 ---------- */
+.doc{width:100%; max-width:47rem; padding:56px 32px 140px}
+.doc[hidden]{display:none}
+.doc>*:first-child{margin-top:0}
+
+h1,h2,h3,h4,h5,h6{font-family:"Zen Old Mincho",serif; text-wrap:balance; letter-spacing:.01em}
+.doc h1{
+  font-size:clamp(1.85rem,1.3rem + 1.7vw,2.5rem); font-weight:900; line-height:1.4;
+  margin:0 0 34px; padding-bottom:20px; border-bottom:3px double var(--line);
+}
+.doc h2{
+  font-size:1.42rem; font-weight:700; line-height:1.5; margin:64px 0 20px;
+  padding-left:16px; border-left:5px solid var(--accent);
+}
+.doc h3{font-size:1.1rem; font-weight:700; margin:40px 0 14px; color:var(--ink)}
+/* 目次から飛んだとき、上に固定された進捗バーで見出しが隠れないようにする */
+.doc h2,.doc h3{scroll-margin-top:96px}
+.doc h4{
+  font-size:.82rem; font-weight:700; margin:28px 0 10px; color:var(--ink-3);
+  letter-spacing:.13em; font-family:"Zen Kaku Gothic New",sans-serif;
+}
+.doc h5,.doc h6{font-size:.95rem; font-weight:700; margin:24px 0 8px; color:var(--ink-2)}
+.doc p{margin:0 0 1.25em}
+hr{border:0; border-top:1px solid var(--line); margin:56px 0}
+
+.doc ul,.doc ol{margin:0 0 1.3em; padding-left:1.5em}
+.doc li{margin-bottom:.42em}
+.doc li>ul,.doc li>ol{margin:.45em 0 .1em}
+.doc ol{list-style:decimal}
+.doc ul{list-style:none}
+.doc ul>li{position:relative}
+.doc ul>li::before{
+  content:""; position:absolute; left:-1.05em; top:.82em;
+  width:5px; height:5px; background:var(--accent); opacity:.55; border-radius:1px;
+}
+.doc ul ul>li::before{background:var(--ink-3); opacity:.5; border-radius:50%}
+.doc li.task::before{display:none}
+
+blockquote{
+  margin:1.6em 0; padding:16px 20px; background:var(--lens-soft);
+  border-left:4px solid var(--lens); border-radius:0 8px 8px 0;
+  font-size:.92rem; line-height:1.85; color:var(--ink-2);
+}
+blockquote strong{color:var(--ink)}
+
+code{
+  font-family:"JetBrains Mono",ui-monospace,monospace; font-size:.85em;
+  background:var(--surface-2); padding:.14em .42em; border-radius:4px;
+  border:1px solid var(--line-soft); word-break:break-word;
+}
+
+/* ---------- 幅の要る要素（内側で横スクロールさせ、本文は横に流さない） ---------- */
+.table-wrap,figure.code,figure.diagram{margin:1.7em 0; width:100%}
+/* 余白のある画面でだけ、本文より少しはみ出させる */
+@media (min-width:1240px){
+  .table-wrap,figure.code,figure.diagram{width:calc(100% + 6rem); margin-left:-3rem}
+}
+.table-wrap{overflow-x:auto; border:1px solid var(--line); border-radius:10px; background:var(--surface)}
+table{border-collapse:collapse; width:100%; font-size:.87rem; line-height:1.7}
+th,td{padding:11px 15px; text-align:left; border-bottom:1px solid var(--line-soft); vertical-align:top}
+thead th{
+  background:var(--surface-2); font-weight:700; font-size:.76rem;
+  letter-spacing:.06em; color:var(--ink-2); white-space:nowrap;
+}
+tbody tr:last-child td{border-bottom:0}
+td code{font-size:.82em}
+
+figure.code{border:1px solid var(--line); border-radius:10px; overflow:hidden; background:var(--surface)}
+.code-head{
+  display:flex; justify-content:space-between; align-items:center;
+  padding:7px 14px; background:var(--surface-2); border-bottom:1px solid var(--line);
+  font-family:"JetBrains Mono",monospace; font-size:.68rem;
+  letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3);
+}
+.copy{
+  font:inherit; font-size:.68rem; letter-spacing:.08em; text-transform:uppercase;
+  background:none; border:1px solid var(--line); color:var(--ink-3);
+  padding:3px 10px; border-radius:5px; cursor:pointer; transition:.15s;
+}
+.copy:hover{border-color:var(--lens); color:var(--lens)}
+.copy.done{border-color:var(--done); color:var(--done)}
+figure.code pre{margin:0; padding:16px 18px; overflow-x:auto}
+figure.code code{
+  background:none; border:0; padding:0; font-size:.82rem; line-height:1.75;
+  display:block; white-space:pre;
+}
+.tok-c{color:var(--ink-3); font-style:italic}
+.tok-s{color:var(--done)}
+.tok-k{color:var(--accent-ink); font-weight:600}
+.tok-a{color:var(--lens)}
+.tok-n{color:var(--lens)}
+
+figure.diagram{
+  border:1px solid var(--line); border-radius:10px; background:var(--surface);
+  padding:20px; overflow-x:auto;
+}
+figure.diagram pre{margin:0}
+figure.diagram svg{max-width:none; height:auto}
+
+/* ---------- チェックリスト ---------- */
+li.task{list-style:none; margin-left:-1.5em; padding-left:0}
+li.task label{
+  display:flex; gap:11px; align-items:flex-start; cursor:pointer;
+  padding:5px 10px; border-radius:7px; transition:background .15s;
+}
+li.task label:hover{background:var(--surface-2)}
+li.task input{
+  appearance:none; flex:0 0 auto; width:17px; height:17px; margin-top:.42em;
+  border:2px solid var(--ink-3); border-radius:4px; cursor:pointer;
+  background:var(--surface); transition:.15s; position:relative;
+}
+li.task input:checked{background:var(--done); border-color:var(--done)}
+li.task input:checked::after{
+  content:""; position:absolute; left:4.5px; top:1px; width:4px; height:9px;
+  border:solid var(--surface); border-width:0 2.5px 2.5px 0; transform:rotate(42deg);
+}
+li.task input:checked+span{
+  color:var(--ink-3); text-decoration:line-through;
+  text-decoration-color:var(--ink-3); text-decoration-thickness:1px;
+}
+
+.progress{
+  position:sticky; top:0; z-index:5; margin:0 0 2em;
+  background:var(--surface); border:1px solid var(--line); border-radius:10px;
+  padding:14px 18px; box-shadow:var(--shadow);
+}
+.progress .row{display:flex; justify-content:space-between; align-items:baseline; gap:16px}
+.progress .lbl{font-size:.78rem; letter-spacing:.08em; color:var(--ink-3)}
+.progress .num{
+  font-family:"JetBrains Mono",monospace; font-size:.95rem; font-weight:600;
+  font-variant-numeric:tabular-nums; color:var(--accent-ink);
+}
+.progress .bar{height:6px; background:var(--surface-3); border-radius:3px; margin-top:10px; overflow:hidden}
+.progress .fill{height:100%; background:var(--done); width:0; transition:width .35s ease; border-radius:3px}
+.progress button{
+  font:inherit; font-size:.72rem; background:none; border:1px solid var(--line);
+  color:var(--ink-3); padding:3px 10px; border-radius:5px; cursor:pointer;
+}
+.progress button:hover{border-color:var(--accent); color:var(--accent-ink)}
+
+/* ---------- Issue のフェーズ表示 ---------- */
+.badge{
+  display:inline-block; vertical-align:.18em; margin-left:12px;
+  font-family:"Zen Kaku Gothic New",sans-serif; font-size:.66rem; font-weight:700;
+  letter-spacing:.08em; padding:3px 9px; border-radius:99px; white-space:nowrap;
+  background:var(--accent-soft); color:var(--accent-ink); border:1px solid transparent;
+}
+.badge.p2{background:var(--lens-soft); color:var(--lens)}
+.badge.bonus{background:var(--done-soft); color:var(--done)}
+.badge.submit{background:var(--surface-3); color:var(--ink-2)}
+
+/* Issue の索引 */
+.issue-index{margin:0 0 2.4em}
+.issue-index .cap{
+  font-size:.78rem; letter-spacing:.08em; color:var(--ink-3); margin:0 0 10px;
+}
+.issue-index .grid{
+  display:grid; grid-template-columns:repeat(auto-fill, minmax(168px,1fr)); gap:6px;
+}
+.issue-index a{
+  display:flex; align-items:center; gap:7px; text-decoration:none;
+  padding:7px 10px; border:1px solid var(--line); border-radius:7px;
+  background:var(--surface); color:var(--ink-2); font-size:.76rem; line-height:1.35;
+  transition:border-color .15s, background .15s;
+}
+.issue-index a:hover{border-color:var(--accent); background:var(--surface-2)}
+.issue-index .no{
+  font-family:"JetBrains Mono",monospace; font-weight:600; font-size:.72rem;
+  color:var(--accent-ink); font-variant-numeric:tabular-nums; flex:0 0 auto;
+}
+.issue-index a.p2 .no{color:var(--lens)}
+.issue-index a.bonus .no{color:var(--done)}
+.issue-index a.submit .no{color:var(--ink-3)}
+.issue-index .nm{overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.issue-index a.complete{background:var(--done-soft); border-color:var(--done)}
+.issue-index a.complete .no,.issue-index a.complete .nm{color:var(--done)}
+
+/* ---------- モバイル ---------- */
+.railtoggle{display:none}
+@media (max-width:900px){
+  .shell{grid-template-columns:1fr}
+  .rail{
+    position:fixed; inset:0 auto 0 0; width:288px; z-index:20;
+    transform:translateX(-100%); transition:transform .25s ease;
+  }
+  .rail.open{transform:none; box-shadow:0 0 0 100vw rgba(0,0,0,.4)}
+  .main{grid-column:1}
+  .doc{padding:80px 20px 120px}
+  .table-wrap,figure.code,figure.diagram{width:calc(100vw - 40px)}
+  .railtoggle{
+    display:flex; align-items:center; gap:8px; position:fixed; top:12px; left:12px; z-index:30;
+    font:inherit; font-size:.82rem; background:var(--surface); color:var(--ink);
+    border:1px solid var(--line); border-radius:8px; padding:8px 14px;
+    cursor:pointer; box-shadow:var(--shadow);
+  }
+}
+@media (prefers-reduced-motion:reduce){*{transition:none !important; animation:none !important}}
+</style>
+
+<button class="railtoggle" type="button" aria-expanded="false">目次</button>
+
+<div class="shell">
+  <aside class="rail">
+    <div class="plate">
+      <div class="lens"><i></i><b></b><b></b><b></b></div>
+      <h1>ポケモン図鑑アプリ<br>最終課題</h1>
+      <p>ANDROID / KOTLIN · KANTO 151</p>
+    </div>
+    <nav><ul class="doclist" id="doclist"></ul></nav>
+  </aside>
+  <main class="main"><section class="doc" id="doc-0" data-file="README.md"><h1 id="モバイルアプリ開発-最終課題">モバイルアプリ開発 最終課題</h1>
+<p>カントー地方のポケモン図鑑アプリを <strong>Android ネイティブ（Kotlin + Jetpack Compose）</strong> で実装します。全16 Issue、4週間で完成する構成です。</p>
+<p>上から順に読んでいけば、何を作るのか、どう作るのか、どこから手をつけるのかが分かります。</p>
+<h2 id="何を作るのか">何を作るのか</h2>
+<p>PokeAPI からカントー地方の151匹を取得して、一覧と詳細を表示する図鑑アプリです。一度取得したデータは端末に保存し、電波がなくても見られるようにします。</p>
+<p>なぜ作るのか、誰のためのものか、どこまでを対象にするのかは<a class="lnk" href="01_要件定義.md" data-doc="01_要件定義.md">01 要件定義</a> に書いてあります。</p>
+<h2 id="どう作るのか">どう作るのか</h2>
+<p><a class="lnk" href="02_基本設計.md" data-doc="02_基本設計.md">02 基本設計</a> が全体の骨組みです。画面の一覧と遷移図、PokeAPI とのやりとり、テーブル構成といった「形」が決まります。</p>
+<p>そのうえで <a class="lnk" href="03_詳細設計.md" data-doc="03_詳細設計.md">03 詳細設計</a> が、機能ごとのシーケンス図とKotlin の実装例まで踏み込みます。分量があるので、実装する機能のところだけ読めば十分です。</p>
+<h2 id="今回どこまで作るのか">今回どこまで作るのか</h2>
+<p><a class="lnk" href="04_実装仕様.md" data-doc="04_実装仕様.md">04 実装仕様</a> が課題としての範囲を決めます。必須機能と加点機能、実装の共通ルール、技術スタック、評価基準の配点、4週間のスケジュール。迷ったらこの文書が基準です。</p>
+<p>Kotlin / Jetpack Compose / ViewModel + StateFlow / Room / Retrofit / Coil / Navigation Compose、<code>minSdk</code> は 26（Android 8.0）を使います。</p>
+<h2 id="手を動かす">手を動かす</h2>
+<p><a class="lnk" href="05_環境構築ガイド.md" data-doc="05_環境構築ガイド.md">05 環境構築ガイド</a> に沿って、Fork から最初のビルドまで通します。リポジトリを Fork して clone し、プロジェクトを作り、依存を追加して、PokeAPI に繋がるところまで。ここまでで Issue <code>#1</code> と <code>#2</code> が終わります。</p>
+<h2 id="実装する">実装する</h2>
+<p>あとは <a class="lnk ext" href="https://github.com/sghh02/pokedex-android-kadai/issues" target="_blank" rel="noopener">Issues</a> を <code>#1</code> から順に進めるだけです。</p>
+<ol>
+<li>Issue ごとにブランチを切る
+</li>
+<li>実装する
+</li>
+<li>プルリクエストを作成する
+</li>
+<li>メンターに PR の URL を添えてレビューを依頼する
+</li>
+<li>LGTM をもらったら、その Issue は完了
+</li></ol>
+<p>各 Issue には受け入れ条件が付いています。すべて満たしてからレビューを依頼してください。</p>
+<div class="table-wrap"><table><thead><tr><th>週</th><th>Issue</th><th>やること</th></tr></thead><tbody><tr><td>1週目</td><td>#1 〜 #2</td><td>環境構築</td></tr><tr><td>2週目</td><td>#3 〜 #5</td><td>データレイヤー</td></tr><tr><td>3週目</td><td>#6 〜 #10</td><td>UIレイヤー（ここまでで必須要件を満たす）</td></tr><tr><td>4週目</td><td>#11 〜 #16</td><td>機能拡張・提出</td></tr></tbody></table></div>
+<p><code>#1</code> 〜 <code>#10</code> が必須要件（70点）、<code>#11</code> 〜 <code>#14</code> が加点要件（+30点）、<code>#15</code> がボーナス、<code>#16</code> が提出物です。</p>
+<h2 id="素材">素材</h2>
+<ul>
+<li><a class="lnk" href="素材/画面素材" data-doc="素材/画面素材">画面素材</a> — 画面モック（HTML）とスクリーンショット
+</li>
+<li><a class="lnk" href="素材/launcher_icon" data-doc="素材/launcher_icon">launcher_icon</a> — アプリアイコン
+</li>
+<li><a class="lnk ext" href="https://www.figma.com/design/b0kI8aTikCubCeKQdcSKEC/%E3%83%9D%E3%82%B1%E3%83%A2%E3%83%B3%E5%9B%B3%E9%91%91%28%E3%82%AB%E3%83%B3%E3%83%88%E3%83%BC%E5%9C%B0%E6%96%B9%29%E3%83%87%E3%82%B6%E3%82%A4%E3%83%B3?node-id=3-40&amp;t=c3mklPkvnhvy8Sp5-1" target="_blank" rel="noopener">Figma デザイン</a> — 画面レイアウト
+</li></ul>
+<p>01・02 の末尾には、要件定義・基本設計という工程そのものの解説を付録として収録しています。<a class="lnk" href="最終課題_全文.md" data-doc="最終課題_全文.md">最終課題_全文.md</a> は設計書5冊を1ファイルに結合したものです。</p></section>
+<section class="doc" id="doc-1" data-file="05_環境構築ガイド.md" hidden><h1 id="環境構築ガイド">環境構築ガイド</h1>
+<p><a class="lnk ext" href="https://github.com/sghh02/pokedex-android-kadai/issues" target="_blank" rel="noopener">Issue</a> の <code>#1</code> と <code>#2</code> を進めるための手順です。ここまで通れば、以降の Issue は実装に集中できます。</p>
+<h2 id="1-前提">1. 前提</h2>
+<div class="table-wrap"><table><thead><tr><th>項目</th><th>要件</th></tr></thead><tbody><tr><td>Android Studio</td><td>最新の安定版</td></tr><tr><td>JDK</td><td>Android Studio 同梱の JDK（17以上）</td></tr><tr><td>確認端末</td><td>エミュレータ（API 26 以上）または実機</td></tr></tbody></table></div>
+<h2 id="2-リポジトリを-fork-して手元に置く">2. リポジトリを Fork して手元に置く</h2>
+<h3 id="2-1-fork-とは">2.1 Fork とは</h3>
+<p>Fork は、他人のリポジトリを <strong>自分のアカウントに丸ごとコピー</strong>する GitHub の機能です。コピーされたリポジトリは自分のものなので、自由にコミットもプッシュもできます。</p>
+<p>課題リポジトリに直接プッシュする権限はありません。必ず Fork してから作業します。</p>
+<h3 id="2-2-fork-する">2.2 Fork する</h3>
+<ol>
+<li>課題リポジトリ &lt;https://github.com/sghh02/pokedex-android-kadai&gt; を開く
+</li>
+<li>ページ右上の <strong>Fork</strong> ボタンを押す
+</li>
+<li>表示された画面で次を確認する
+<ul>
+<li><strong>Owner</strong>: 自分のアカウント
+</li>
+<li><strong>Repository name</strong>: <code>pokedex-android-kadai</code> のまま
+</li>
+<li><strong>Copy the main branch only</strong>: チェックが入ったままでよい
+</li></ul>
+</li>
+<li><strong>Create fork</strong> を押す
+</li></ol>
+<p>数秒で <code>https://github.com/&lt;自分のアカウント&gt;/pokedex-android-kadai</code> ができます。以降の作業はすべてこの<strong>自分の</strong>リポジトリに対して行います。</p>
+<blockquote><strong>Issue は Fork にコピーされません。</strong> これは GitHub の仕様です。 自分の Fork の Issues タブは空のままで問題ありません。 実装タスクは元のリポジトリの <a class="lnk ext" href="https://github.com/sghh02/pokedex-android-kadai/issues" target="_blank" rel="noopener">Issues</a> を見てください。</blockquote>
+<h3 id="2-3-clone-して手元に持ってくる">2.3 clone して手元に持ってくる</h3>
+<p>Fork したリポジトリのページで緑の <strong>Code</strong> ボタンを押し、<strong>HTTPS</strong> のURLをコピーします。<code>https://github.com/&lt;自分のアカウント&gt;/pokedex-android-kadai.git</code> の形です。</p>
+<figure class="code"><div class="code-head"><span>bash</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-bash">cd ~          # 作業したい場所へ移動する
+git clone https://github.com/&lt;自分のアカウント&gt;/pokedex-android-kadai.git
+cd pokedex-android-kadai</code></pre></figure>
+<p><code>README.md</code> と <code>素材/</code> が入っていれば成功です。</p>
+<figure class="code"><div class="code-head"><span>bash</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-bash">ls</code></pre></figure>
+<h3 id="2-4-push-できるようにする">2.4 push できるようにする</h3>
+<p>初めて push するとき、ユーザー名とパスワードを聞かれます。<strong>ここでのパスワードは GitHub のログインパスワードではなく、Personal Access Token（PAT）です。</strong>2021年以降、パスワードでの push はできなくなっています。</p>
+<ol>
+<li>GitHub の <strong>Settings → Developer settings → Personal access tokens → Tokens (classic)</strong> を開く
+</li>
+<li><strong>Generate new token (classic)</strong> を押す
+</li>
+<li>設定
+<ul>
+<li><strong>Note</strong>: <code>pokedex-kadai</code> など分かる名前
+</li>
+<li><strong>Expiration</strong>: 課題期間をカバーする長さ（90 days など）
+</li>
+<li><strong>Select scopes</strong>: <strong>repo</strong> にチェック
+</li></ul>
+</li>
+<li><strong>Generate token</strong> を押し、表示された文字列をコピーする
+</li></ol>
+<blockquote><strong>トークンは一度しか表示されません。</strong> その場でパスワード管理ツールなどに保存してください。 紛失したら作り直します。</blockquote>
+<p>push 時に聞かれたら、Username には GitHub のアカウント名、Password にはこのトークンを貼り付けます。毎回聞かれないよう、保存しておくと楽です。</p>
+<figure class="code"><div class="code-head"><span>bash</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-bash">git config --global credential.helper osxkeychain   # macOS
+# Windows は Git for Windows 同梱の manager が既定で有効</code></pre></figure>
+<h3 id="2-5-コミットに使う名前を設定する">2.5 コミットに使う名前を設定する</h3>
+<p>まだ設定していなければ、コミットに記録される名前とメールアドレスを登録します。</p>
+<figure class="code"><div class="code-head"><span>bash</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-bash">git config --global user.name &quot;Your Name&quot;
+git config --global user.email &quot;you@example.com&quot;</code></pre></figure>
+<h3 id="2-6-作業ブランチを切る">2.6 作業ブランチを切る</h3>
+<p><code>main</code> に直接コミットせず、Issue ごとにブランチを切ります。</p>
+<figure class="code"><div class="code-head"><span>bash</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-bash">git switch -c feature/1-setup</code></pre></figure>
+<p>ブランチ名は <code>feature/&lt;Issue番号&gt;-&lt;内容&gt;</code> の形にすると、どの Issue の作業か一目で分かります。<code>feature/3-room</code>、<code>feature/7-list-screen</code> のように。</p>
+<p>以降は <strong>1 Issue = 1 ブランチ = 1 プルリクエスト</strong>で進めます。<code>.gitignore</code> は用意済みなので、ビルド成果物や署名鍵は自動的に除外されます。</p>
+<h2 id="3-プロジェクトを作る">3. プロジェクトを作る</h2>
+<p>Android Studio の <strong>New Project</strong> は空のディレクトリにしか作れません。別の場所に作ってから、clone したディレクトリへ移します。</p>
+<ol>
+<li>Android Studio で <strong>New Project → Empty Activity</strong>（Compose のテンプレート）を選ぶ
+</li>
+<li>設定値
+<ul>
+<li>Name: <code>Pokedex</code>
+</li>
+<li>Package name: <code>com.example.pokedex</code>
+</li>
+<li>Language: Kotlin
+</li>
+<li><strong>Minimum SDK: API 26（Android 8.0）</strong> — 要件定義の対応OSに合わせる
+</li>
+<li>Location: 一時的な場所でよい（例: <code>~/tmp/Pokedex</code>）
+</li></ul>
+</li>
+<li>生成されたファイルを、clone したディレクトリの直下へ移す
+</li></ol>
+<figure class="code"><div class="code-head"><span>bash</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-bash"># clone したディレクトリで実行する
+rsync -a --exclude .git ~/tmp/Pokedex/ .
+rm -rf ~/tmp/Pokedex</code></pre></figure>
+<ol>
+<li>Android Studio で clone したディレクトリを <strong>Open</strong> し直し、ビルドが通ることを確認する
+</li></ol>
+<blockquote><code>minSdk</code> を 26 にすることで <code>java.time</code>（<code>LocalDate</code> / <code>LocalTime</code>）が desugaring なしで使えます。自動更新の判定（<code>#14</code>）で必要になります。</blockquote>
+<h2 id="4-依存の追加">4. 依存の追加</h2>
+<h3 id="バージョンの扱い">バージョンの扱い</h3>
+<p><strong>Kotlin / AGP / Compose のバージョンは、ウィザードが生成したものをそのまま使ってください。</strong>この3つは互いに強く結合しており、手で差し替えると噛み合わなくなります。</p>
+<p>一方、以下に挙げるライブラリは比較的独立しているので、明示的に追加します。記載のバージョンは執筆時点の安定版です。Android Studio が更新を提案してきたら従って構いません。</p>
+<blockquote><strong>KSP だけは注意。</strong> KSP のバージョンは Kotlin のバージョンに対応するものを選ぶ必要があります。 ビルド時に「ksp が Kotlin x.y.z に対応していない」と怒られたら、 <a class="lnk ext" href="https://github.com/google/ksp/releases" target="_blank" rel="noopener">KSP のリリース一覧</a>から対応する版を探してください。</blockquote>
+<h3 id="gradle-libs-versions-toml"><code>gradle/libs.versions.toml</code></h3>
+<blockquote><strong>既存のファイルへの「追記」です。</strong> ウィザードが生成した <code>agp</code> / <code>kotlin</code> / <code>composeBom</code> などの行は消さずに残してください。消すとビルドが通らなくなります。</blockquote>
+<figure class="code"><div class="code-head"><span>toml</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-toml">[versions]
+# ↓ 既存の行はそのまま。以下を追記する
+ksp = &quot;2.3.11&quot;
+room = &quot;2.8.4&quot;
+retrofit = &quot;3.0.0&quot;
+okhttp = &quot;5.5.0&quot;
+kotlinxSerialization = &quot;1.11.0&quot;
+coil = &quot;3.6.0&quot;
+navigation = &quot;2.10.0&quot;
+lifecycle = &quot;2.11.0&quot;
+datastore = &quot;1.2.1&quot;
+
+[libraries]
+room-runtime  = { module = &quot;androidx.room:room-runtime&quot;,  version.ref = &quot;room&quot; }
+room-ktx      = { module = &quot;androidx.room:room-ktx&quot;,      version.ref = &quot;room&quot; }
+room-compiler = { module = &quot;androidx.room:room-compiler&quot;, version.ref = &quot;room&quot; }
+room-testing  = { module = &quot;androidx.room:room-testing&quot;,  version.ref = &quot;room&quot; }
+
+retrofit                 = { module = &quot;com.squareup.retrofit2:retrofit&quot;, version.ref = &quot;retrofit&quot; }
+retrofit-serialization   = { module = &quot;com.squareup.retrofit2:converter-kotlinx-serialization&quot;, version.ref = &quot;retrofit&quot; }
+okhttp-logging           = { module = &quot;com.squareup.okhttp3:logging-interceptor&quot;, version.ref = &quot;okhttp&quot; }
+kotlinx-serialization-json = { module = &quot;org.jetbrains.kotlinx:kotlinx-serialization-json&quot;, version.ref = &quot;kotlinxSerialization&quot; }
+
+coil-compose        = { module = &quot;io.coil-kt.coil3:coil-compose&quot;,        version.ref = &quot;coil&quot; }
+coil-network-okhttp = { module = &quot;io.coil-kt.coil3:coil-network-okhttp&quot;, version.ref = &quot;coil&quot; }
+
+navigation-compose        = { module = &quot;androidx.navigation:navigation-compose&quot;, version.ref = &quot;navigation&quot; }
+lifecycle-viewmodel-compose = { module = &quot;androidx.lifecycle:lifecycle-viewmodel-compose&quot;, version.ref = &quot;lifecycle&quot; }
+lifecycle-runtime-compose   = { module = &quot;androidx.lifecycle:lifecycle-runtime-compose&quot;,   version.ref = &quot;lifecycle&quot; }
+datastore-preferences       = { module = &quot;androidx.datastore:datastore-preferences&quot;,       version.ref = &quot;datastore&quot; }
+
+[plugins]
+# android-application / kotlin-android / kotlin-compose はウィザードが生成済みなので
+# そのまま残す。追記するのは次の2つだけ。
+# version.ref = &quot;kotlin&quot; は、ウィザードが [versions] に書いた kotlin を参照する。
+kotlin-serialization = { id = &quot;org.jetbrains.kotlin.plugin.serialization&quot;, version.ref = &quot;kotlin&quot; }
+ksp                  = { id = &quot;com.google.devtools.ksp&quot;,                   version.ref = &quot;ksp&quot; }</code></pre></figure>
+<blockquote><strong>Coil 3 は artifact が2つに分かれています。</strong> <code>coil-compose</code> だけでは ネットワーク画像を読み込めません。<code>coil-network-okhttp</code> も必ず追加してください。 ここを忘れて「画像が表示されない」で止まる人が多い箇所です。</blockquote>
+<h3 id="ルートの-build-gradle-kts">ルートの <code>build.gradle.kts</code></h3>
+<p>追加した2つのプラグインを、ルートで宣言します（<code>apply false</code> を付けるのがポイントです）。</p>
+<figure class="code"><div class="code-head"><span>kotlin</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-kotlin">plugins {
+    alias(libs.plugins.android.application) apply false
+    alias(libs.plugins.kotlin.android) apply false
+    alias(libs.plugins.kotlin.compose) apply false
+    alias(libs.plugins.kotlin.serialization) apply false   // 追加
+    alias(libs.plugins.ksp) apply false                    // 追加
+}</code></pre></figure>
+<h3 id="app-build-gradle-kts"><code>app/build.gradle.kts</code></h3>
+<figure class="code"><div class="code-head"><span>kotlin</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-kotlin">plugins {
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlin.serialization)   // JSON の変換に必要
+    alias(libs.plugins.ksp)                    // Room のコード生成に必要
+}
+
+android {
+    namespace = &quot;com.example.pokedex&quot;
+    defaultConfig {
+        minSdk = 26
+    }
+    buildFeatures {
+        compose = true
+        buildConfig = true      // BuildConfig.DEBUG でログ出力を切り替えるために必要
+    }
+}
+
+dependencies {
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
+    ksp(libs.room.compiler)
+
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.serialization)
+    implementation(libs.okhttp.logging)
+    implementation(libs.kotlinx.serialization.json)
+
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
+
+    implementation(libs.navigation.compose)
+    implementation(libs.lifecycle.viewmodel.compose)
+    implementation(libs.lifecycle.runtime.compose)      // collectAsStateWithLifecycle
+    implementation(libs.datastore.preferences)
+
+    testImplementation(libs.room.testing)
+}</code></pre></figure>
+<p><code>libs.plugins.ksp</code> は <code>[plugins]</code> に宣言した ID から解決されます。<code>Plugin [id: &#x27;com.google.devtools.ksp&#x27;] was not found</code> と出たら、ルートの <code>build.gradle.kts</code> への <code>apply false</code> 付きの宣言を忘れていないか確認してください。</p>
+<h2 id="5-androidmanifest-xml">5. <code>AndroidManifest.xml</code></h2>
+<figure class="code"><div class="code-head"><span>xml</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-xml">&lt;manifest xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;&gt;
+
+    &lt;!-- PokeAPI との通信に必要 --&gt;
+    &lt;uses-permission android:name=&quot;android.permission.INTERNET&quot; /&gt;
+    &lt;!-- オフライン判定（NetworkMonitor）に必要 --&gt;
+    &lt;uses-permission android:name=&quot;android.permission.ACCESS_NETWORK_STATE&quot; /&gt;
+
+    &lt;application
+        android:name=&quot;.PokedexApplication&quot;
+        android:icon=&quot;@mipmap/ic_launcher&quot;
+        android:label=&quot;@string/app_name&quot;
+        android:theme=&quot;@style/Theme.Pokedex&quot;&gt;
+
+        &lt;activity
+            android:name=&quot;.MainActivity&quot;
+            android:exported=&quot;true&quot;&gt;
+            &lt;intent-filter&gt;
+                &lt;action android:name=&quot;android.intent.action.MAIN&quot; /&gt;
+                &lt;category android:name=&quot;android.intent.category.LAUNCHER&quot; /&gt;
+            &lt;/intent-filter&gt;
+        &lt;/activity&gt;
+    &lt;/application&gt;
+&lt;/manifest&gt;</code></pre></figure>
+<p><code>android:name=&quot;.PokedexApplication&quot;</code> の指定を忘れると、<code>AppContainer</code> が生成されず<code>lateinit property container has not been initialized</code> で落ちます。</p>
+<h2 id="6-パッケージ構成">6. パッケージ構成</h2>
+<figure class="code"><div class="code-head"><span>text</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-text">com.example.pokedex
+├── MainActivity.kt
+├── PokedexApplication.kt
+├── data
+│   ├── local          … Room（Entity / Dao / Database）
+│   ├── remote         … Retrofit（ApiService / DTO）
+│   └── repository     … PokemonRepository / UpdateService
+├── domain
+│   └── model          … Pokemon / PokemonDetail
+└── ui
+    ├── splash
+    ├── list
+    ├── detail
+    ├── settings
+    ├── component      … OfflineBanner / ErrorMessage など共通の部品
+    ├── navigation
+    └── theme</code></pre></figure>
+<h2 id="7-疎通確認-2">7. 疎通確認（<code>#2</code>）</h2>
+<figure class="code"><div class="code-head"><span>kotlin</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-kotlin">// data/remote/PokeApiService.kt
+interface PokeApiService {
+    @GET(&quot;pokemon&quot;)
+    suspend fun getPokemonList(
+        @Query(&quot;limit&quot;) limit: Int = 151,
+        @Query(&quot;offset&quot;) offset: Int = 0,
+    ): PokemonListResponse
+
+    @GET(&quot;pokemon/{id}&quot;)
+    suspend fun getPokemon(@Path(&quot;id&quot;) id: Int): PokemonDetailResponse
+
+    companion object {
+        const val BASE_URL = &quot;https://pokeapi.co/api/v2/&quot;   // 末尾のスラッシュは必須
+    }
+}
+
+@Serializable
+data class PokemonListResponse(
+    val count: Int,
+    val results: List&lt;PokemonListItem&gt;,
+)
+
+@Serializable
+data class PokemonListItem(
+    val name: String,
+    val url: String,      // 例: https://pokeapi.co/api/v2/pokemon/1/
+) {
+    // 一覧APIはIDを返さないため、URL の末尾から切り出す
+    val id: Int get() = url.trimEnd(&#x27;/&#x27;).substringAfterLast(&#x27;/&#x27;).toInt()
+}</code></pre></figure>
+<p>一時的に <code>MainActivity</code> から呼び出し、Logcat に件数が出れば疎通確認は完了です。</p>
+<figure class="code"><div class="code-head"><span>kotlin</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-kotlin">lifecycleScope.launch {
+    runCatching { api.getPokemonList() }
+        .onSuccess { Log.d(&quot;Pokedex&quot;, &quot;取得件数: ${it.results.size}&quot;) }   // 151 になる
+        .onFailure { Log.e(&quot;Pokedex&quot;, &quot;取得失敗&quot;, it) }
+}</code></pre></figure>
+<h2 id="8-プルリクエストを出す">8. プルリクエストを出す</h2>
+<p>Issue の実装が終わったら、レビューを依頼します。</p>
+<h3 id="8-1-コミットして-push-する">8.1 コミットして push する</h3>
+<figure class="code"><div class="code-head"><span>bash</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-bash">git add .
+git commit -m &quot;feat: プロジェクトの初期セットアップ&quot;
+git push -u origin feature/1-setup</code></pre></figure>
+<h3 id="8-2-プルリクエストを作る">8.2 プルリクエストを作る</h3>
+<p>push すると、GitHub のリポジトリページに<strong>Compare &amp; pull request</strong> のボタンが出るので押します。</p>
+<blockquote><strong>向き先に注意してください。</strong> Fork から PR を作ると、GitHub は初期状態で <strong>base repository を元のリポジトリ（sghh02/pokedex-android-kadai）</strong> にします。 そのままだと課題リポジトリへの PR になってしまいます。  <strong>base repository を自分の Fork に変更してください。</strong>  <code></code><code> base repository: &lt;自分のアカウント&gt;/pokedex-android-kadai   base: main ← head repository: &lt;自分のアカウント&gt;/pokedex-android-kadai   compare: feature/1-setup </code><code></code></blockquote>
+<h3 id="8-3-本文を書く">8.3 本文を書く</h3>
+<p>テンプレートが自動で入ります。埋めるのは次の4つです。</p>
+<ul>
+<li><strong>対応 Issue</strong> — 元リポジトリの Issue の URL を貼る
+</li>
+<li><strong>変更内容</strong> — 何を実装したか
+</li>
+<li><strong>受け入れ条件</strong> — Issue の条件をすべて満たしたらチェック
+</li>
+<li><strong>確認方法</strong> — レビュアーが動作を確かめる手順
+</li></ul>
+<p>画面に変更があるときは、スクリーンショットか短い動画を添えてください。</p>
+<h3 id="8-4-レビューを依頼する">8.4 レビューを依頼する</h3>
+<p><strong>Create pull request</strong> を押したあと、メンターに PR の URL を送ります。指摘があれば同じブランチにコミットを追加すれば、PR に自動で反映されます。</p>
+<p>LGTM をもらったらマージし、次の Issue のブランチを <code>main</code> から切り直します。</p>
+<figure class="code"><div class="code-head"><span>bash</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-bash">git switch main
+git pull
+git switch -c feature/2-api</code></pre></figure>
+<h2 id="9-よくあるつまずき">9. よくあるつまずき</h2>
+<div class="table-wrap"><table><thead><tr><th>症状</th><th>原因と対処</th></tr></thead><tbody><tr><td><code>SecurityException: Permission denied</code></td><td><code>INTERNET</code> 権限が未指定</td></tr><tr><td>画像が表示されない</td><td>Coil 3 の <code>coil-network-okhttp</code> が未追加</td></tr><tr><td><code>lateinit property container has not been initialized</code></td><td>Manifest の <code>android:name=&quot;.PokedexApplication&quot;</code> が未指定</td></tr><tr><td><code>Unable to create converter for ...</code></td><td><code>@Serializable</code> の付け忘れ、または converter の未登録</td></tr><tr><td><code>Field &#x27;xxx&#x27; is required but was missing</code></td><td>API のレスポンスに null が入る。<code>Json { ignoreUnknownKeys = true }</code> と、DTO のフィールドを nullable にする</td></tr><tr><td>Room の <code>@Upsert</code> が見つからない</td><td>Room 2.5 未満。<code>libs.versions.toml</code> のバージョンを確認</td></tr><tr><td>ビルドが <code>ksp</code> で失敗する</td><td>KSP と Kotlin のバージョンが噛み合っていない。上記「バージョンの扱い」を参照</td></tr><tr><td>初回起動が終わらない</td><td>151回の詳細取得を逐次実行している。同時実行数を制限した並列取得にする（<a class="lnk" href="04_実装仕様.md#5-pokeapi-の実装上の注意" data-doc="04_実装仕様.md">実装上の注意</a>）</td></tr></tbody></table></div></section>
+<section class="doc" id="doc-2" data-file="04_実装仕様.md" hidden><h1 id="実装仕様-ポケモン図鑑アプリ">実装仕様 — ポケモン図鑑アプリ</h1>
+<p>実装するスコープ、使用する技術、評価の基準を定めます。何を作るかはこの文書が基準になります。背景は<a class="lnk" href="01_要件定義.md" data-doc="01_要件定義.md">要件定義</a>、設計の詳細は<a class="lnk" href="02_基本設計.md" data-doc="02_基本設計.md">基本設計</a>・<a class="lnk" href="03_詳細設計.md" data-doc="03_詳細設計.md">詳細設計</a>を参照してください。</p>
+<h2 id="1-学習目標">1. 学習目標</h2>
+<p>この課題を通じて次のスキルを習得します。</p>
+<div class="table-wrap"><table><thead><tr><th>領域</th><th>身につけること</th></tr></thead><tbody><tr><td>REST API連携</td><td>Retrofit による PokeAPI との通信</td></tr><tr><td>ローカルデータベース</td><td>Room（SQLite）によるデータ永続化</td></tr><tr><td>状態管理</td><td>ViewModel + StateFlow による MVVM</td></tr><tr><td>宣言的UI</td><td>Jetpack Compose による画面実装</td></tr><tr><td>非同期処理</td><td>Kotlin Coroutines / Flow の実践</td></tr><tr><td>エラーハンドリング</td><td>ネットワークエラーとユーザーへのフィードバック</td></tr></tbody></table></div>
+<h2 id="2-アーキテクチャ">2. アーキテクチャ</h2>
+<h3 id="2-1-レイヤー構成">2.1 レイヤー構成</h3>
+<figure class="code"><div class="code-head"><span>text</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-text">┌─────────────────────────────────────┐
+│           UI Layer                  │ ← Composable（*Screen）
+├─────────────────────────────────────┤
+│         ViewModel Layer             │ ← 状態保持と画面ロジック
+├─────────────────────────────────────┤
+│        Repository Layer             │ ← データの統合管理
+├─────────────────────────────────────┤
+│       Data Sources Layer            │ ← PokeAPI / Room
+└─────────────────────────────────────┘</code></pre></figure>
+<p>上の層は下の層だけを知り、下の層は上を知りません。Composable から Repository や API を直接呼ばないでください。</p>
+<h3 id="2-2-主要コンポーネント">2.2 主要コンポーネント</h3>
+<div class="table-wrap"><table><thead><tr><th>コンポーネント</th><th>役割</th></tr></thead><tbody><tr><td><code>PokemonRepository</code></td><td>API とローカルDBを束ね、画面に単一の入口を提供する</td></tr><tr><td><code>PokeApiService</code></td><td>PokeAPI との通信（Retrofit インターフェース）</td></tr><tr><td><code>PokemonDao</code> / <code>AppDatabase</code></td><td>Room によるローカル永続化</td></tr><tr><td><code>DetailCache</code></td><td>詳細情報のキャッシュ（直近10件）</td></tr><tr><td><code>UpdateService</code></td><td>151匹ぶんの取得と再試行の制御</td></tr><tr><td><code>NetworkMonitor</code></td><td>ネットワーク状態の監視</td></tr><tr><td><code>*ViewModel</code></td><td>画面ごとの状態保持（<code>StateFlow</code> で公開）</td></tr></tbody></table></div>
+<h3 id="2-3-実装の共通ルール">2.3 実装の共通ルール</h3>
+<p>Issue をまたいで守るルールです。レビューでも見ます。</p>
+<ul>
+<li><strong>アーキテクチャ</strong> — UI / ViewModel / Repository / DataSource の4層。
+</li></ul>
+<p>Composable から Repository や API を直接呼ばない。</p>
+<ul>
+<li><strong>状態の公開</strong> — ViewModel は <code>StateFlow</code> で UI 状態を公開し、
+</li></ul>
+<p>画面は <code>collectAsStateWithLifecycle()</code> で購読する。</p>
+<ul>
+<li><strong>単一の情報源</strong> — 一覧データはローカルDBを唯一の情報源とする。
+</li></ul>
+<p>API の結果は DB を経由して画面へ届ける。</p>
+<ul>
+<li><strong>エラーの扱い</strong> — Repository より下では例外を投げず <code>Result</code> で返す。
+</li></ul>
+<p>例外の分類とユーザー向け文言への変換は <a class="lnk" href="03_詳細設計.md" data-doc="03_詳細設計.md">詳細設計 5. エラーハンドリング</a> の<code>AppException</code> / <code>toUserMessage()</code> に従う。画面はメッセージ文字列だけを扱う。</p>
+<ul>
+<li><strong>DI</strong> — Phase 1 は <code>PokedexApplication</code> が持つ <code>AppContainer</code> による手動DIとする。
+</li></ul>
+<p>Hilt の導入は任意（加点対象）。<strong>Phase 1 の途中で切り替えないこと。</strong></p>
+<ul>
+<li><strong>命名</strong> — 詳細設計のシーケンス図とクラス名を一致させる
+</li></ul>
+<p>（<code>PokemonRepository</code> / <code>PokeApiService</code> / <code>PokemonDao</code> / <code>DetailCache</code> / <code>NetworkMonitor</code>）。</p>
+<h2 id="3-機能仕様">3. 機能仕様</h2>
+<p>Phase 1 が必須、Phase 2 が加点対象です。Phase 1 を終えてから Phase 2 に進みます。</p>
+<h3 id="3-1-phase-1-基本機能-必須">3.1 Phase 1: 基本機能（必須）</h3>
+<div class="table-wrap"><table><thead><tr><th>機能</th><th>内容</th></tr></thead><tbody><tr><td>ポケモン一覧表示</td><td>カントー地方151匹を2列グリッドで表示。図鑑番号・画像・名前</td></tr><tr><td>ポケモン詳細表示</td><td>タイプ・身長・体重・画像を表示。戻る操作に対応</td></tr><tr><td>オフライン対応</td><td>一度取得したデータをローカル保存し、オフラインでも表示</td></tr></tbody></table></div>
+<h3 id="3-2-phase-2-拡張機能-加点">3.2 Phase 2: 拡張機能（加点）</h3>
+<div class="table-wrap"><table><thead><tr><th>機能</th><th>内容</th></tr></thead><tbody><tr><td>検索機能</td><td>名前の部分一致、図鑑番号、タイプでの絞り込み</td></tr><tr><td>詳細情報の拡張</td><td>日本語名、特性、進化チェーン（簡易版）</td></tr><tr><td>UI/UX改善</td><td>ローディング表示、エラーハンドリング、Pull to refresh</td></tr></tbody></table></div>
+<h2 id="4-データベース設計">4. データベース設計</h2>
+<p>Room で次のスキーマを構成します。日付はエポックミリ秒（<code>INTEGER</code>）で保持します。</p>
+<figure class="code"><div class="code-head"><span>sql</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-sql">-- ポケモン基本情報
+CREATE TABLE pokemon (
+    id         INTEGER PRIMARY KEY,   -- 図鑑番号
+    name       TEXT    NOT NULL,      -- 英語名。一覧APIから取得
+    name_ja    TEXT,                  -- 日本語名。pokemon-species から取得（Phase 2）
+    image_url  TEXT,
+    height     INTEGER,               -- デシメートル（APIの生値）
+    weight     INTEGER,               -- ヘクトグラム（APIの生値）
+    type1      TEXT,
+    type2      TEXT,                  -- 単タイプのポケモンは NULL
+    created_at INTEGER NOT NULL
+);
+
+CREATE INDEX idx_pokemon_name    ON pokemon(name);
+CREATE INDEX idx_pokemon_name_ja ON pokemon(name_ja);
+CREATE INDEX idx_pokemon_type1   ON pokemon(type1);
+CREATE INDEX idx_pokemon_type2   ON pokemon(type2);
+
+-- 詳細情報のキャッシュ（直近10件のみ保持）
+CREATE TABLE pokemon_detail_cache (
+    id            INTEGER PRIMARY KEY,
+    detail_json   TEXT    NOT NULL,
+    cached_at     INTEGER NOT NULL,
+    last_accessed INTEGER NOT NULL,   -- LRU の判定に使う
+    FOREIGN KEY (id) REFERENCES pokemon(id)
+);
+
+CREATE INDEX idx_cache_last_accessed ON pokemon_detail_cache(last_accessed);</code></pre></figure>
+<p>設計上の要点は3つです。</p>
+<ul>
+<li><strong>タイプを正規化する</strong> — <code>type1</code> / <code>type2</code> の個別カラムにします。JSON配列で持つとインデックスが効かず、タイプ検索が全件走査になります。
+</li>
+<li><strong>単位は変換しない</strong> — <code>height</code> / <code>weight</code> は API の生値をそのまま保存し、表示時に m・kg へ変換します。
+</li>
+<li><strong>キャッシュは10件で打ち切る</strong> — 保存のたびに <code>last_accessed</code> の古いものから削除します。
+</li></ul>
+<h2 id="5-pokeapi-の実装上の注意">5. PokeAPI の実装上の注意</h2>
+<p>着手前に必ず読んでください。ここでつまずく人が多い箇所です。</p>
+<ol>
+<li><strong>一覧APIにはIDもタイプも含まれない</strong>
+</li></ol>
+<p><code>GET /pokemon?limit=151</code> が返すのは名前と URL だけです。ID は URL の末尾から切り出します。タイプ・身長・体重は <strong>1匹ずつ詳細APIを叩く必要があり、初回起動時に151回の通信が発生します。</strong>逐次実行すると数分かかるため、同時実行数を10程度に制限した並列取得にしてください。取得できたものから DB に保存すれば、途中で失敗しても次回に持ち越せます。</p>
+<ol>
+<li><strong>PokeAPI にはレート制限の明記がないが、フェアユースが求められる</strong>
+</li></ol>
+<p>一度取得したデータは必ずローカルに保存し、起動のたびに151回叩かないこと。</p>
+<ol>
+<li><strong>名前は英語で返る</strong>
+</li></ol>
+<p>一覧・詳細APIの <code>name</code> は <code>bulbasaur</code> のような英語名です。日本語名は <code>GET /pokemon-species/{id}</code> の <code>names</code> から <code>language.name == &quot;ja-Hrkt&quot;</code> を選びます。Phase 1 は英語名のままで構いません。日本語名の取得は <code>#13</code> で扱います。</p>
+<ol>
+<li><strong>身長・体重の単位に注意</strong>
+</li></ol>
+<p><code>height</code> はデシメートル、<code>weight</code> はヘクトグラムです。フシギダネは <code>height: 7</code> <code>weight: 69</code> で、表示は <strong>0.7 m / 6.9 kg</strong> となります。DB には API の生値をそのまま保存し、表示時に変換してください。</p>
+<ol>
+<li><strong>画像URL</strong>
+</li></ol>
+<p><code>sprites.other.official-artwork.front_default</code> が最も画質が良く、一覧・詳細の両方に使えます。</p>
+<h2 id="6-技術スタック">6. 技術スタック</h2>
+<p><strong>Android ネイティブ（Kotlin）</strong> で実装します。以下は必須構成です。</p>
+<div class="table-wrap"><table><thead><tr><th>領域</th><th>ライブラリ</th><th>備考</th></tr></thead><tbody><tr><td>言語</td><td>Kotlin</td><td>—</td></tr><tr><td>UI</td><td>Jetpack Compose</td><td>Material 3</td></tr><tr><td>状態管理</td><td>ViewModel + StateFlow</td><td>MVVM</td></tr><tr><td>非同期</td><td>Kotlin Coroutines / Flow</td><td>—</td></tr><tr><td>DB</td><td>Room</td><td>SQLite ラッパー</td></tr><tr><td>通信</td><td>Retrofit + OkHttp</td><td>—</td></tr><tr><td>JSON</td><td>Kotlinx Serialization</td><td>Moshi でも可</td></tr><tr><td>画像</td><td>Coil</td><td><code>coil-compose</code> と <code>coil-network-okhttp</code></td></tr><tr><td>画面遷移</td><td>Navigation Compose</td><td>—</td></tr></tbody></table></div>
+<h3 id="6-1-加点対象-任意">6.1 加点対象（任意）</h3>
+<ul>
+<li><strong>Hilt</strong> — DIコンテナ。Phase 1 は手動DI（Application が保持するコンテナ）で構いません
+</li>
+<li><strong>Paging 3</strong> — 一覧のページング
+</li>
+<li><strong>WorkManager</strong> — バックグラウンドでのデータ更新
+</li></ul>
+<h3 id="6-2-ビルド設定">6.2 ビルド設定</h3>
+<ul>
+<li><code>minSdk</code> = <strong>26</strong>（Android 8.0。要件定義の対応OSに合わせる）
+</li>
+<li><code>targetSdk</code> / <code>compileSdk</code> = 最新の安定版
+</li>
+<li>Android Studio は最新の安定版を使用する
+</li></ul>
+<p>具体的な依存の書き方は<a class="lnk" href="05_環境構築ガイド.md" data-doc="05_環境構築ガイド.md">環境構築ガイド</a>にあります。</p>
+<h2 id="7-実装手順">7. 実装手順</h2>
+<p>4週間で完成する構成です。各週の作業は <a class="lnk ext" href="https://github.com/sghh02/pokedex-android-kadai/issues" target="_blank" rel="noopener">GitHub Issues</a> の Issue に対応します。</p>
+<div class="table-wrap"><table><thead><tr><th>週</th><th>作業</th><th>Issue</th></tr></thead><tbody><tr><td>1週目</td><td>環境構築</td><td>#1 〜 #2</td></tr><tr><td>2週目</td><td>データレイヤー実装</td><td>#3 〜 #5</td></tr><tr><td>3週目</td><td>UIレイヤー実装</td><td>#6 〜 #10</td></tr><tr><td>4週目</td><td>機能拡張・提出</td><td>#11 〜 #16</td></tr></tbody></table></div>
+<h3 id="7-1-step-1-環境構築-1週目">7.1 Step 1: 環境構築（1週目）</h3>
+<ol>
+<li>Android Studio で Empty Compose Activity プロジェクトを作成（<code>minSdk</code> 26）
+</li>
+<li>Room / Retrofit / Coil / Navigation の依存を追加し、ビルドを通す
+</li>
+<li>Retrofit で PokeAPI の一覧エンドポイントを叩き、レスポンスをログ出力して疎通確認
+</li></ol>
+<h3 id="7-2-step-2-データレイヤー実装-2週目">7.2 Step 2: データレイヤー実装（2週目）</h3>
+<ol>
+<li>Room の Entity / DAO / Database を実装
+</li>
+<li>Retrofit の <code>PokeApiService</code> と DTO を実装
+</li>
+<li><code>PokemonRepository</code> を実装（API取得 → DB保存 → DBから読み出し）
+</li></ol>
+<h3 id="7-3-step-3-uiレイヤー実装-3週目">7.3 Step 3: UIレイヤー実装（3週目）</h3>
+<ol>
+<li>スプラッシュ画面（初期化とデータ取得の起点）
+</li>
+<li>一覧画面（<code>LazyVerticalGrid</code> で2列表示）
+</li>
+<li>詳細画面と Navigation Compose による画面遷移
+</li></ol>
+<h3 id="7-4-step-4-機能拡張-4週目">7.4 Step 4: 機能拡張（4週目）</h3>
+<ol>
+<li>検索機能（名前の部分一致・図鑑番号）
+</li>
+<li>エラーハンドリングとオフライン表示
+</li>
+<li>ローディング表示・Pull to refresh などの UI/UX 改善
+</li></ol>
+<h2 id="8-評価基準">8. 評価基準</h2>
+<h3 id="8-1-必須要件-70点">8.1 必須要件（70点）</h3>
+<ul>
+<li class="task"><label><input type="checkbox"><span><strong>API連携</strong>: PokeAPIからデータ取得</span></label>
+</li>
+<li class="task"><label><input type="checkbox"><span><strong>データ永続化</strong>: Room でローカル保存</span></label>
+</li>
+<li class="task"><label><input type="checkbox"><span><strong>基本UI</strong>: 一覧表示、詳細表示</span></label>
+</li>
+<li class="task"><label><input type="checkbox"><span><strong>オフライン対応</strong>: ネット接続なしでも動作</span></label>
+</li></ul>
+<h3 id="8-2-高評価要件-30点">8.2 高評価要件（+30点）</h3>
+<ul>
+<li class="task"><label><input type="checkbox"><span><strong>検索機能</strong>: 名前・番号・タイプ検索</span></label>
+</li>
+<li class="task"><label><input type="checkbox"><span><strong>エラーハンドリング</strong>: 適切なエラー表示</span></label>
+</li>
+<li class="task"><label><input type="checkbox"><span><strong>UI/UX</strong>: ローディング、Pull to refresh</span></label>
+</li>
+<li class="task"><label><input type="checkbox"><span><strong>コード品質</strong>: Kotlin らしい記述、適切な設計パターン（MVVM／単方向データフロー）</span></label>
+</li></ul>
+<h3 id="8-3-ボーナス要件-α">8.3 ボーナス要件（+α）</h3>
+<ul>
+<li class="task"><label><input type="checkbox"><span><strong>テスト実装</strong>: ユニットテスト</span></label>
+</li>
+<li class="task"><label><input type="checkbox"><span><strong>アニメーション</strong>: 画面遷移、ローディング</span></label>
+</li>
+<li class="task"><label><input type="checkbox"><span><strong>アクセシビリティ</strong>: スクリーンリーダー対応</span></label>
+</li></ul>
+<h2 id="9-提出要件">9. 提出要件</h2>
+<ol>
+<li><strong>ソースコード</strong>: GitHubリポジトリ
+</li>
+<li><strong>README</strong>: セットアップ手順、機能説明
+</li>
+<li><strong>実行動画</strong>: 主要機能のデモ（3分以内）
+</li>
+<li><strong>振り返りレポート</strong>: 学んだこと、課題点（1000字程度）
+</li></ol>
+<p>提出前に各 <a class="lnk ext" href="https://github.com/sghh02/pokedex-android-kadai/issues" target="_blank" rel="noopener">Issue</a> の受け入れ条件をすべて満たしているか確認してください。</p>
+<h2 id="関連リソース">関連リソース</h2>
+<ul>
+<li><a class="lnk ext" href="https://pokeapi.co/docs/v2" target="_blank" rel="noopener">PokeAPI 公式ドキュメント</a>
+</li>
+<li><a class="lnk ext" href="https://developer.android.com/topic/architecture" target="_blank" rel="noopener">Android アプリ アーキテクチャ ガイド</a>
+</li>
+<li><a class="lnk ext" href="https://developer.android.com/develop/ui/compose/documentation" target="_blank" rel="noopener">Jetpack Compose 公式ドキュメント</a>
+</li>
+<li><a class="lnk ext" href="https://developer.android.com/training/data-storage/room" target="_blank" rel="noopener">Room 公式ガイド</a>
+</li>
+<li><a class="lnk ext" href="https://square.github.io/retrofit/" target="_blank" rel="noopener">Retrofit 公式サイト</a>
+</li>
+<li><a class="lnk ext" href="https://kotlinlang.org/docs/coroutines-guide.html" target="_blank" rel="noopener">Kotlin Coroutines ガイド</a>
+</li>
+<li><a class="lnk ext" href="https://coil-kt.github.io/coil/compose/" target="_blank" rel="noopener">Coil（画像読み込み）</a>
+</li></ul></section>
+<section class="doc" id="doc-3" data-file="01_要件定義.md" hidden><h1 id="要件定義書-ポケモン図鑑アプリ-カントー地方">要件定義書 — ポケモン図鑑アプリ（カントー地方）</h1>
+<blockquote><strong>本課題の実装対象は Android のみです。</strong> iOS や他フレームワークに関する記述は、実際の製品を想定した設計として残しています。 実装スコープは <a class="lnk" href="04_実装仕様.md" data-doc="04_実装仕様.md">実装仕様</a> と <a class="lnk ext" href="https://github.com/sghh02/pokedex-android-kadai/issues" target="_blank" rel="noopener">GitHub Issues</a> を参照してください。</blockquote>
+<h2 id="1-目的・ターゲットユーザー・スコープ">1. 目的・ターゲットユーザー・スコープ</h2>
+<h3 id="目的">目的</h3>
+<ul>
+<li>ポケモン図鑑への協力を促進:
+<ul>
+<li>各町の住人やポケモン研究者にポケモン情報の収集をお願いするため、スマホを使ったアプリ化を進めることで、より多くの協力を得ることができる。
+</li>
+<li>住人やトレーナーに積極的に情報提供を促し、協力を得るための簡単なインターフェースを提供する。
+</li></ul>
+</li>
+<li>郵送の手間を省く:
+<ul>
+<li>これまで郵送で行われていたポケモン図鑑の申請作業をアプリ化し、物理的な手間を省き、即時に情報が送信される仕組みを作ることで、全体的な作業の効率化を図る。
+</li></ul>
+</li></ul>
+<h3 id="ターゲットユーザー">ターゲットユーザー</h3>
+<ul>
+<li>カントー地方のポケモン研究者
+</li></ul>
+<p>ポケモンの詳細な情報を求めている研究者たち。彼らはポケモンの分類や生息地に関するデータを集め、記録します。</p>
+<ul>
+<li>カントー地方を旅するトレーナー
+</li></ul>
+<p>ポケモンの捕獲や育成に興味があるトレーナー。捕まえたポケモンの情報を管理し、進化条件や生息地を知りたいと思っています。</p>
+<ul>
+<li>ポケモンに興味があるカントー地方の住人
+</li></ul>
+<p>カントー地方に住む、ポケモンに興味があるが研究者やトレーナーではない住民たち。日常生活の中でポケモンの情報を知りたいと考えています。</p>
+<h3 id="スコープ">スコープ</h3>
+<ol>
+<li>ポケモン図鑑の機能
+<ul>
+<li>カントー地方に登場するポケモンの情報を表示。
+</li>
+<li>検索機能、フィルタリング、ソート機能。
+</li>
+<li>各ポケモンの詳細ページ（進化情報、生息地、技、特性など）。
+</li></ul>
+</li>
+<li>オフライン機能
+<ul>
+<li>ローカル保存する情報:
+<ul>
+<li>オフラインで使用する際、ポケモン図鑑の一覧情報（名前、番号、タイプなど）だけをローカルに保存します。
+</li>
+<li>最後に閲覧した10件のポケモン詳細情報をキャッシュとして保存し、オフライン時でも参照可能にします。
+</li></ul>
+</li>
+<li>詳細情報の取得方法:
+<ul>
+<li>各ポケモンの詳細情報（進化条件、生息地、技、特性など）は APIから都度取得します。これにより、最新の情報を常に取得できるようにします。
+</li>
+<li>オフライン時にはキャッシュされた情報を表示し、データが古い可能性がある旨を通知します。
+</li></ul>
+</li></ul>
+</li>
+<li>ユーザーインターフェース
+<ul>
+<li>ゲームボーイ風の懐かしさを感じるシンプルなUIデザイン。
+</li>
+<li>直感的で使いやすいナビゲーション。
+</li></ul>
+</li>
+<li>PokeAPIとの連携
+<ul>
+<li>データはPokeAPIから取得し、ローカルで保持・更新。
+</li>
+<li>API仕様変更に備え、バージョンチェック機能を実装します。
+</li>
+<li>API障害時の再試行ポリシーを設定し、最大3回まで30秒間隔で再試行します。
+</li></ul>
+</li></ol>
+<h3 id="今回の開発で除外する機能">今回の開発で除外する機能</h3>
+<ul>
+<li>他の地方（例：ジョウト地方）のポケモン情報は現段階では含まれません。
+</li>
+<li>情報掲示板機能は含まれません。（将来の開発フェーズで追加予定）
+</li></ul>
+<hr>
+<h2 id="2-機能要件">2. 機能要件</h2>
+<h3 id="2-1-ポケモン図鑑の機能">2.1 ポケモン図鑑の機能</h3>
+<ol>
+<li>ポケモン一覧表示
+<ul>
+<li>目的: ユーザーがカントー地方のポケモンを簡単に確認できるようにする。
+</li>
+<li>機能詳細:
+<ul>
+<li>一覧表示: ポケモンの図鑑番号、画像、名前、タイプをリスト表示。簡単にスクロールして閲覧できるようにします。
+</li>
+<li>オフライン対応: 初回起動時にポケモン一覧データ（図鑑番号、画像、名前、タイプ）をローカルに保存し、オフライン時でも一覧情報を表示できるようにします。
+</li></ul>
+</li></ul>
+</li>
+<li>ポケモン検索機能
+<ul>
+<li>目的: ユーザーが特定のポケモンを簡単に検索できるようにする。
+</li>
+<li>機能詳細:
+<ul>
+<li>検索方法: 名前と図鑑番号で検索可能。検索結果を素早く表示し、該当ポケモンを簡単に選べるようにします。
+</li>
+<li>ソート方法: 図鑑番号順でソート可能。
+</li>
+<li>検索結果表示: タイプ別で絞り込みが可能。
+</li></ul>
+</li></ul>
+</li>
+<li>ポケモン詳細情報
+<ul>
+<li>目的: ユーザーがポケモンに関する詳細な情報を取得できるようにする。
+</li>
+<li>機能詳細:
+<ul>
+<li>詳細情報ページ: 選択したポケモンの進化情報、特性、進化条件などを表示。
+</li>
+<li>データ取得:
+<ul>
+<li>詳細情報は、オンラインでAPIを通じて取得します。
+</li>
+<li>取得失敗時は、再取得ボタンを設置し、ネットワーク接続の有無やエラー状況に応じた具体的なエラーメッセージを表示します。
+</li></ul>
+</li></ul>
+</li></ul>
+</li>
+<li>ポケモンの情報更新
+<ul>
+<li>目的: ユーザーが最新のポケモン情報を手に入れられるようにする。
+</li>
+<li>機能詳細:
+<ul>
+<li>定期的なデータ更新:
+<ul>
+<li>午前10時（端末のローカル時間）を過ぎている場合、アプリ起動時に自動的にデータの更新を確認し、必要に応じて更新を行います。
+</li>
+<li>1日に一度しか更新のタイミングはありません。（※成功した場合）
+</li></ul>
+</li>
+<li>手動更新: ユーザーが手動で情報を更新できるボタンを設置（設定メニューに追加）。
+</li></ul>
+</li></ul>
+</li></ol>
+<h3 id="2-2-オフライン機能">2.2 オフライン機能</h3>
+<ol>
+<li>ローカルデータ保存
+<ul>
+<li>目的: オフラインでも最低限の情報を提供できるようにする。
+</li>
+<li>機能詳細:
+<ul>
+<li>保存対象: ポケモン一覧の基本情報（図鑑番号、画像、名前、タイプ）をローカルに保存。
+</li>
+<li>データ保存形式: SQLite や JSON などでローカルデータを保存。
+</li>
+<li>オフライン時の表示: オフライン時にローカルデータを利用してポケモン一覧を表示。
+</li>
+<li>最近閲覧した詳細情報のキャッシュ: 最後に閲覧した10件のポケモン詳細情報をキャッシュとして保存します。
+</li></ul>
+</li></ul>
+</li></ol>
+<h3 id="2-3-新情報掲示板-次フェーズの開発スコープ">2.3 新情報掲示板（次フェーズの開発スコープ）</h3>
+<blockquote>このセクションは次フェーズの開発内容です。初期リリースには含まれません。</blockquote>
+<ol>
+<li>掲示板表示機能
+<ul>
+<li>目的: ユーザー同士で新たなポケモン情報を共有できるようにする。
+</li>
+<li>機能詳細:
+<ul>
+<li>投稿一覧表示: 投稿された情報（新たなポケモンの生息地、特性、進化情報など）を一覧表示します。
+</li>
+<li>投稿の詳細表示: ユーザーが投稿した内容を詳細に表示。
+</li></ul>
+</li></ul>
+</li>
+<li>投稿機能
+<ul>
+<li>目的: ユーザーが新たな発見を簡単に投稿できるようにする。
+</li>
+<li>機能詳細:
+<ul>
+<li>投稿フォーム: 新しいポケモンの情報、発見場所、観察結果などを入力するフォームを提供。
+</li>
+<li>データ送信: 入力したデータをサーバーに送信し、掲示板に投稿される。
+</li></ul>
+</li></ul>
+</li>
+<li>コメント機能
+<ul>
+<li>目的: 投稿に対して他のユーザーが情報を追加したり、質問したりできるようにする。
+</li>
+<li>機能詳細:
+<ul>
+<li>コメント表示: 投稿に対するコメント一覧を表示。
+</li>
+<li>コメント投稿: ユーザーがコメントを投稿できる機能。
+</li></ul>
+</li></ul>
+</li>
+<li>通知機能
+<ul>
+<li>目的: 新しい投稿が掲示板に追加された際に、ユーザーが通知を受け取れるようにする。
+</li>
+<li>機能詳細:
+<ul>
+<li>新規投稿通知: 掲示板に新しい投稿があった際に通知を送信します。
+</li>
+<li>ユーザーの設定: 通知の受信設定をユーザーが調整できるようにする（設定メニューに通知設定項目）。
+</li></ul>
+</li></ul>
+</li></ol>
+<hr>
+<h2 id="3-ui-ux要件">3. UI/UX要件</h2>
+<ul>
+<li>ゲームボーイ風の懐かしさを感じるUIデザイン
+<ul>
+<li>ピクセルアートスタイルのデザイン、シンプルな色使い（例えば、緑と黒の2色を基調にした配色）で、ゲームボーイの画面を模したインターフェース。
+</li>
+<li>ナビゲーションバー: 左下に「図鑑」、「設定」などのメニューアイコンを表示。
+</li>
+<li>テキストベースのインターフェース: ポケモン名や番号、情報はスクロール可能なリストで表示。アイコンはピクセルアートで描かれたポケモンのイラストを使用。
+</li></ul>
+</li>
+<li>インタラクション
+<ul>
+<li>画面遷移はスムーズで、ページ切り替えやポケモン詳細へのアクセスが直感的。
+</li>
+<li>ポケモン図鑑内でポケモンをタップすると、ポケモンの詳細情報ページに遷移。
+</li></ul>
+</li></ul>
+<hr>
+<h2 id="4-データ要件">4. データ要件</h2>
+<ul>
+<li>PokeAPIとの連携
+<ul>
+<li>ポケモンの基本データ（図鑑番号、画像、名前、タイプ、進化情報など）をPokeAPIから取得。
+</li>
+<li>詳細情報は、オンラインでAPIを通じて取得し、取得失敗時にはエラーメッセージを表示します。
+</li>
+<li>API仕様変更検出: APIのバージョン情報を確認し、必要に応じてアップデートを促す仕組みを実装します。
+</li></ul>
+</li>
+<li>ローカルデータ保存
+<ul>
+<li>取得したポケモンの基本データ（図鑑番号、画像、名前、タイプ）はローカルストレージに保存し、オフライン時にはローカルデータを利用してポケモン一覧を表示します。
+</li>
+<li>データ保存容量: アプリケーションのローカルストレージ使用量は初期状態で約10MB以内に収めます。
+</li></ul>
+</li></ul>
+<hr>
+<h2 id="5-パフォーマンス要件">5. パフォーマンス要件</h2>
+<ul>
+<li>低遅延の応答速度
+<ul>
+<li>アプリは、オフライン時にはローカルデータを迅速に表示し、インターネット接続時には、データ取得・更新がスムーズに行えるように最適化します。
+</li>
+<li>検索機能やポケモン詳細情報の読み込みは、ユーザーが待たされないように、高速で処理されるべきです。
+</li>
+<li>画面遷移と読み込み: 画面遷移時のレスポンスは300ms以内、データ読み込みは通常のネットワーク環境下で2秒以内を目標とします。
+</li></ul>
+</li>
+<li>軽量化
+<ul>
+<li>アプリは軽量で、低スペックのスマートフォンでも動作するように設計・最適化されます。
+</li>
+<li>アプリサイズ: 初期インストール時のアプリサイズは30MB以下を目標とします。
+</li>
+<li>メモリ使用量: アプリの実行時メモリ使用量は100MB以下を目標とします。
+</li></ul>
+</li></ul>
+<hr>
+<h2 id="6-セキュリティ要件">6. セキュリティ要件</h2>
+<ul>
+<li>データの保護
+<ul>
+<li>不正アクセス防止のため、掲示板の投稿者情報やコメントは匿名で表示。
+</li>
+<li>ユーザーデータは端末内で暗号化して保存します。
+</li></ul>
+</li>
+<li>通信のセキュリティ
+<ul>
+<li>PokeAPIとの通信はすべてHTTPSで行い、セキュリティを確保。
+</li>
+<li>証明書ピン留めを実装し、中間者攻撃を防止します。
+</li></ul>
+</li></ul>
+<hr>
+<h2 id="7-非機能要件">7. 非機能要件</h2>
+<ul>
+<li>対応OS:
+<ul>
+<li>iOSおよびAndroidに対応。
+</li>
+<li>最低限サポートするOSバージョンはiOS 10以上、Android 8以上。
+</li></ul>
+</li>
+<li>言語対応:
+<ul>
+<li>日本語、英語に対応。
+</li></ul>
+</li>
+<li>テスト要件:
+<ul>
+<li>ユニットテスト: すべての主要機能に対するユニットテストを実装します。
+</li>
+<li>UI/UXテスト: 主要なユーザーフローに対する自動化UIテストを実装します。
+</li>
+<li>互換性テスト: 様々な画面サイズとデバイスでの互換性テストを実施します。
+</li></ul>
+</li>
+<li>保守・運用計画:
+<ul>
+<li>バグ修正: 重大なバグは48時間以内、軽微なバグは2週間以内に修正版をリリースします。
+</li>
+<li>アップデート頻度: 機能追加は3ヶ月ごと、バグ修正は必要に応じて随時行います。
+</li>
+<li>サポート期間: 正式リリースから最低2年間のサポートを提供します。
+</li></ul>
+</li></ul>
+<hr>
+<h2 id="8-スケジュールとマイルストーン">8. スケジュールとマイルストーン</h2>
+<ul>
+<li>開発スケジュール:
+<ul>
+<li>1ヶ月以内にプロトタイプを完成。
+</li>
+<li>3ヶ月以内にベータ版を公開。
+</li>
+<li>6ヶ月以内に正式リリース。
+</li></ul>
+</li>
+<li>テストスケジュール:
+<ul>
+<li>プロトタイプ完成後2週間以内に内部テストを実施。
+</li>
+<li>ベータ版公開1ヶ月前にユーザー受け入れテストを開始。
+</li></ul>
+</li>
+<li>リスク管理計画:
+<ul>
+<li>API仕様変更: PokeAPIの仕様変更に備え、APIの変更を検知する仕組みを実装します。
+</li>
+<li>リソース不足: 開発リソースが不足した場合に備え、優先順位付けを行い、最重要機能から実装します。
+</li></ul>
+</li>
+<li>ユーザーフィードバック収集計画:
+<ul>
+<li>ベータテスト期間中にユーザーからのフィードバックを収集するためのフォームを提供します。
+</li>
+<li>アプリ内からバグ報告や機能改善の提案を送信できる仕組みを実装します。
+</li></ul>
+</li></ul>
+<hr>
+<h2 id="9-フェーズ2開発計画-参考情報">9. フェーズ2開発計画（参考情報）</h2>
+<ul>
+<li>掲示板機能の実装
+</li>
+<li>他地方のポケモン情報の追加
+</li>
+<li>対戦データの記録・分析機能
+</li>
+<li>ユーザープロフィール機能
+</li></ul>
+<hr>
+<h2 id="付録-要件定義とは">付録: 要件定義とは</h2>
+<blockquote>設計工程そのものの解説です。アプリの仕様ではありません。</blockquote>
+<p>要件定義とは、ソフトウェア開発プロジェクトの最初の重要なステップで、開発するシステムが「何をするべきか」を明確にする作業です。簡単に言えば、完成するシステムの設計図を作る前に、そのシステムに必要な機能や特性を文書化する過程です。</p>
+<h3 id="要件定義の目的">要件定義の目的</h3>
+<p>要件定義の主な目的は以下の通りです：</p>
+<ol>
+<li>クライアントやユーザーが求めているものを正確に理解すること
+</li>
+<li>開発チームが何を作るべきかを明確にすること
+</li>
+<li>プロジェクトの範囲と制約を定めること
+</li>
+<li>後の設計・開発段階での混乱やリスクを減らすこと
+</li></ol>
+<h3 id="要件定義のプロセス">要件定義のプロセス</h3>
+<h4 id="1-情報収集">1. 情報収集</h4>
+<p>クライアントやエンドユーザーとの面談、既存システムの分析、業界調査などを通じて情報を集めます。この段階では「このシステムで何ができるようになりたいか」という視点で話を聞きます。</p>
+<h4 id="2-要件の整理と分類">2. 要件の整理と分類</h4>
+<p>集めた情報を整理し、以下のような要件に分類します：</p>
+<ul>
+<li><strong>機能要件</strong>：システムが実行すべき機能（例：ユーザー登録、データ検索、レポート生成など）
+</li>
+<li><strong>非機能要件</strong>：性能、セキュリティ、使いやすさなどの品質特性
+</li>
+<li><strong>制約条件</strong>：予算、納期、使用技術などの制限事項
+</li></ul>
+<h4 id="3-要件の文書化">3. 要件の文書化</h4>
+<p>収集・整理した要件を文書にまとめます。この文書は「要件定義書」と呼ばれ、プロジェクトの基礎となります。</p>
+<h4 id="4-レビューと承認">4. レビューと承認</h4>
+<p>作成した要件定義書をクライアントや関係者と共有し、内容を確認してもらいます。必要に応じて修正を行い、最終的に承認を得ます。</p>
+<h3 id="要件定義書に含まれる内容">要件定義書に含まれる内容</h3>
+<p>典型的な要件定義書には以下の項目が含まれます：</p>
+<ul>
+<li>プロジェクトの目的と背景
+</li>
+<li>システムの概要
+</li>
+<li>詳細な機能要件（画面ごとの機能、データ処理など）
+</li>
+<li>非機能要件（性能・セキュリティ・可用性など）
+</li>
+<li>制約条件
+</li>
+<li>用語集
+</li>
+<li>前提条件とリスク
+</li></ul>
+<h3 id="要件定義の重要性">要件定義の重要性</h3>
+<p>要件定義は以下の理由から非常に重要です：</p>
+<ol>
+<li><strong>コスト削減</strong>: 開発の後半になるほど変更コストは高くなります。要件定義の段階で要件を明確にすることで、後の大幅な変更を避けられます。
+</li>
+<li><strong>品質向上</strong>: 明確な要件があれば、それに沿った適切なテストが可能になり、品質の高いシステムが開発できます。
+</li>
+<li><strong>コミュニケーション</strong>: 要件定義書は開発者、デザイナー、テスター、クライアントなど、全ての関係者間のコミュニケーションツールとなります。
+</li>
+<li><strong>スケジュール管理</strong>: 明確な要件があれば、より正確な工数見積もりとスケジュール計画が可能になります。
+</li></ol>
+<h3 id="未経験者が知っておくべきポイント">未経験者が知っておくべきポイント</h3>
+<ol>
+<li><strong>要件は変わるもの</strong>: 完璧な要件定義を最初から作ることは難しいです。プロジェクトの進行に伴い、要件は変化・追加されることを理解しておきましょう。
+</li>
+<li><strong>コミュニケーションが鍵</strong>: 技術的な知識だけでなく、クライアントの真のニーズを引き出すコミュニケーション能力が重要です。
+</li>
+<li><strong>曖昧さを排除</strong>: 「使いやすい」「高速に」などの曖昧な表現は避け、具体的で測定可能な表現を使いましょう。
+</li>
+<li><strong>優先順位づけ</strong>: すべての要件が同じ重要度ではありません。要件には優先順位をつけ、最も重要なものから対応していくことが大切です。
+</li></ol>
+<p>要件定義はプロジェクトの成功を左右する重要なプロセスです。十分な時間をかけて丁寧に行うことで、後の工程をスムーズに進めることができます。</p></section>
+<section class="doc" id="doc-4" data-file="02_基本設計.md" hidden><h1 id="基本設計書-ポケモン図鑑アプリ-カントー地方">基本設計書 — ポケモン図鑑アプリ（カントー地方）</h1>
+<blockquote><strong>本課題の実装対象は Android のみです。</strong> iOS や他フレームワークに関する記述は、実際の製品を想定した設計として残しています。 実装スコープは <a class="lnk" href="04_実装仕様.md" data-doc="04_実装仕様.md">実装仕様</a> と <a class="lnk ext" href="https://github.com/sghh02/pokedex-android-kadai/issues" target="_blank" rel="noopener">GitHub Issues</a> を参照してください。</blockquote>
+<h2 id="1-はじめに">1. はじめに</h2>
+<p>この基本設計書は、「ポケモン図鑑アプリケーション」のシステム全体像や主要機能の概要を示すものです。システム設計の基礎となる部分であり、今後の開発作業を進めるための指針となります。</p>
+<hr>
+<h2 id="2-機能設計">2. 機能設計</h2>
+<h3 id="2-1-システム方式設計">2.1 システム方式設計</h3>
+<h4 id="2-1-1-システム構成図">2.1.1 システム構成図</h4>
+<p>システム全体の構成としては、次の主要なコンポーネントが含まれます。</p>
+<ul>
+<li><strong>ハードウェア要件</strong>
+<ul>
+<li><strong>クライアント端末</strong>
+<ul>
+<li>スマートフォン（iOS、Android）
+</li>
+<li>必要OSバージョン：iOS 10以降、Android 8.0以降
+</li></ul>
+</li></ul>
+</li>
+<li><strong>ソフトウェア要件</strong>
+<ul>
+<li><strong>フロントエンド</strong>
+<ul>
+<li>モバイルアプリ（本課題では Kotlin + Jetpack Compose）
+</li></ul>
+</li>
+<li><strong>バックエンド</strong>
+<ul>
+<li>API仕様(RESTful API)
+</li></ul>
+</li></ul>
+</li>
+<li><strong>フロントエンド（モバイルアプリ）</strong>
+<ul>
+<li>ユーザーインターフェース(UI)
+</li>
+<li>機能: ポケモンの検索、一覧表示、詳細情報の表示、データ更新など
+</li>
+<li>対応OS: iOS、Android
+</li></ul>
+</li>
+<li><strong>バックエンド（APIサーバー）</strong>
+<ul>
+<li>REST API
+</li>
+<li>ポケモン情報の提供(PokeAPI)
+</li>
+<li><strong>API再試行ポリシー</strong>: 最大3回まで30秒間隔で再試行
+</li>
+<li><strong>APIバージョンチェック機能</strong>: 仕様変更検出のため
+</li></ul>
+</li>
+<li><strong>ローカルデータベース(SQLite)</strong>
+<ul>
+<li>一覧表示で使用するポケモンデータ（図鑑番号、画像、名前、タイプ）
+</li>
+<li><strong>最近閲覧した詳細情報キャッシュ</strong>: 最後に閲覧した10件のポケモン詳細情報
+</li></ul>
+</li></ul>
+<figure class="diagram"><pre class="mermaid">graph TD
+  subgraph "モバイルアプリケーション"
+    A[スマートフォンアプリ]
+
+    subgraph "フロントエンド"
+      C[ユーザーインターフェース]
+
+      subgraph "機能コンポーネント"
+        D[ポケモン一覧表示]
+        E[ポケモン検索]
+        F[ポケモン詳細表示]
+        G[情報更新]
+        H[オフライン機能]
+      end
+    end
+
+    subgraph "データ管理"
+      M[ローカルデータ保存]
+
+      subgraph "SQLiteデータベース"
+        N[基本情報テーブル]
+        Q[詳細情報キャッシュ]
+      end
+    end
+
+    subgraph "API連携"
+      I[API連携モジュール]
+      K[PokeAPI連携サービス]
+    end
+  end
+
+  subgraph "外部システム"
+    J[PokeAPI]
+  end
+
+  A --&gt; C
+  C --&gt; D &amp; E &amp; F &amp; G &amp; H
+  A --&gt; M
+  M --&gt; N
+  N --&gt; Q
+  A --&gt; I
+  I --&gt; J
+  J --&gt; K
+  K --&gt; F
+
+  classDef frontend fill:#d4f1f9,stroke:#333,stroke-width:1px,color:#000000,font-weight:bold;
+  classDef database fill:#ffe6cc,stroke:#333,stroke-width:1px,color:#000000,font-weight:bold;
+  classDef api fill:#d5e8d4,stroke:#333,stroke-width:1px,color:#000000,font-weight:bold;
+  classDef external fill:#f8cecc,stroke:#333,stroke-width:1px,color:#000000,font-weight:bold;
+
+  class C,D,E,F,G,H,P,O frontend;
+  class M,N,Q,R database;
+  class I,K api;
+  class J external;</pre></figure>
+<h4 id="2-1-2-アプリケーション機能構成図">2.1.2 アプリケーション機能構成図</h4>
+<p>以下のアプリケーション機能構成図は、ユーザーが利用する各機能がどのようにアプリケーション内でつながっているかを示しています。</p>
+<ul>
+<li><strong>ポケモン一覧表示機能</strong>: ユーザーがポケモン一覧を表示し、検索・ソート・絞り込みができる機能。
+</li>
+<li><strong>ポケモン詳細表示機能</strong>: ユーザーが特定のポケモンを選択し、その詳細情報（進化等）を表示する機能。
+</li>
+<li><strong>ポケモン情報更新機能</strong>: ユーザーが最新のポケモン情報を手動で更新する機能や、アプリ起動時に自動的に情報が更新される機能。
+</li>
+<li><strong>オフライン機能</strong>: インターネット接続なしでも基本的なポケモン情報を表示できる機能。
+</li></ul>
+<figure class="diagram"><pre class="mermaid">graph TD
+  subgraph "アプリケーション機能"
+    A[ポケモン図鑑アプリ]
+
+    subgraph "コア機能"
+      B[ポケモン一覧表示]
+      C[ポケモン検索]
+      D[ポケモン詳細情報]
+      E[ポケモン情報更新]
+    end
+
+    subgraph "ユーザーサポート機能"
+      F[オフライン機能]
+    end
+  end
+
+  subgraph "ポケモン一覧"
+    J[基本情報リスト表示]
+  end
+
+  subgraph "検索機能"
+    K[名前検索]
+    X[図鑑番号検索]
+    L[タイプ別絞り込み]
+  end
+
+  subgraph "詳細情報"
+    M[進化情報]
+    N[特性・能力情報]
+    Y[詳細情報キャッシュ]
+  end
+
+  subgraph "データ更新"
+    O[定期自動更新]
+    P[手動更新]
+  end
+
+  subgraph "オフライン対応"
+    Q[ローカルデータ活用]
+  end
+
+  A --&gt; B &amp; C &amp; D &amp; E &amp; F
+  B --&gt; J
+  C --&gt; K &amp; X &amp; L
+  D --&gt; M &amp; N &amp; Y
+  E --&gt; O &amp; P
+  F --&gt; Q
+
+  classDef core fill:#d5e8d4,stroke:#82b366,stroke-width:2px,color:#006600,font-weight:bold;
+  classDef support fill:#d4f1f9,stroke:#6c8ebf,stroke-width:2px,color:#0055aa,font-weight:bold;
+  classDef list fill:#ffe6cc,stroke:#d79b00,stroke-width:1px,color:#884400,font-weight:bold;
+  classDef search fill:#fff2cc,stroke:#d6b656,stroke-width:1px,color:#7a6300,font-weight:bold;
+  classDef detail fill:#e1d5e7,stroke:#9673a6,stroke-width:1px,color:#5c2d7a,font-weight:bold;
+  classDef update fill:#f8cecc,stroke:#b85450,stroke-width:1px,color:#8a3b38,font-weight:bold;
+  classDef offline fill:#dae8fc,stroke:#6c8ebf,stroke-width:1px,color:#0055aa,font-weight:bold;
+  classDef access fill:#d5e8d4,stroke:#82b366,stroke-width:1px,color:#006600,font-weight:bold;
+
+  class B,C,D,E core;
+  class F,W support;
+  class J list;
+  class K,X,L search;
+  class M,N,Y detail;
+  class O,P update;
+  class Q offline;
+  class Z,AA,AB access;</pre></figure>
+<hr>
+<h3 id="2-2-画面設計">2.2 画面設計</h3>
+<h4 id="2-2-1-画面一覧">2.2.1 画面一覧</h4>
+<div class="table-wrap"><table><thead><tr><th>No.</th><th><strong>画面名</strong></th><th><strong>機能</strong></th><th><strong>操作内容</strong></th></tr></thead><tbody><tr><td>1</td><td><strong>スプラッシュ画面</strong></td><td>・ポケモン基本情報更新機能開始</td><td>・なし</td></tr><tr><td>2</td><td><strong>ポケモン一覧画面</strong></td><td>・ポケモンのリスト表示<br>・検索機能<br>・ソート機能（図鑑番号順）<br>・タイプ別絞り込み機能</td><td>・ポケモンをリストからスクロールして選択<br>・名前または図鑑番号で検索<br>・図鑑番号でソート<br>・タイプで絞り込み</td></tr><tr><td>3</td><td><strong>ポケモン詳細画面</strong></td><td>・ポケモンの詳細情報表示（進化情報、進化条件など）<br>・オフライン表示のためのキャッシュ機能</td><td>・進化等の情報を確認<br>・詳細はオフライン時でもキャッシュから閲覧可能</td></tr><tr><td>4</td><td><strong>設定画面</strong></td><td>・手動でのデータ更新</td><td>・データを手動で更新文字サイズ調整</td></tr></tbody></table></div>
+<h4 id="2-2-2-画面遷移図">2.2.2 画面遷移図</h4>
+<figure class="diagram"><pre class="mermaid">graph LR
+  subgraph "アプリケーション画面遷移"
+    A[スプラッシュ画面]
+    C[ポケモン一覧画面]
+    D[ポケモン詳細画面]
+    E[設定画面]
+  end
+
+  subgraph "ナビゲーション"
+    B[ボトムナビゲーションバー]
+  end
+
+  A --&gt;|"0.5-1秒後"| C
+  C --&gt;|"ポケモン選択"| D
+  D --&gt;|"戻る"| C
+  B --&gt;|"図鑑アイコン"| C
+  B --&gt;|"設定アイコン"| E
+  E --&gt;|"ボトムナビ"| C
+
+  classDef startScreen fill:#d5e8d4,stroke:#82b366,stroke-width:2px,color:#006600,font-weight:bold;
+  classDef mainScreen fill:#dae8fc,stroke:#6c8ebf,stroke-width:2px,color:#0055aa,font-weight:bold;
+  classDef detailScreen fill:#ffe6cc,stroke:#d79b00,stroke-width:2px,color:#884400,font-weight:bold;
+  classDef configScreen fill:#fff2cc,stroke:#d6b656,stroke-width:2px,color:#7a6300,font-weight:bold;
+  classDef navElement fill:#e1d5e7,stroke:#9673a6,stroke-width:2px,color:#5c2d7a,font-weight:bold;
+  classDef edgeLabel color:#333333,font-weight:bold,font-size:12px;
+
+  class A startScreen;
+  class C mainScreen;
+  class D detailScreen;
+  class E configScreen;
+  class B navElement;</pre></figure>
+<h5 id="画面遷移説明">画面遷移説明</h5>
+<p>スプラッシュ画面:アプリ起動後始めに表示される画面。ポケモン基本情報更新機能を開始する。表示時間は0.5秒〜1秒に収まるようにし、更新が終わるか関係なく「ポケモン一覧画面」に遷移する。</p>
+<p>ポケモン一覧画面:「ポケモン一覧画面」からは、選択したポケモンの詳細情報を表示するために「ポケモン詳細画面」へ遷移できます。また、ボトムナビゲーションバーを使って、「設定画面」へ遷移できます。</p>
+<p>ポケモン詳細画面:ユーザーはポケモンの詳細情報を確認後、ヘッダーの戻るボタンか戻るジェスチャーを使用して「ポケモン一覧画面」へ戻ることができます。詳細情報は自動的にキャッシュされ、最後に閲覧した10件はオフラインでも参照可能です。</p>
+<p>設定画面:ユーザーは「設定画面」で手動でデータ更新ができます。設定画面からもボトムナビゲーションバーを使用して「ポケモン一覧画面」に遷移可能です。</p>
+<h4 id="2-2-3-画面レイアウト">2.2.3 画面レイアウト</h4>
+<p>以下を参照</p>
+<p><a class="lnk ext" href="https://www.figma.com/design/b0kI8aTikCubCeKQdcSKEC/%E3%83%9D%E3%82%B1%E3%83%A2%E3%83%B3%E5%9B%B3%E9%91%91%28%E3%82%AB%E3%83%B3%E3%83%88%E3%83%BC%E5%9C%B0%E6%96%B9%29%E3%83%87%E3%82%B6%E3%82%A4%E3%83%B3?node-id=3-40&amp;t=c3mklPkvnhvy8Sp5-1" target="_blank" rel="noopener">Figma: ポケモン図鑑(カントー地方)デザイン</a></p>
+<hr>
+<h3 id="2-3-外部インターフェース設計">2.3 外部インターフェース設計</h3>
+<p>外部インターフェース設計では、アプリが他のシステムとどのように通信するかを詳細に定義します。このアプリでは、外部インターフェースとして PokeAPI を使用してポケモン情報を取得します。</p>
+<h4 id="2-3-1-外部システム関連図">2.3.1 外部システム関連図</h4>
+<figure class="diagram"><pre class="mermaid">graph LR
+  subgraph "クライアントアプリ"
+    A[モバイルアプリ]
+
+    subgraph "API連携機能"
+      A1[ポケモン基本情報取得]
+      A2[ポケモン詳細情報取得]
+      A3[API再試行処理]
+      A4[APIバージョンチェック]
+    end
+  end
+
+  subgraph "外部API"
+    B[PokeAPI]
+  end
+
+  A --&gt; A1 &amp; A2 &amp; A3 &amp; A4
+  A1 --&gt;|"GET /pokemon"| B
+  A2 --&gt;|"GET /pokemon/{id}"| B
+  A3 --&gt;|"最大3回再試行"| B
+  A4 --&gt;|"バージョン確認"| B
+
+  classDef client fill:#dae8fc,stroke:#6c8ebf,stroke-width:2px,color:#0055aa,font-weight:bold;
+  classDef api fill:#d5e8d4,stroke:#82b366,stroke-width:2px,color:#006600,font-weight:bold;
+  classDef apiFunction fill:#fff2cc,stroke:#d6b656,stroke-width:1px,color:#7a6300,font-weight:bold;
+  classDef external fill:#f8cecc,stroke:#b85450,stroke-width:2px,color:#8a3b38,font-weight:bold;
+  classDef edgeLabel color:#333333,font-weight:bold,font-size:12px;
+
+  class A client;
+  class A1,A2,A3,A4 apiFunction;
+  class B external;</pre></figure>
+<h5 id="外部システム関連図説明">外部システム関連図説明</h5>
+<p>モバイルアプリ:ユーザーが操作するアプリ部分。PokeAPIと連携してデータを取得、更新します。また、API障害時の再試行やバージョンチェックも行います。</p>
+<p>PokeAPI:外部APIで、ポケモン情報（基本データや詳細情報）を提供します。</p>
+<h4 id="2-3-2-外部インターフェース一覧">2.3.2 外部インターフェース一覧</h4>
+<div class="table-wrap"><table><thead><tr><th>No.</th><th><strong>インターフェース名</strong></th><th><strong>インターフェースの種類</strong></th><th><strong>外部システム名</strong></th><th><strong>利用目的</strong></th><th><strong>インターフェース詳細</strong></th></tr></thead><tbody><tr><td>1</td><td><strong>PokeAPI</strong></td><td>RESTful API</td><td>PokeAPI</td><td>ポケモン情報の取得（基本データ、進化情報など）</td><td>・ポケモンの基本データ（番号、名前、タイプ、進化情報など）を取得する。<br>・リクエストはHTTPSで行い、レスポンスをJSON形式で受け取る。<br>・最大3回まで30秒間隔で再試行し、API障害に備える。</td></tr></tbody></table></div>
+<h5 id="外部インターフェース説明">外部インターフェース説明</h5>
+<ol>
+<li><strong>PokeAPI</strong>:
+<ul>
+<li>外部のポケモン情報を提供するAPI。モバイルアプリがポケモンの基本情報や進化情報などを取得するために利用します。
+</li>
+<li>通信はすべてHTTPSで行い、証明書ピン留めによる中間者攻撃防止を実装します。
+</li>
+<li>API仕様変更検出のためバージョン情報を確認し、必要に応じてアップデートを促す仕組みを実装します。
+</li>
+<li>取得失敗時は最大3回まで30秒間隔で自動的に再試行します。
+</li></ul>
+</li></ol>
+<h4 id="2-3-3-外部インターフェース定義">2.3.3 外部インターフェース定義</h4>
+<p><strong>1. PokeAPI</strong></p>
+<p>以下を参照Swaggerで作成する</p>
+<h5 id="エラー処理">エラー処理</h5>
+<p>PokeAPIを利用する際のエラー処理は、以下の通り定義します。</p>
+<ol>
+<li><strong>ネットワークエラー</strong>
+<ul>
+<li><strong>原因</strong>: ネットワークの接続不良、タイムアウトなど。
+</li>
+<li><strong>対応方法</strong>:
+<ul>
+<li>ユーザーに「ネットワーク接続を確認してください」というメッセージを表示。
+</li>
+<li>再試行ボタンを提供し、最大3回まで30秒間隔で自動的に再試行を行う。
+</li>
+<li>リトライ後も失敗した場合は、オフラインモードに切り替えるか、キャッシュされたデータを表示。
+</li></ul>
+</li></ul>
+</li>
+<li><strong>APIレスポンスエラー</strong>
+<ul>
+<li><strong>原因</strong>: APIからのレスポンスが異常、ステータスコードがエラー（例: 500, 404）など。
+</li>
+<li><strong>対応方法</strong>:
+<ul>
+<li>エラーメッセージをユーザーに表示。
+</li>
+<li>リトライオプションの提供。
+</li>
+<li>最大3回まで30秒間隔で自動的に再試行を行う。
+</li>
+<li>10件までのキャッシュされた詳細情報を提供。
+</li></ul>
+</li></ul>
+</li>
+<li><strong>不正なデータエラー</strong>
+<ul>
+<li><strong>原因</strong>: APIからのレスポンスが期待される形式ではない（JSON解析エラーなど）。
+</li>
+<li><strong>対応方法</strong>:
+<ul>
+<li>ユーザーには「データの取得に失敗しました」と表示。
+</li>
+<li>ログを記録し、開発者にフィードバックする。
+</li>
+<li>キャッシュされたデータがある場合は表示し、その旨をユーザーに通知。
+</li></ul>
+</li></ul>
+</li></ol>
+<hr>
+<h3 id="2-4-内部インターフェース定義">2.4 内部インターフェース定義</h3>
+<h4 id="2-4-1-内部システム関連図">2.4.1 内部システム関連図</h4>
+<figure class="diagram"><pre class="mermaid">graph LR
+  subgraph "アプリケーション"
+    A[モバイルアプリ]
+
+    subgraph "データ操作"
+      A1[ポケモン基本情報保存]
+      A2[ポケモン詳細情報キャッシュ]
+    end
+  end
+
+  subgraph "ローカルストレージ"
+    B[SQLiteデータベース]
+
+    subgraph "テーブル構造"
+      T1[pokemon_basic_info]
+      T2[pokemon_detail_cache]
+    end
+  end
+
+  A --&gt; A1 &amp; A2
+  A1 --&gt;|"CRUD操作"| B
+  A2 --&gt;|"最近10件保存"| B
+
+  B --&gt; T1 &amp; T2
+
+  classDef app fill:#dae8fc,stroke:#6c8ebf,stroke-width:2px,color:#0055aa,font-weight:bold;
+  classDef dataOps fill:#d5e8d4,stroke:#82b366,stroke-width:1px,color:#006600,font-weight:bold;
+  classDef database fill:#ffe6cc,stroke:#d79b00,stroke-width:2px,color:#884400,font-weight:bold;
+  classDef tables fill:#fff2cc,stroke:#d6b656,stroke-width:1px,color:#7a6300,font-weight:bold;
+  classDef edgeLabel color:#333333,font-weight:bold,font-size:12px;
+
+  class A app;
+  class A1,A2 dataOps;
+  class B database;
+  class T1,T2 tables;</pre></figure>
+<h5 id="内部システム関連図説明">内部システム関連図説明</h5>
+<p>モバイルアプリ:ユーザーが操作するアプリ部分。PokeAPIから取得したデータをSQLiteに保存、取得します。また、最近閲覧した詳細情報のキャッシュも行います。</p>
+<p>SQLite:SQLiteは軽量で自己完結型のローカルデータベース管理システム。</p>
+<h4 id="2-4-2-内部インターフェース一覧">2.4.2 内部インターフェース一覧</h4>
+<div class="table-wrap"><table><thead><tr><th>No.</th><th><strong>インターフェース名</strong></th><th><strong>インターフェースの種類</strong></th><th><strong>内部システム名</strong></th><th><strong>利用目的</strong></th><th><strong>インターフェース詳細</strong></th></tr></thead><tbody><tr><td>1</td><td><strong>SQLite</strong></td><td>ローカルデータベース</td><td>SQLite</td><td>ポケモンの基本情報の保存とキャッシュ</td><td>・保存: ユーザーが取得したポケモン情報をローカルデータベースに保存<br>・取得: ローカルデータベースからポケモン情報を取得<br>・キャッシュ: 最近閲覧した10件の詳細情報を保存</td></tr></tbody></table></div>
+<p><strong>内部インターフェース説明</strong></p>
+<ol>
+<li><strong>SQLite</strong>:
+<ul>
+<li>SQLiteは軽量で自己完結型のローカルデータベース管理システムで、外部サーバーと接続せずにデータベースをローカル環境内で直接操作できます。
+</li>
+<li>ポケモンの基本情報（ポケモンの図鑑番号、画像、名前、タイプ）をデバイス内に保存し、ユーザーが獲得したポケモンデータを効率的に管理するために使用されます。
+</li>
+<li>最近閲覧した10件のポケモン詳細情報をキャッシュとして保存し、オフライン時でも参照可能にします。
+</li>
+<li>ユーザー設定情報を暗号化して保存し、セキュリティを確保します。
+</li>
+<li>データ保存容量は初期状態で約10MB以内に収めます。
+</li></ul>
+</li></ol>
+<h4 id="2-4-3-テーブル構成">2.4.3 テーブル構成</h4>
+<p><strong>1. テーブル名: pokemon_basic_info</strong></p>
+<div class="table-wrap"><table><thead><tr><th>カラム名</th><th>データ型</th><th>説明</th></tr></thead><tbody><tr><td><strong>id</strong></td><td><code>INT</code> （自動インクリメント）</td><td>主キー。ポケモンの一意識別用。</td></tr><tr><td><strong>pokedex_number</strong></td><td><code>INT</code></td><td>ポケモンの図鑑番号（例：001, 002, ...）。ユニーク制約。</td></tr><tr><td><strong>name</strong></td><td><code>VARCHAR(255)</code></td><td>ポケモンの名前（例：ピカチュウ、リザードン）。</td></tr><tr><td><strong>type_1</strong></td><td><code>VARCHAR(50)</code></td><td>主タイプ（例：でんき、ほのお、みず）。</td></tr><tr><td><strong>type_2</strong></td><td><code>VARCHAR(50)</code></td><td>サブタイプ（例：ふゆう、ひこう）。NULLも許容。</td></tr><tr><td><strong>image_url</strong></td><td><code>VARCHAR(255)</code></td><td>ポケモンの画像URL（外部リンク）。</td></tr><tr><td><strong>last_updated</strong></td><td><code>TIMESTAMP</code></td><td>最終更新日時。データ鮮度の確認用。</td></tr></tbody></table></div>
+<p><strong>2. テーブル名: pokemon_detail_cache</strong></p>
+<div class="table-wrap"><table><thead><tr><th>カラム名</th><th>データ型</th><th>説明</th></tr></thead><tbody><tr><td><strong>id</strong></td><td><code>INT</code> （自動インクリメント）</td><td>主キー。キャッシュエントリの一意識別用。</td></tr><tr><td><strong>pokedex_number</strong></td><td><code>INT</code></td><td>ポケモンの図鑑番号。pokemon_basic_infoの外部キー。</td></tr><tr><td><strong>evolution_chain</strong></td><td><code>TEXT</code></td><td>進化情報をJSON形式で保存。</td></tr><tr><td><strong>moves</strong></td><td><code>TEXT</code></td><td>技情報をJSON形式で保存。</td></tr><tr><td><strong>last_viewed</strong></td><td><code>TIMESTAMP</code></td><td>最後に閲覧した日時。古いキャッシュ削除用。</td></tr><tr><td><strong>cached_on</strong></td><td><code>TIMESTAMP</code></td><td>キャッシュした日時。データ鮮度の確認用。</td></tr></tbody></table></div>
+<hr>
+<h3 id="2-5-パフォーマンス設計">2.5 パフォーマンス設計</h3>
+<p>パフォーマンス設計では、アプリが効率的に動作するための性能基準を定義します。</p>
+<h4 id="2-5-1-パフォーマンス目標">2.5.1 パフォーマンス目標</h4>
+<div class="table-wrap"><table><thead><tr><th>項目</th><th>目標値</th><th>説明</th></tr></thead><tbody><tr><td><strong>画面遷移時間</strong></td><td>300ms以内</td><td>画面間の遷移にかかる時間</td></tr><tr><td><strong>データ読み込み時間</strong></td><td>2秒以内</td><td>通常のネットワーク環境下でのデータ読み込み時間</td></tr><tr><td><strong>アプリサイズ</strong></td><td>30MB以下</td><td>初期インストール時のアプリケーションサイズ</td></tr><tr><td><strong>メモリ使用量</strong></td><td>100MB以下</td><td>アプリケーション実行時の最大メモリ使用量</td></tr><tr><td><strong>ローカルストレージ使用量</strong></td><td>10MB以内</td><td>アプリケーションのローカルストレージ使用量（初期状態）</td></tr></tbody></table></div>
+<h4 id="2-5-2-最適化戦略">2.5.2 最適化戦略</h4>
+<ol>
+<li><strong>イメージの最適化</strong>
+<ul>
+<li>ポケモン画像はキャッシュし、再読み込みを最小限に抑える
+</li>
+<li>適切な解像度とフォーマットを使用し、ファイルサイズを小さく保つ
+</li></ul>
+</li>
+<li><strong>データ取得の最適化</strong>
+<ul>
+<li>一覧表示に必要な最小限のデータのみを最初に取得
+</li>
+<li>詳細データは必要に応じて遅延読み込み
+</li></ul>
+</li>
+<li><strong>キャッシュ戦略</strong>
+<ul>
+<li>最近閲覧した10件のポケモン詳細情報をキャッシュとして保存
+</li>
+<li>一覧データは完全にローカルに保存し、オフラインでも利用可能に
+</li></ul>
+</li></ol>
+<hr>
+<h3 id="2-6-テスト計画">2.6 テスト計画</h3>
+<h4 id="2-6-1-テスト種類と範囲">2.6.1 テスト種類と範囲</h4>
+<div class="table-wrap"><table><thead><tr><th>テスト種類</th><th>説明</th><th>実施タイミング</th></tr></thead><tbody><tr><td><strong>ユニットテスト</strong></td><td>各機能の個別コンポーネントのテスト</td><td>開発中随時</td></tr><tr><td><strong>統合テスト</strong></td><td>複数のコンポーネントを組み合わせたテスト</td><td>機能実装後</td></tr><tr><td><strong>UI/UXテスト</strong></td><td>ユーザーインターフェースと操作性のテスト</td><td>プロトタイプ完成後</td></tr><tr><td><strong>互換性テスト</strong></td><td>様々な画面サイズとデバイスでの互換性テスト</td><td>ベータ版前</td></tr><tr><td><strong>パフォーマンステスト</strong></td><td>応答速度、メモリ使用量などのテスト</td><td>ベータ版前</td></tr><tr><td><strong>セキュリティテスト</strong></td><td>データ保護機能、通信セキュリティのテスト</td><td>ベータ版前</td></tr></tbody></table></div>
+<h4 id="2-6-2-テストスケジュール">2.6.2 テストスケジュール</h4>
+<ul>
+<li>プロトタイプ完成後2週間以内に内部テストを実施
+</li>
+<li>ベータ版公開1ヶ月前にユーザー受け入れテストを開始
+</li></ul>
+<hr>
+<h3 id="2-7-セキュリティ設計">2.7 セキュリティ設計</h3>
+<h4 id="2-7-1-データ保護">2.7.1 データ保護</h4>
+<ol>
+<li><strong>ローカルデータの暗号化</strong>
+<ul>
+<li>ユーザーデータは端末内で暗号化して保存
+</li>
+<li>SQLiteデータベースへのアクセス制限
+</li></ul>
+</li>
+<li><strong>通信セキュリティ</strong>
+<ul>
+<li>PokeAPIとの通信はすべてHTTPSで実施
+</li>
+<li>証明書ピン留めによる中間者攻撃防止
+</li></ul>
+</li></ol>
+<h4 id="2-7-2-セキュリティ対策">2.7.2 セキュリティ対策</h4>
+<div class="table-wrap"><table><thead><tr><th>脅威</th><th>対策</th></tr></thead><tbody><tr><td><strong>データ漏洩</strong></td><td>データの暗号化保存、最小限の情報収集</td></tr><tr><td><strong>中間者攻撃</strong></td><td>HTTPS通信、証明書ピン留め</td></tr><tr><td><strong>不正アクセス</strong></td><td>アプリ内データへのアクセス制限</td></tr></tbody></table></div>
+<hr>
+<h3 id="2-8-運用・保守計画">2.8 運用・保守計画</h3>
+<h4 id="2-8-1-バグ修正ポリシー">2.8.1 バグ修正ポリシー</h4>
+<ul>
+<li>重大なバグは48時間以内に修正版をリリース
+</li>
+<li>軽微なバグは2週間以内に修正版をリリース
+</li></ul>
+<h4 id="2-8-2-アップデート頻度">2.8.2 アップデート頻度</h4>
+<ul>
+<li>機能追加は3ヶ月ごとに実施
+</li>
+<li>バグ修正は必要に応じて随時実施
+</li></ul>
+<h4 id="2-8-3-サポート期間">2.8.3 サポート期間</h4>
+<ul>
+<li>正式リリースから最低2年間のサポートを提供
+</li></ul>
+<h4 id="2-8-4-ユーザーフィードバック収集">2.8.4 ユーザーフィードバック収集</h4>
+<ul>
+<li>ベータテスト期間中にユーザーからのフィードバックを収集するためのフォームを提供
+</li>
+<li>アプリ内からバグ報告や機能改善の提案を送信できる仕組みを実装
+</li></ul>
+<hr>
+<h2 id="付録-基本設計とは">付録: 基本設計とは</h2>
+<blockquote>設計工程そのものの解説です。アプリの仕様ではありません。</blockquote>
+<h3 id="開発プロジェクトとは">開発プロジェクトとは</h3>
+<p>開発プロジェクトとは、ソフトウェアやシステムを作成するための組織的な取り組みです。これは単にプログラムを書くだけではなく、計画から実装、テスト、リリースまでの全工程を含みます。</p>
+<h3 id="基本設計の位置づけ">基本設計の位置づけ</h3>
+<p>基本設計（Basic Design）は、開発プロジェクトの初期段階で行われる重要なプロセスです。これは要件定義の後に行われ、システムの骨組みを決定する段階です。</p>
+<h3 id="基本設計のプロセス">基本設計のプロセス</h3>
+<h4 id="1-要件の確認">1. 要件の確認</h4>
+<p>まず、顧客やユーザーの要望（要件）を十分に理解することから始めます。これにより、作るべきものの目的や機能が明確になります。</p>
+<h4 id="2-システム全体の構造決定">2. システム全体の構造決定</h4>
+<p>システムをどのように構成するかの大枠を決めます。例えば、ウェブアプリケーションであれば、フロントエンド（見た目の部分）とバックエンド（裏側で動く部分）の分離などを決定します。</p>
+<h4 id="3-データ設計">3. データ設計</h4>
+<p>システムで扱うデータの種類と構造を決めます。データベースを使用する場合は、テーブル設計や関連性の定義も行います。</p>
+<h4 id="4-インターフェース設計">4. インターフェース設計</h4>
+<p>システムの利用者がどのように操作するか、また他のシステムとどのように連携するかを決めます。画面のレイアウトや機能配置なども含まれます。</p>
+<h4 id="5-セキュリティ設計">5. セキュリティ設計</h4>
+<p>情報漏洩やシステム障害を防ぐための対策を計画します。ユーザー認証やデータ暗号化などの方法を決定します。</p>
+<h3 id="基本設計の成果物">基本設計の成果物</h3>
+<p>基本設計の結果として、以下のような文書が作成されます：</p>
+<ul>
+<li>システム構成図：システム全体の構造を視覚的に表現したもの
+</li>
+<li>画面設計書：ユーザーインターフェースの詳細
+</li>
+<li>データベース設計書：データの保存方法や関連性の詳細
+</li>
+<li>外部インターフェース仕様書：他システムとの連携方法
+</li></ul>
+<h3 id="基本設計の重要性">基本設計の重要性</h3>
+<p>基本設計は後工程の詳細設計や実装の基盤となるため、ここでの判断ミスは後の大幅な修正につながる可能性があります。そのため、十分な検討と関係者間での合意形成が重要です。</p>
+<h3 id="まとめ">まとめ</h3>
+<p>基本設計とは、開発プロジェクトにおいて「何を」「どのように」作るかの骨組みを決める重要なプロセスです。明確で適切な基本設計があれば、後の工程がスムーズに進み、品質の高いシステムを効率的に開発することができます。</p></section>
+<section class="doc" id="doc-5" data-file="03_詳細設計.md" hidden><h1 id="詳細設計書-ポケモン図鑑アプリ-カントー地方">詳細設計書 — ポケモン図鑑アプリ（カントー地方）</h1>
+<h2 id="はじめに">はじめに</h2>
+<p>この詳細設計書は、<a class="lnk" href="01_要件定義.md" data-doc="01_要件定義.md">要件定義</a>と<a class="lnk" href="02_基本設計.md" data-doc="02_基本設計.md">基本設計</a>に基づき、そのまま実装に着手できる粒度まで設計を具体化したものです。</p>
+<p>コード例は <strong>Kotlin + Jetpack Compose</strong> で記載しています。そのまま貼って動くものではなく、設計の意図を伝えるためのスケッチです。import 文とテーマ定義は省略しています。</p>
+<p>次のものは意図的に省いています。各 Issue で自分で実装してください。</p>
+<ul>
+<li>DTO からモデル・Entity への変換（<code>toEntity()</code> / <code>toDetail()</code>）
+</li>
+<li>見た目を決める Composable（<code>PokemonGridItem</code> / <code>SearchField</code> / <code>LoadingIndicator</code>）
+</li>
+<li>画面遷移の定義（<code>PokedexNavHost</code>）
+</li></ul>
+<p>実装するスコープと評価の基準は<a class="lnk" href="04_実装仕様.md" data-doc="04_実装仕様.md">実装仕様</a>、作業の単位は <a class="lnk ext" href="https://github.com/sghh02/pokedex-android-kadai/issues" target="_blank" rel="noopener">GitHub Issues</a> にまとめてあります。</p>
+<h3 id="設計原則">設計原則</h3>
+<ul>
+<li><strong>レイヤードアーキテクチャ</strong>: Presentation / Business / Data / Infrastructure の4層構成
+</li>
+<li><strong>SOLID原則</strong>: 保守性と拡張性を重視した設計
+</li>
+<li><strong>パフォーマンス最適化</strong>: ユーザー体験を左右する応答性の確保
+</li>
+<li><strong>オフラインファースト</strong>: ネットワーク状況に依存しない堅牢な設計
+</li></ul>
+<h3 id="この文書の構成">この文書の構成</h3>
+<ol>
+<li>全体アーキテクチャ — レイヤー構成と主要コンポーネント
+</li>
+<li>データ構造設計 — 型定義とSQLiteテーブル
+</li>
+<li>API設計 — PokeAPIの利用仕様と内部インターフェース
+</li>
+<li>機能詳細設計 — 機能ごとのシーケンス図・実装例・エラーハンドリング
+</li>
+<li>エラーハンドリング — 例外の分類と共通処理
+</li>
+<li>パフォーマンス設計 — 目標値と最適化方針
+</li></ol>
+<hr>
+<hr>
+<h2 id="1-全体アーキテクチャ">1. 全体アーキテクチャ</h2>
+<h3 id="1-1-レイヤー構成">1.1 レイヤー構成</h3>
+<figure class="code"><div class="code-head"><span>text</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-text">┌─────────────────────────────────────┐
+│        Presentation Layer           │ ← Composable（*Screen）
+├─────────────────────────────────────┤
+│         Business Layer              │ ← ViewModel（状態と画面ロジック）
+├─────────────────────────────────────┤
+│         Data Layer                  │ ← Repository / UpdateService / DetailCache
+├─────────────────────────────────────┤
+│      Infrastructure Layer           │ ← PokeApiService / Room / NetworkMonitor
+└─────────────────────────────────────┘</code></pre></figure>
+<p><a class="lnk" href="04_実装仕様.md" data-doc="04_実装仕様.md">実装仕様</a>では同じ構造を Android の慣用名で「UI / ViewModel / Repository / Data Sources」と呼んでいます。対応は次のとおりです。</p>
+<div class="table-wrap"><table><thead><tr><th>本書</th><th>実装仕様</th><th>実装上の型</th></tr></thead><tbody><tr><td>Presentation</td><td>UI Layer</td><td><code>@Composable fun *Screen</code></td></tr><tr><td>Business</td><td>ViewModel Layer</td><td><code>*ViewModel</code>（<code>StateFlow</code> で状態を公開）</td></tr><tr><td>Data</td><td>Repository Layer</td><td><code>PokemonRepository</code> / <code>UpdateService</code> / <code>DetailCache</code></td></tr><tr><td>Infrastructure</td><td>Data Sources Layer</td><td><code>PokeApiService</code> / <code>PokemonDao</code> / <code>NetworkMonitor</code></td></tr></tbody></table></div>
+<h3 id="1-2-主要コンポーネント">1.2 主要コンポーネント</h3>
+<div class="table-wrap"><table><thead><tr><th>コンポーネント</th><th>役割</th><th>層</th></tr></thead><tbody><tr><td><code>PokemonRepository</code></td><td>API とローカルDBを束ね、画面に単一の入口を提供する</td><td>Data</td></tr><tr><td><code>PokeApiService</code></td><td>PokeAPI との通信（Retrofit インターフェース）</td><td>Infrastructure</td></tr><tr><td><code>PokemonDao</code> / <code>AppDatabase</code></td><td>Room によるローカル永続化</td><td>Infrastructure</td></tr><tr><td><code>DetailCache</code></td><td>詳細情報のキャッシュ（直近10件・LRU）</td><td>Data</td></tr><tr><td><code>UpdateService</code></td><td>151匹ぶんの取得と再試行の制御</td><td>Data</td></tr><tr><td><code>NetworkMonitor</code></td><td>ネットワーク状態の監視</td><td>Infrastructure</td></tr><tr><td><code>*ViewModel</code></td><td>画面ごとの状態保持（StateFlow で公開）</td><td>Business</td></tr><tr><td><code>*Screen</code></td><td>Composable による画面描画</td><td>Presentation</td></tr></tbody></table></div>
+<hr>
+<h2 id="2-データ構造設計">2. データ構造設計</h2>
+<h3 id="2-1-pokemon基本情報">2.1 Pokemon基本情報</h3>
+<figure class="code"><div class="code-head"><span>kotlin</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-kotlin">// domain/model/Pokemon.kt — 画面が扱うモデル
+data class Pokemon(
+    val id: Int,
+    val name: String,        // 英語名。一覧APIから取得
+    val nameJa: String?,     // 日本語名。pokemon-species から取得（Phase 2）
+    val imageUrl: String?,
+    val type1: String?,
+    val type2: String?,
+    val heightDm: Int,       // APIの生値（デシメートル）
+    val weightHg: Int,       // APIの生値（ヘクトグラム）
+) {
+    val displayName: String get() = nameJa ?: name
+    val heightMeters: Double get() = heightDm / 10.0   // 7 → 0.7 m
+    val weightKg: Double get() = weightHg / 10.0       // 69 → 6.9 kg
+    val types: List&lt;String&gt; get() = listOfNotNull(type1, type2)
+}</code></pre></figure>
+<figure class="code"><div class="code-head"><span>kotlin</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-kotlin">// data/local/PokemonEntity.kt — Room の保存形式
+@Entity(
+    tableName = &quot;pokemon&quot;,
+    indices = [Index(&quot;name&quot;), Index(&quot;name_ja&quot;), Index(&quot;type1&quot;), Index(&quot;type2&quot;)],
+)
+data class PokemonEntity(
+    @PrimaryKey val id: Int,
+    val name: String,
+    @ColumnInfo(name = &quot;name_ja&quot;) val nameJa: String? = null,
+    @ColumnInfo(name = &quot;image_url&quot;) val imageUrl: String? = null,
+    val height: Int,
+    val weight: Int,
+    val type1: String? = null,
+    val type2: String? = null,
+    @ColumnInfo(name = &quot;created_at&quot;) val createdAt: Long = System.currentTimeMillis(),
+)
+
+fun PokemonEntity.toDomain() = Pokemon(id, name, nameJa, imageUrl, type1, type2, height, weight)</code></pre></figure>
+<h3 id="2-2-pokemon詳細情報">2.2 Pokemon詳細情報</h3>
+<figure class="code"><div class="code-head"><span>kotlin</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-kotlin">// domain/model/PokemonDetail.kt
+data class PokemonDetail(
+    val pokemon: Pokemon,
+    val abilities: List&lt;Ability&gt;,
+    val stats: List&lt;Stat&gt;,
+    val evolutions: List&lt;Evolution&gt;,
+    val flavorTextJa: String?,   // pokemon-species の日本語説明文
+)
+
+data class Ability(
+    val name: String,
+    val isHidden: Boolean,       // 隠れ特性かどうか
+)
+
+data class Stat(
+    val name: String,            // hp / attack / defense ...
+    val value: Int,
+) {
+    companion object { const val MAX_VALUE = 255 }
+}
+
+data class Evolution(
+    val fromId: Int,
+    val toId: Int,
+    val condition: String,       // 例: &quot;レベル16&quot;
+)</code></pre></figure>
+<h3 id="2-3-sqliteテーブル設計">2.3 SQLiteテーブル設計</h3>
+<p>Room が生成するスキーマは次のとおりです。日付はエポックミリ秒（<code>INTEGER</code>）で保持します。</p>
+<figure class="code"><div class="code-head"><span>sql</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-sql">-- ポケモン基本情報
+CREATE TABLE pokemon (
+    id         INTEGER PRIMARY KEY,   -- 図鑑番号
+    name       TEXT    NOT NULL,      -- 英語名
+    name_ja    TEXT,                  -- 日本語名（Phase 2）
+    image_url  TEXT,
+    height     INTEGER,               -- デシメートル（APIの生値）
+    weight     INTEGER,               -- ヘクトグラム（APIの生値）
+    type1      TEXT,
+    type2      TEXT,                  -- 単タイプのポケモンは NULL
+    created_at INTEGER NOT NULL
+);
+
+CREATE INDEX idx_pokemon_name    ON pokemon(name);
+CREATE INDEX idx_pokemon_name_ja ON pokemon(name_ja);
+CREATE INDEX idx_pokemon_type1   ON pokemon(type1);
+CREATE INDEX idx_pokemon_type2   ON pokemon(type2);
+
+-- 詳細情報のキャッシュ（直近10件のみ保持）
+CREATE TABLE pokemon_detail_cache (
+    id            INTEGER PRIMARY KEY,
+    detail_json   TEXT    NOT NULL,
+    cached_at     INTEGER NOT NULL,
+    last_accessed INTEGER NOT NULL,   -- LRU の判定に使う
+    FOREIGN KEY (id) REFERENCES pokemon(id)
+);
+
+CREATE INDEX idx_cache_last_accessed ON pokemon_detail_cache(last_accessed);</code></pre></figure>
+<p>タイプは <code>type1</code> / <code>type2</code> の個別カラムに分けています。JSON配列で持つとタイプ検索が <code>LIKE</code> になりインデックスが効かないためです。</p>
+<hr>
+<h2 id="3-api設計">3. API設計</h2>
+<h3 id="3-1-pokeapi-エンドポイント仕様">3.1 PokeAPI エンドポイント仕様</h3>
+<h4 id="3-1-1-ポケモン一覧取得">3.1.1 ポケモン一覧取得</h4>
+<figure class="code"><div class="code-head"><span>text</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-text">GET https://pokeapi.co/api/v2/pokemon/?limit=151&amp;offset=0</code></pre></figure>
+<p><strong>レスポンス例:</strong></p>
+<figure class="code"><div class="code-head"><span>json</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-json">{
+  &quot;count&quot;: 151,
+  &quot;results&quot;: [
+    {
+      &quot;name&quot;: &quot;bulbasaur&quot;,
+      &quot;url&quot;: &quot;https://pokeapi.co/api/v2/pokemon/1/&quot;
+    }
+  ]
+}</code></pre></figure>
+<h4 id="3-1-2-ポケモン詳細取得">3.1.2 ポケモン詳細取得</h4>
+<figure class="code"><div class="code-head"><span>text</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-text">GET https://pokeapi.co/api/v2/pokemon/{id}/</code></pre></figure>
+<h3 id="3-2-内部api設計">3.2 内部API設計</h3>
+<h4 id="3-2-1-pokemonrepository-interface">3.2.1 PokemonRepository Interface</h4>
+<figure class="code"><div class="code-head"><span>kotlin</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-kotlin">// data/repository/PokemonRepository.kt
+interface PokemonRepository {
+
+    /** 一覧はローカルDBを唯一の情報源とする。DBが更新されれば画面へ自動的に流れる。 */
+    fun observePokemonList(): Flow&lt;List&lt;Pokemon&gt;&gt;
+
+    /** 検索も DB に対して行う。query が空なら全件を返す。 */
+    fun searchPokemon(query: String): Flow&lt;List&lt;Pokemon&gt;&gt;
+
+    /** 詳細は API から取得し、直近10件をキャッシュする。 */
+    suspend fun getPokemonDetail(id: Int): Result&lt;PokemonDetail&gt;
+
+    /** API から取得して DB を更新する。onProgress は (完了数, 総数)。 */
+    suspend fun refresh(onProgress: (done: Int, total: Int) -&gt; Unit = { _, _ -&gt; }): Result&lt;Unit&gt;
+
+    /** 最終更新日時（エポックミリ秒）。未更新なら null。 */
+    suspend fun lastUpdatedAt(): Long?
+}</code></pre></figure>
+<hr>
+<h2 id="4-機能詳細設計">4. 機能詳細設計</h2>
+<h3 id="4-1-アプリ起動・初期化機能">4.1 アプリ起動・初期化機能</h3>
+<h4 id="4-1-1-機能概要">4.1.1 機能概要</h4>
+<p>アプリ起動時にスプラッシュ画面を表示し、初期データ取得と画面遷移を行う。</p>
+<h4 id="4-1-2-処理フロー">4.1.2 処理フロー</h4>
+<figure class="diagram"><pre class="mermaid">sequenceDiagram
+    participant User
+    participant SplashScreen
+    participant SplashViewModel
+    participant PokemonDao
+    participant PokeApiService
+    participant PokemonListScreen
+
+    User-&gt;&gt;SplashScreen: アプリ起動
+    SplashScreen-&gt;&gt;SplashViewModel: 初期化開始
+    SplashViewModel-&gt;&gt;PokemonDao: ローカルDB確認
+
+    alt ローカルDBにデータなし
+        SplashViewModel-&gt;&gt;PokeApiService: 初回データ取得開始
+        PokeApiService-&gt;&gt;PokeApiService: PokeAPI呼び出し(非同期)
+        SplashViewModel-&gt;&gt;PokemonDao: 基本テーブル作成
+    else ローカルDBにデータあり
+        SplashViewModel-&gt;&gt;PokemonDao: データ存在確認
+        SplashViewModel-&gt;&gt;PokeApiService: バックグラウンド更新開始(非同期)
+    end
+
+    SplashViewModel-&gt;&gt;SplashScreen: 初期化完了通知
+    SplashScreen-&gt;&gt;PokemonListScreen: 画面遷移(0.5-1秒後)
+    SplashScreen-&gt;&gt;User: 一覧画面表示
+
+    Note over PokeApiService: バックグラウンドで継続実行
+    PokeApiService-&gt;&gt;PokemonDao: データ更新(完了後)</pre></figure>
+<h4 id="4-1-3-実装仕様">4.1.3 実装仕様</h4>
+<h5 id="splashscreen-composable">SplashScreen（Composable）</h5>
+<figure class="code"><div class="code-head"><span>kotlin</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-kotlin">// ui/splash/SplashScreen.kt
+private const val MINIMUM_DISPLAY_MS = 500L   // 要件: 0.5〜1秒
+
+@Composable
+fun SplashScreen(
+    onFinished: () -&gt; Unit,
+    viewModel: SplashViewModel = viewModel(factory = LocalAppContainer.current.viewModelFactory),
+) {
+    LaunchedEffect(Unit) {
+        // 初期化の成否にかかわらず一覧へ進む。起動を止めないことを優先する。
+        val elapsed = measureTimeMillis { viewModel.initialize() }
+        delay((MINIMUM_DISPLAY_MS - elapsed).coerceAtLeast(0L))
+        onFinished()
+    }
+
+    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Image(
+            painter = painterResource(R.drawable.ic_pokedex),
+            contentDescription = null,
+        )
+    }
+}
+
+class SplashViewModel(private val repository: PokemonRepository) : ViewModel() {
+    suspend fun initialize() {
+        repository.refresh()
+            .onFailure { Log.w(TAG, &quot;初期データの取得に失敗。保存済みデータで継続する&quot;, it) }
+    }
+
+    private companion object { const val TAG = &quot;SplashViewModel&quot; }
+}</code></pre></figure>
+<h5 id="application-と依存の組み立て">Application と依存の組み立て</h5>
+<figure class="code"><div class="code-head"><span>kotlin</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-kotlin">// PokedexApplication.kt — アプリ全体の初期化と依存の組み立て
+class PokedexApplication : Application() {
+    lateinit var container: AppContainer
+        private set
+
+    override fun onCreate() {
+        super.onCreate()
+        container = AppContainer(this)
+    }
+}
+
+/**
+ * 手動DIのコンテナ。Hilt を導入する場合は @Module に置き換える。
+ * Phase 1 はこの形で十分に動く。
+ */
+class AppContainer(context: Context) {
+
+    private val json = Json { ignoreUnknownKeys = true }
+
+    private val database = Room
+        .databaseBuilder(context, AppDatabase::class.java, &quot;pokedex.db&quot;)
+        .fallbackToDestructiveMigration()   // 学習用途。データは API から取り直せる
+        .build()
+
+    private val okHttp = OkHttpClient.Builder()
+        .addInterceptor(
+            HttpLoggingInterceptor().apply {
+                // リリースビルドではログを出さない
+                level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY
+                        else HttpLoggingInterceptor.Level.NONE
+            }
+        )
+        .build()
+
+    private val api: PokeApiService = Retrofit.Builder()
+        .baseUrl(PokeApiService.BASE_URL)
+        .client(okHttp)
+        .addConverterFactory(json.asConverterFactory(&quot;application/json&quot;.toMediaType()))
+        .build()
+        .create(PokeApiService::class.java)
+
+    val networkMonitor = NetworkMonitor(context)
+
+    val pokemonRepository: PokemonRepository = DefaultPokemonRepository(
+        api = api,
+        dao = database.pokemonDao(),
+        detailCache = DetailCache(database.detailCacheDao(), json),
+        networkMonitor = networkMonitor,
+        updateService = UpdateService(api, database.pokemonDao()),
+    )
+
+    /** ViewModel に依存を渡すためのファクトリ */
+    val viewModelFactory = viewModelFactory {
+        initializer { SplashViewModel(pokemonRepository) }
+        initializer { PokemonListViewModel(pokemonRepository, networkMonitor) }
+        initializer { PokemonDetailViewModel(pokemonRepository) }
+    }
+}
+
+/** Composable から AppContainer を引くための CompositionLocal */
+val LocalAppContainer = staticCompositionLocalOf&lt;AppContainer&gt; {
+    error(&quot;AppContainer が提供されていません&quot;)
+}
+
+// MainActivity の setContent で流し込む
+setContent {
+    CompositionLocalProvider(
+        LocalAppContainer provides (application as PokedexApplication).container
+    ) {
+        PokedexTheme { PokedexNavHost() }
+    }
+}</code></pre></figure>
+<hr>
+<h3 id="4-2-ポケモン一覧表示機能">4.2 ポケモン一覧表示機能</h3>
+<h4 id="4-2-1-機能概要">4.2.1 機能概要</h4>
+<p>カントー地方のポケモン151匹を一覧表示し、検索・絞り込み機能を提供する。</p>
+<h4 id="4-2-2-処理フロー">4.2.2 処理フロー</h4>
+<figure class="diagram"><pre class="mermaid">sequenceDiagram
+    participant User
+    participant PokemonListScreen
+    participant PokemonListViewModel
+    participant PokemonRepository
+    participant PokemonDao
+    participant PokeApiService
+
+    User-&gt;&gt;PokemonListScreen: 画面表示
+    PokemonListScreen-&gt;&gt;PokemonListViewModel: loadPokemonList()
+    PokemonListViewModel-&gt;&gt;PokemonRepository: getAllPokemon()
+
+    PokemonRepository-&gt;&gt;PokemonDao: ローカルデータ取得
+    PokemonDao--&gt;&gt;PokemonRepository: ローカルデータ返却
+
+    alt ローカルデータあり
+        PokemonRepository--&gt;&gt;PokemonListViewModel: ポケモンリスト返却
+        PokemonListViewModel--&gt;&gt;PokemonListScreen: データ更新通知
+        PokemonListScreen--&gt;&gt;User: 一覧表示
+    else ローカルデータなし
+        PokemonRepository-&gt;&gt;PokeApiService: API呼び出し
+        PokeApiService--&gt;&gt;PokemonRepository: API レスポンス
+        PokemonRepository-&gt;&gt;PokemonDao: データ保存
+        PokemonRepository--&gt;&gt;PokemonListViewModel: ポケモンリスト返却
+        PokemonListViewModel--&gt;&gt;PokemonListScreen: データ更新通知
+        PokemonListScreen--&gt;&gt;User: 一覧表示
+    end
+
+    User-&gt;&gt;PokemonListScreen: スクロール(ページング)
+    PokemonListScreen-&gt;&gt;PokemonListViewModel: loadMorePokemon()
+    Note over PokemonListViewModel: 同様の処理を繰り返し</pre></figure>
+<h4 id="4-2-3-実装仕様">4.2.3 実装仕様</h4>
+<h5 id="pokemonlistscreen-composable">PokemonListScreen（Composable）</h5>
+<figure class="code"><div class="code-head"><span>kotlin</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-kotlin">// ui/list/PokemonListScreen.kt
+@Composable
+fun PokemonListScreen(
+    onPokemonClick: (Int) -&gt; Unit,
+    viewModel: PokemonListViewModel = viewModel(factory = LocalAppContainer.current.viewModelFactory),
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    Column {
+        OfflineBanner(visible = uiState.isOffline)
+
+        SearchField(
+            query = uiState.query,
+            onQueryChange = viewModel::onQueryChange,
+        )
+
+        PullToRefreshBox(
+            isRefreshing = uiState.isRefreshing,
+            onRefresh = viewModel::refresh,
+        ) {
+            // LazyVerticalGrid は画面に見えているセルだけを構成するため、
+            // 151件をそのまま渡してよい。手動のページングは不要。
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(2),
+                contentPadding = PaddingValues(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                items(uiState.pokemonList, key = { it.id }) { pokemon -&gt;
+                    PokemonGridItem(
+                        pokemon = pokemon,
+                        onClick = { onPokemonClick(pokemon.id) },
+                    )
+                }
+            }
+        }
+    }
+}</code></pre></figure>
+<h5 id="pokemonlistviewmodel">PokemonListViewModel</h5>
+<figure class="code"><div class="code-head"><span>kotlin</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-kotlin">// ui/list/PokemonListViewModel.kt
+data class PokemonListUiState(
+    val pokemonList: List&lt;Pokemon&gt; = emptyList(),
+    val query: String = &quot;&quot;,
+    val isRefreshing: Boolean = false,
+    val isOffline: Boolean = false,
+    val errorMessage: String? = null,
+) {
+    val isEmpty: Boolean get() = pokemonList.isEmpty() &amp;&amp; query.isNotBlank()
+}
+
+@OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
+class PokemonListViewModel(
+    private val repository: PokemonRepository,
+    networkMonitor: NetworkMonitor,
+) : ViewModel() {
+
+    private val query = MutableStateFlow(&quot;&quot;)
+    private val isRefreshing = MutableStateFlow(false)
+    private val errorMessage = MutableStateFlow&lt;String?&gt;(null)
+
+    private val pokemonList = query
+        .debounce(300)              // 入力のたびに検索が走らないようにする
+        .distinctUntilChanged()
+        .flatMapLatest { repository.searchPokemon(it) }   // 前の検索は自動的に打ち切られる
+
+    val uiState: StateFlow&lt;PokemonListUiState&gt; = combine(
+        pokemonList, query, isRefreshing, networkMonitor.isOnline, errorMessage,
+    ) { list, q, refreshing, online, error -&gt;
+        PokemonListUiState(list, q, refreshing, isOffline = !online, errorMessage = error)
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000),   // 画面回転では購読を切らない
+        initialValue = PokemonListUiState(),
+    )
+
+    fun onQueryChange(text: String) { query.value = text }
+
+    fun refresh() {
+        viewModelScope.launch {
+            isRefreshing.value = true
+            errorMessage.value = null
+            repository.refresh().onFailure { errorMessage.value = it.toUserMessage() }
+            isRefreshing.value = false
+        }
+    }
+
+    fun consumeError() { errorMessage.value = null }
+}</code></pre></figure>
+<hr>
+<h3 id="4-3-ポケモン検索機能">4.3 ポケモン検索機能</h3>
+<h4 id="4-3-1-機能概要">4.3.1 機能概要</h4>
+<p>名前、図鑑番号、タイプによるポケモン検索機能を提供する。</p>
+<h4 id="4-3-2-処理フロー">4.3.2 処理フロー</h4>
+<figure class="diagram"><pre class="mermaid">sequenceDiagram
+    participant User
+    participant SearchField
+    participant PokemonListViewModel
+    participant PokemonRepository
+    participant PokemonDao
+
+    User-&gt;&gt;SearchField: 検索文字入力
+    SearchField-&gt;&gt;PokemonListViewModel: onSearchTextChanged(text)
+
+    alt 文字数 &gt;= 2
+        PokemonListViewModel-&gt;&gt;PokemonListViewModel: デバウンス処理(300ms)
+        PokemonListViewModel-&gt;&gt;PokemonRepository: searchPokemon(query, type)
+        PokemonRepository-&gt;&gt;PokemonDao: SQL検索実行
+
+        alt 名前検索
+            PokemonDao-&gt;&gt;PokemonDao: SELECT * WHERE name LIKE '%query%'
+        else 図鑑番号検索
+            PokemonDao-&gt;&gt;PokemonDao: SELECT * WHERE id = query
+        else タイプ検索
+            PokemonDao-&gt;&gt;PokemonDao: SELECT * WHERE types LIKE '%query%'
+        end
+
+        PokemonDao--&gt;&gt;PokemonRepository: 検索結果
+        PokemonRepository-&gt;&gt;PokemonDao: 検索履歴保存
+        PokemonRepository--&gt;&gt;PokemonListViewModel: 検索結果返却
+        PokemonListViewModel--&gt;&gt;SearchField: UI更新
+        SearchField--&gt;&gt;User: 検索結果表示
+    else 文字数 &lt; 2
+        PokemonListViewModel--&gt;&gt;SearchField: 検索結果クリア
+        SearchField--&gt;&gt;User: 全件表示
+    end</pre></figure>
+<h4 id="4-3-3-実装仕様">4.3.3 実装仕様</h4>
+<h5 id="検索の状態管理">検索の状態管理</h5>
+<figure class="code"><div class="code-head"><span>kotlin</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-kotlin">// 検索は一覧画面の ViewModel に統合する。専用の ViewModel は作らない。
+// 入力文字列から検索の種類を判定し、DAO のクエリを使い分ける。
+
+enum class SearchType { ID, TYPE, NAME }
+
+/** ポケモンのタイプ名（PokeAPI の英語表記） */
+val POKEMON_TYPES = setOf(
+    &quot;normal&quot;, &quot;fire&quot;, &quot;water&quot;, &quot;electric&quot;, &quot;grass&quot;, &quot;ice&quot;, &quot;fighting&quot;, &quot;poison&quot;,
+    &quot;ground&quot;, &quot;flying&quot;, &quot;psychic&quot;, &quot;bug&quot;, &quot;rock&quot;, &quot;ghost&quot;, &quot;dragon&quot;, &quot;dark&quot;, &quot;steel&quot;, &quot;fairy&quot;,
+)
+
+fun detectSearchType(query: String): SearchType = when {
+    query.toIntOrNull() != null -&gt; SearchType.ID
+    query.lowercase() in POKEMON_TYPES -&gt; SearchType.TYPE
+    else -&gt; SearchType.NAME
+}
+
+// ViewModel 側でのデバウンス（PokemonListViewModel から抜粋）
+private val pokemonList = query
+    .debounce(300)                                    // 300ms 入力が止まってから検索する
+    .distinctUntilChanged()                           // 同じ文字列で二重に検索しない
+    .flatMapLatest { repository.searchPokemon(it) }   // 新しい入力が来たら前の検索は破棄</code></pre></figure>
+<h5 id="pokemonrepository-検索実装">PokemonRepository 検索実装</h5>
+<figure class="code"><div class="code-head"><span>kotlin</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-kotlin">// data/local/PokemonDao.kt — 検索は SQL に任せる（インデックスが効く）
+@Dao
+interface PokemonDao {
+
+    @Query(&quot;SELECT * FROM pokemon ORDER BY id&quot;)
+    fun observeAll(): Flow&lt;List&lt;PokemonEntity&gt;&gt;
+
+    @Query(&quot;SELECT * FROM pokemon WHERE id = :id&quot;)
+    fun observeById(id: Int): Flow&lt;List&lt;PokemonEntity&gt;&gt;
+
+    // SQLite の LIKE は ASCII について大文字小文字を区別しない
+    @Query(
+        &quot;&quot;&quot;
+        SELECT * FROM pokemon
+        WHERE name LIKE &#x27;%&#x27; || :query || &#x27;%&#x27;
+           OR name_ja LIKE &#x27;%&#x27; || :query || &#x27;%&#x27;
+        ORDER BY id
+        &quot;&quot;&quot;
+    )
+    fun searchByName(query: String): Flow&lt;List&lt;PokemonEntity&gt;&gt;
+
+    @Query(&quot;SELECT * FROM pokemon WHERE type1 = :type OR type2 = :type ORDER BY id&quot;)
+    fun searchByType(type: String): Flow&lt;List&lt;PokemonEntity&gt;&gt;
+
+    @Upsert
+    suspend fun upsertAll(pokemon: List&lt;PokemonEntity&gt;)
+
+    @Query(&quot;SELECT COUNT(*) FROM pokemon&quot;)
+    suspend fun count(): Int
+
+    @Query(&quot;SELECT MAX(created_at) FROM pokemon&quot;)
+    suspend fun latestCreatedAt(): Long?
+}
+
+// data/repository/DefaultPokemonRepository.kt
+override fun searchPokemon(query: String): Flow&lt;List&lt;Pokemon&gt;&gt; {
+    val trimmed = query.trim()
+    val source = when {
+        trimmed.isEmpty() -&gt; dao.observeAll()
+        else -&gt; when (detectSearchType(trimmed)) {
+            SearchType.ID -&gt; dao.observeById(trimmed.toInt())
+            SearchType.TYPE -&gt; dao.searchByType(trimmed.lowercase())
+            SearchType.NAME -&gt; dao.searchByName(trimmed)
+        }
+    }
+    return source.map { entities -&gt; entities.map { it.toDomain() } }
+}</code></pre></figure>
+<hr>
+<h3 id="4-4-ポケモン詳細表示機能">4.4 ポケモン詳細表示機能</h3>
+<h4 id="4-4-1-機能概要">4.4.1 機能概要</h4>
+<p>選択されたポケモンの詳細情報（進化、特性、能力値等）を表示する。</p>
+<h4 id="4-4-2-処理フロー">4.4.2 処理フロー</h4>
+<figure class="diagram"><pre class="mermaid">sequenceDiagram
+    participant User
+    participant PokemonListScreen
+    participant PokemonDetailScreen
+    participant PokemonDetailViewModel
+    participant PokemonRepository
+    participant DetailCache
+    participant PokemonDao
+    participant PokeApiService
+
+    User-&gt;&gt;PokemonListScreen: ポケモン選択
+    PokemonListScreen-&gt;&gt;PokemonDetailScreen: navigate(pokemonId)
+    PokemonDetailScreen-&gt;&gt;PokemonDetailViewModel: loadPokemonDetail(id)
+
+    PokemonDetailViewModel-&gt;&gt;PokemonRepository: getPokemonById(id)
+    PokemonRepository-&gt;&gt;DetailCache: checkCache(id)
+
+    alt キャッシュあり
+        DetailCache-&gt;&gt;PokemonDao: SELECT from pokemon_detail_cache
+        PokemonDao--&gt;&gt;DetailCache: キャッシュデータ
+        DetailCache--&gt;&gt;PokemonRepository: キャッシュデータ返却
+        PokemonRepository--&gt;&gt;PokemonDetailViewModel: 詳細データ
+        PokemonDetailViewModel--&gt;&gt;PokemonDetailScreen: データ更新通知
+        PokemonDetailScreen--&gt;&gt;User: 詳細画面表示
+
+        Note over DetailCache: バックグラウンドで最新データチェック
+        DetailCache-&gt;&gt;PokeApiService: 最新データ取得(非同期)
+    else キャッシュなし
+        PokemonRepository-&gt;&gt;PokeApiService: API詳細データ取得
+        PokeApiService--&gt;&gt;PokemonRepository: 詳細データ
+        PokemonRepository-&gt;&gt;DetailCache: キャッシュ保存
+        DetailCache-&gt;&gt;PokemonDao: INSERT/UPDATE cache
+        PokemonRepository--&gt;&gt;PokemonDetailViewModel: 詳細データ
+        PokemonDetailViewModel--&gt;&gt;PokemonDetailScreen: データ更新通知
+        PokemonDetailScreen--&gt;&gt;User: 詳細画面表示
+    end
+
+    User-&gt;&gt;PokemonDetailScreen: 戻るボタン
+    PokemonDetailScreen-&gt;&gt;PokemonListScreen: navigate back</pre></figure>
+<h4 id="4-4-3-実装仕様">4.4.3 実装仕様</h4>
+<h5 id="pokemondetailscreen-composable">PokemonDetailScreen（Composable）</h5>
+<figure class="code"><div class="code-head"><span>kotlin</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-kotlin">// ui/detail/PokemonDetailScreen.kt
+@Composable
+fun PokemonDetailScreen(
+    pokemonId: Int,
+    onBack: () -&gt; Unit,
+    viewModel: PokemonDetailViewModel = viewModel(factory = LocalAppContainer.current.viewModelFactory),
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(pokemonId) { viewModel.load(pokemonId) }
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text((uiState as? DetailUiState.Success)?.detail?.pokemon?.displayName.orEmpty()) },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = &quot;戻る&quot;)
+                    }
+                },
+            )
+        },
+    ) { padding -&gt;
+        when (val state = uiState) {
+            DetailUiState.Loading -&gt; LoadingIndicator(Modifier.padding(padding))
+            is DetailUiState.Error -&gt; ErrorMessage(
+                message = state.message,
+                onRetry = { viewModel.load(pokemonId) },
+                modifier = Modifier.padding(padding),
+            )
+            is DetailUiState.Success -&gt; DetailContent(state.detail, Modifier.padding(padding))
+        }
+    }
+}
+
+@Composable
+private fun DetailContent(detail: PokemonDetail, modifier: Modifier = Modifier) {
+    Column(modifier.verticalScroll(rememberScrollState())) {
+        PokemonImage(detail.pokemon)
+        BasicInfoSection(detail.pokemon)        // 図鑑番号・タイプ・身長・体重
+        AbilitiesSection(detail.abilities)      // Phase 2
+        if (detail.evolutions.isNotEmpty()) {   // 進化しないポケモンでは表示しない
+            EvolutionSection(detail.evolutions)
+        }
+    }
+}</code></pre></figure>
+<h5 id="pokemondetailviewmodel">PokemonDetailViewModel</h5>
+<figure class="code"><div class="code-head"><span>kotlin</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-kotlin">// ui/detail/PokemonDetailViewModel.kt
+sealed interface DetailUiState {
+    data object Loading : DetailUiState
+    data class Success(val detail: PokemonDetail) : DetailUiState
+    data class Error(val message: String) : DetailUiState
+}
+
+class PokemonDetailViewModel(private val repository: PokemonRepository) : ViewModel() {
+
+    private val _uiState = MutableStateFlow&lt;DetailUiState&gt;(DetailUiState.Loading)
+    val uiState: StateFlow&lt;DetailUiState&gt; = _uiState.asStateFlow()
+
+    fun load(id: Int) {
+        viewModelScope.launch {
+            _uiState.value = DetailUiState.Loading
+            _uiState.value = repository.getPokemonDetail(id).fold(
+                onSuccess = { DetailUiState.Success(it) },
+                onFailure = { DetailUiState.Error(it.toUserMessage()) },
+            )
+        }
+    }
+}</code></pre></figure>
+<h5 id="詳細情報のキャッシュ">詳細情報のキャッシュ</h5>
+<figure class="code"><div class="code-head"><span>kotlin</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-kotlin">// data/local/DetailCache.kt — 最後に閲覧した10件だけを保持する
+@Entity(tableName = &quot;pokemon_detail_cache&quot;, indices = [Index(&quot;last_accessed&quot;)])
+data class PokemonDetailCacheEntity(
+    @PrimaryKey val id: Int,
+    @ColumnInfo(name = &quot;detail_json&quot;) val detailJson: String,
+    @ColumnInfo(name = &quot;cached_at&quot;) val cachedAt: Long,
+    @ColumnInfo(name = &quot;last_accessed&quot;) val lastAccessed: Long,
+)
+
+@Dao
+interface DetailCacheDao {
+
+    @Query(&quot;SELECT * FROM pokemon_detail_cache WHERE id = :id&quot;)
+    suspend fun find(id: Int): PokemonDetailCacheEntity?
+
+    @Query(&quot;UPDATE pokemon_detail_cache SET last_accessed = :now WHERE id = :id&quot;)
+    suspend fun touch(id: Int, now: Long)
+
+    @Upsert
+    suspend fun upsert(entity: PokemonDetailCacheEntity)
+
+    @Query(&quot;DELETE FROM pokemon_detail_cache WHERE id = :id&quot;)
+    suspend fun delete(id: Int)
+
+    /** 直近アクセス順に :keep 件だけ残し、あふれたぶんを消す */
+    @Query(
+        &quot;&quot;&quot;
+        DELETE FROM pokemon_detail_cache
+        WHERE id NOT IN (
+            SELECT id FROM pokemon_detail_cache ORDER BY last_accessed DESC LIMIT :keep
+        )
+        &quot;&quot;&quot;
+    )
+    suspend fun trimTo(keep: Int)
+}
+
+class DetailCache(
+    private val dao: DetailCacheDao,
+    private val json: Json,
+) {
+    suspend fun get(id: Int): PokemonDetail? {
+        val row = dao.find(id) ?: return null
+
+        // 24時間を過ぎたキャッシュは使わない
+        if (System.currentTimeMillis() - row.cachedAt &gt; EXPIRY_MS) {
+            dao.delete(id)
+            return null
+        }
+
+        dao.touch(id, System.currentTimeMillis())   // LRU の順序を更新
+        return json.decodeFromString(row.detailJson)
+    }
+
+    suspend fun put(id: Int, detail: PokemonDetail) {
+        val now = System.currentTimeMillis()
+        dao.upsert(PokemonDetailCacheEntity(id, json.encodeToString(detail), now, now))
+        dao.trimTo(MAX_ENTRIES)
+    }
+
+    private companion object {
+        const val MAX_ENTRIES = 10                      // 要件: 最後に閲覧した10件
+        val EXPIRY_MS = 24.hours.inWholeMilliseconds
+    }
+}</code></pre></figure>
+<hr>
+<h3 id="4-5-データ更新機能">4.5 データ更新機能</h3>
+<h4 id="4-5-1-機能概要">4.5.1 機能概要</h4>
+<p>PokeAPIから最新のポケモンデータを取得し、ローカルデータベースを更新する。</p>
+<h4 id="4-5-2-処理フロー">4.5.2 処理フロー</h4>
+<figure class="diagram"><pre class="mermaid">sequenceDiagram
+    participant User
+    participant SettingsScreen
+    participant UpdateService
+    participant PokemonRepository
+    participant PokeApiService
+    participant PokemonDao
+    participant ProgressIndicator
+
+    User-&gt;&gt;SettingsScreen: 手動更新ボタン押下
+    SettingsScreen-&gt;&gt;UpdateService: startManualUpdate()
+    UpdateService-&gt;&gt;ProgressIndicator: 進捗ダイアログ表示
+
+    UpdateService-&gt;&gt;PokeApiService: checkApiVersion()
+    PokeApiService--&gt;&gt;UpdateService: バージョン情報
+
+    alt 更新が必要
+        UpdateService-&gt;&gt;PokemonRepository: startBatchUpdate()
+
+        loop 全ポケモン（151匹）
+            PokemonRepository-&gt;&gt;PokeApiService: getPokemonData(id)
+            PokeApiService--&gt;&gt;PokemonRepository: ポケモンデータ
+            PokemonRepository-&gt;&gt;PokemonDao: updatePokemonData()
+            PokemonRepository-&gt;&gt;ProgressIndicator: 進捗更新(id/151)
+        end
+
+        PokemonRepository-&gt;&gt;PokemonDao: データ整合性チェック
+        PokemonRepository--&gt;&gt;UpdateService: 更新完了
+        UpdateService-&gt;&gt;ProgressIndicator: 完了ダイアログ表示
+        UpdateService--&gt;&gt;SettingsScreen: 更新結果通知
+        SettingsScreen--&gt;&gt;User: 完了メッセージ表示
+
+    else 更新不要
+        UpdateService--&gt;&gt;SettingsScreen: 「最新です」メッセージ
+        SettingsScreen--&gt;&gt;User: メッセージ表示
+    end</pre></figure>
+<h4 id="4-5-3-実装仕様">4.5.3 実装仕様</h4>
+<h5 id="updateservice">UpdateService</h5>
+<figure class="code"><div class="code-head"><span>kotlin</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-kotlin">// data/repository/UpdateService.kt
+data class UpdateResult(val updated: Int, val failed: Int)
+
+class UpdateService(
+    private val api: PokeApiService,
+    private val dao: PokemonDao,
+) {
+    private val mutex = Mutex()   // 手動更新と自動更新の二重起動を防ぐ
+
+    /**
+     * 151匹ぶんの詳細を取得して DB に保存する。
+     *
+     * 一覧APIはタイプ・身長・体重を返さないため、1匹ずつ詳細APIを叩く必要がある。
+     * 逐次実行すると数分かかるので、同時実行数を CONCURRENCY に制限した並列取得にする。
+     */
+    suspend fun update(onProgress: (done: Int, total: Int) -&gt; Unit = { _, _ -&gt; }): UpdateResult =
+        mutex.withLock {
+            val total = KANTO_POKEMON_COUNT
+            val done = AtomicInteger(0)
+            val semaphore = Semaphore(CONCURRENCY)
+
+            val results = coroutineScope {
+                (1..total).map { id -&gt;
+                    async(Dispatchers.IO) {
+                        semaphore.withPermit {
+                            runCatching { fetchWithRetry(id) }
+                                .also { onProgress(done.incrementAndGet(), total) }
+                        }
+                    }
+                }.awaitAll()
+            }
+
+            // 取得できたぶんだけ保存する。途中で失敗しても次回に持ち越せる
+            val fetched = results.mapNotNull { it.getOrNull() }
+            dao.upsertAll(fetched)
+
+            UpdateResult(updated = fetched.size, failed = results.count { it.isFailure })
+        }
+
+    /**
+     * 要件定義の再試行ポリシー: 最大3回・30秒間隔。
+     * 手動更新でユーザーを待たせたくない場合は、指数バックオフに変えてもよい。
+     */
+    private suspend fun fetchWithRetry(id: Int): PokemonEntity {
+        var lastError: Throwable? = null
+        repeat(MAX_RETRIES) { attempt -&gt;
+            try {
+                return api.getPokemon(id).toEntity()
+            } catch (e: IOException) {
+                lastError = e
+                if (attempt &lt; MAX_RETRIES - 1) delay(RETRY_INTERVAL_MS)
+            }
+        }
+        throw lastError ?: IllegalStateException(&quot;取得に失敗しました: id=$id&quot;)
+    }
+
+    private companion object {
+        const val KANTO_POKEMON_COUNT = 151
+        const val CONCURRENCY = 10          // PokeAPI のフェアユースに配慮する
+        const val MAX_RETRIES = 3
+        const val RETRY_INTERVAL_MS = 30_000L
+    }
+}</code></pre></figure>
+<h5 id="自動更新の判定">自動更新の判定</h5>
+<figure class="code"><div class="code-head"><span>kotlin</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-kotlin">// data/repository/AutoUpdatePolicy.kt
+/**
+ * 要件: 端末ローカル時間で午前10時を過ぎており、その日まだ更新していなければ
+ * アプリ起動時に自動更新する。更新は1日1回（成功した場合のみ）。
+ *
+ * 成功時だけ日付を記録するため、失敗した日は次回の起動で再試行される。
+ */
+class AutoUpdatePolicy(private val prefs: DataStore&lt;Preferences&gt;) {
+
+    suspend fun shouldUpdate(now: LocalDateTime = LocalDateTime.now()): Boolean {
+        if (now.toLocalTime() &lt; UPDATE_AFTER) return false
+        val last = lastSuccessDate()
+        return last == null || last &lt; now.toLocalDate()
+    }
+
+    suspend fun recordSuccess(date: LocalDate = LocalDate.now()) {
+        prefs.edit { it[LAST_SUCCESS] = date.toString() }
+    }
+
+    private suspend fun lastSuccessDate(): LocalDate? =
+        prefs.data.first()[LAST_SUCCESS]?.let(LocalDate::parse)
+
+    private companion object {
+        val UPDATE_AFTER: LocalTime = LocalTime.of(10, 0)
+        val LAST_SUCCESS = stringPreferencesKey(&quot;last_update_success_date&quot;)
+    }
+}
+
+// MainActivity — アプリがフォアグラウンドに来たときに判定する
+@Composable
+fun AutoUpdateEffect(policy: AutoUpdatePolicy, repository: PokemonRepository) {
+    val lifecycleOwner = LocalLifecycleOwner.current
+    LaunchedEffect(lifecycleOwner) {
+        lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            if (policy.shouldUpdate()) {
+                repository.refresh().onSuccess { policy.recordSuccess() }
+            }
+        }
+    }
+}</code></pre></figure>
+<hr>
+<h3 id="4-6-オフライン機能">4.6 オフライン機能</h3>
+<h4 id="4-6-1-機能概要">4.6.1 機能概要</h4>
+<p>ネットワーク接続がない場合でも、ローカルに保存されたデータでアプリを使用可能にする。</p>
+<h4 id="4-6-2-処理フロー">4.6.2 処理フロー</h4>
+<figure class="diagram"><pre class="mermaid">sequenceDiagram
+    participant User
+    participant App
+    participant NetworkMonitor
+    participant PokemonRepository
+    participant PokemonDao
+    participant OfflineBanner
+
+    App-&gt;&gt;NetworkMonitor: ネットワーク状態監視開始
+
+    User-&gt;&gt;App: アプリ使用開始
+    App-&gt;&gt;NetworkMonitor: 現在のネットワーク状態確認
+
+    alt オフライン状態
+        NetworkMonitor--&gt;&gt;App: オフライン通知
+        App-&gt;&gt;OfflineBanner: オフライン表示
+        App-&gt;&gt;PokemonRepository: ローカルデータのみ使用設定
+
+        User-&gt;&gt;App: ポケモン一覧要求
+        App-&gt;&gt;PokemonRepository: getAllPokemon(offlineMode: true)
+        PokemonRepository-&gt;&gt;PokemonDao: ローカルデータ取得
+        PokemonDao--&gt;&gt;PokemonRepository: 保存済みデータ
+        PokemonRepository--&gt;&gt;App: データ返却
+        App--&gt;&gt;User: 一覧表示（オフライン表示付き）
+
+        User-&gt;&gt;App: 詳細情報要求
+        App-&gt;&gt;PokemonRepository: getPokemonDetail(id, offlineMode: true)
+
+        alt キャッシュあり
+            PokemonRepository-&gt;&gt;PokemonDao: キャッシュ取得
+            PokemonDao--&gt;&gt;PokemonRepository: キャッシュデータ
+            PokemonRepository--&gt;&gt;App: 詳細データ
+            App--&gt;&gt;User: 詳細表示
+        else キャッシュなし
+            PokemonRepository--&gt;&gt;App: エラー（オフラインメッセージ）
+            App--&gt;&gt;User: 「オフラインでは表示できません」表示
+        end
+
+    else オンライン復帰
+        NetworkMonitor--&gt;&gt;App: オンライン通知
+        App-&gt;&gt;OfflineBanner: オフライン表示削除
+        App-&gt;&gt;PokemonRepository: 通常モード復帰
+        App-&gt;&gt;PokemonRepository: バックグラウンド同期開始
+    end</pre></figure>
+<h4 id="4-6-3-実装仕様">4.6.3 実装仕様</h4>
+<h5 id="networkmonitor">NetworkMonitor</h5>
+<figure class="code"><div class="code-head"><span>kotlin</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-kotlin">// data/NetworkMonitor.kt
+// AndroidManifest.xml に &lt;uses-permission android:name=&quot;android.permission.ACCESS_NETWORK_STATE&quot;/&gt; が必要
+class NetworkMonitor(context: Context) {
+
+    private val connectivityManager = context.getSystemService(ConnectivityManager::class.java)
+
+    /** 接続状態の変化を Flow で流す。購読が切れたらコールバックを解除する。 */
+    val isOnline: Flow&lt;Boolean&gt; = callbackFlow {
+        val callback = object : ConnectivityManager.NetworkCallback() {
+            override fun onAvailable(network: Network) { trySend(currentlyOnline()) }
+            override fun onLost(network: Network) { trySend(currentlyOnline()) }
+            override fun onCapabilitiesChanged(network: Network, caps: NetworkCapabilities) {
+                trySend(caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED))
+            }
+        }
+
+        val request = NetworkRequest.Builder()
+            .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+            .build()
+
+        connectivityManager.registerNetworkCallback(request, callback)
+        trySend(currentlyOnline())   // 現在の状態を最初に流す
+
+        awaitClose { connectivityManager.unregisterNetworkCallback(callback) }
+    }.distinctUntilChanged().conflate()
+
+    /** 「接続済み」ではなく「実際に通信できる」かを見る */
+    private fun currentlyOnline(): Boolean {
+        val caps = connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
+        return caps?.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED) == true
+    }
+}</code></pre></figure>
+<h5 id="オフライン対応-repository">オフライン対応 Repository</h5>
+<figure class="code"><div class="code-head"><span>kotlin</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-kotlin">// data/repository/DefaultPokemonRepository.kt
+class DefaultPokemonRepository(
+    private val api: PokeApiService,
+    private val dao: PokemonDao,
+    private val detailCache: DetailCache,
+    private val networkMonitor: NetworkMonitor,
+    private val updateService: UpdateService,
+) : PokemonRepository {
+
+    /**
+     * ローカルDBが唯一の情報源。API の結果は DB を経由して画面に届く。
+     * 画面はオンライン・オフラインを意識しなくてよい。
+     */
+    override fun observePokemonList(): Flow&lt;List&lt;Pokemon&gt;&gt; =
+        dao.observeAll().map { list -&gt; list.map { it.toDomain() } }
+
+    override suspend fun refresh(onProgress: (Int, Int) -&gt; Unit): Result&lt;Unit&gt; {
+        if (!networkMonitor.isOnline.first()) {
+            return Result.failure(OfflineException())
+        }
+        return runCatching { updateService.update(onProgress) }.map { }
+    }
+
+    override suspend fun getPokemonDetail(id: Int): Result&lt;PokemonDetail&gt; {
+        // キャッシュがあればオフラインでも表示できる
+        detailCache.get(id)?.let { return Result.success(it) }
+
+        if (!networkMonitor.isOnline.first()) {
+            return Result.failure(
+                OfflineException(&quot;オフラインのため、このポケモンの詳細は表示できません&quot;)
+            )
+        }
+
+        return apiCall { api.getPokemon(id).toDetail() }
+            .onSuccess { detailCache.put(id, it) }
+    }
+
+    override suspend fun lastUpdatedAt(): Long? = dao.latestCreatedAt()
+}</code></pre></figure>
+<h5 id="offlinebanner-composable">OfflineBanner（Composable）</h5>
+<figure class="code"><div class="code-head"><span>kotlin</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-kotlin">// ui/component/OfflineBanner.kt
+@Composable
+fun OfflineBanner(visible: Boolean, modifier: Modifier = Modifier) {
+    AnimatedVisibility(
+        visible = visible,
+        enter = expandVertically(),
+        exit = shrinkVertically(),
+        modifier = modifier,
+    ) {
+        Surface(
+            color = MaterialTheme.colorScheme.errorContainer,
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+            ) {
+                Icon(
+                    // CloudOff は material-icons-extended が必要。core に含まれる Warning で代用する
+                    imageVector = Icons.Filled.Warning,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onErrorContainer,
+                )
+                Spacer(Modifier.width(8.dp))
+                Text(
+                    text = &quot;オフラインです。保存済みのデータを表示しています&quot;,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onErrorContainer,
+                )
+            }
+        }
+    }
+}</code></pre></figure>
+<hr>
+<h2 id="5-エラーハンドリング">5. エラーハンドリング</h2>
+<h3 id="5-1-エラー分類と対応">5.1 エラー分類と対応</h3>
+<h4 id="5-1-1-ネットワークエラー">5.1.1 ネットワークエラー</h4>
+<figure class="code"><div class="code-head"><span>kotlin</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-kotlin">// domain/AppException.kt — 例外はここで分類し、画面には文言だけを渡す
+sealed class AppException(message: String, cause: Throwable? = null) : Exception(message, cause) {
+    /** 再試行で解決する可能性があるか */
+    abstract val isRetryable: Boolean
+}
+
+class OfflineException(
+    message: String = &quot;ネットワークに接続されていません&quot;,
+) : AppException(message) {
+    override val isRetryable = true
+}
+
+class ServerException(
+    val statusCode: Int,
+    message: String,
+) : AppException(message) {
+    override val isRetryable = statusCode == 429 || statusCode &gt;= 500
+}
+
+class DatabaseException(message: String, cause: Throwable?) : AppException(message, cause) {
+    override val isRetryable = false
+}
+
+/** Retrofit / OkHttp の例外をアプリの例外に変換する */
+suspend fun &lt;T&gt; apiCall(block: suspend () -&gt; T): Result&lt;T&gt; =
+    try {
+        Result.success(block())
+    } catch (e: HttpException) {
+        Result.failure(ServerException(e.code(), e.message()))
+    } catch (e: UnknownHostException) {
+        Result.failure(OfflineException())
+    } catch (e: ConnectException) {
+        Result.failure(OfflineException())
+    } catch (e: IOException) {
+        Result.failure(e)
+    }
+
+/** 例外をユーザー向けの文言にする。画面はこの文字列だけを扱う。 */
+fun Throwable.toUserMessage(): String = when (this) {
+    is OfflineException -&gt; &quot;ネットワークに接続されていません。接続を確認してください。&quot;
+    is ServerException -&gt; when {
+        statusCode == 429 -&gt; &quot;アクセスが集中しています。しばらく待ってから再試行してください。&quot;
+        statusCode &gt;= 500 -&gt; &quot;サーバーで問題が発生しています。時間をおいて再試行してください。&quot;
+        else -&gt; &quot;データを取得できませんでした。&quot;
+    }
+    is SocketTimeoutException -&gt; &quot;通信がタイムアウトしました。再試行してください。&quot;
+    is DatabaseException -&gt; &quot;データの読み書きに失敗しました。アプリを再起動してください。&quot;
+    else -&gt; &quot;予期しないエラーが発生しました。&quot;
+}</code></pre></figure>
+<h4 id="5-1-2-データベースエラー">5.1.2 データベースエラー</h4>
+<figure class="code"><div class="code-head"><span>kotlin</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-kotlin">// data/local/AppDatabase.kt
+@Database(
+    entities = [PokemonEntity::class, PokemonDetailCacheEntity::class],
+    version = 1,
+    exportSchema = true,
+)
+abstract class AppDatabase : RoomDatabase() {
+    abstract fun pokemonDao(): PokemonDao
+    abstract fun detailCacheDao(): DetailCacheDao
+}
+
+// 本アプリのデータはすべて API から取り直せるため、
+// マイグレーションに失敗したときは作り直して復旧する。
+Room.databaseBuilder(context, AppDatabase::class.java, &quot;pokedex.db&quot;)
+    .fallbackToDestructiveMigration()
+    .build()
+
+/** Room の例外をアプリの例外に変換する */
+suspend fun &lt;T&gt; dbCall(block: suspend () -&gt; T): Result&lt;T&gt; =
+    try {
+        Result.success(block())
+    } catch (e: SQLiteException) {
+        Result.failure(DatabaseException(&quot;データの読み書きに失敗しました&quot;, e))
+    }</code></pre></figure>
+<h3 id="5-2-エラーの伝え方">5.2 エラーの伝え方</h3>
+<figure class="code"><div class="code-head"><span>kotlin</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-kotlin">// Android では例外を1箇所で握るより、各画面の UiState に落として表示するほうが扱いやすい。
+// 「捕捉できなかった例外」だけをここで記録する。
+
+class CrashLogger : Thread.UncaughtExceptionHandler {
+    private val default = Thread.getDefaultUncaughtExceptionHandler()
+
+    override fun uncaughtException(thread: Thread, throwable: Throwable) {
+        Log.e(&quot;Pokedex&quot;, &quot;捕捉されなかった例外&quot;, throwable)
+        default?.uncaughtException(thread, throwable)
+    }
+}
+
+// PokedexApplication.onCreate() で登録する
+Thread.setDefaultUncaughtExceptionHandler(CrashLogger())
+
+// ui/component/ErrorMessage.kt — 再試行はダイアログではなく画面内に置く
+@Composable
+fun ErrorMessage(
+    message: String,
+    onRetry: () -&gt; Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier.fillMaxSize().padding(32.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text(text = message, textAlign = TextAlign.Center)
+        Spacer(Modifier.height(16.dp))
+        Button(onClick = onRetry) { Text(&quot;再試行&quot;) }
+    }
+}</code></pre></figure>
+<hr>
+<h2 id="6-パフォーマンス設計">6. パフォーマンス設計</h2>
+<h3 id="6-1-レンダリング最適化">6.1 レンダリング最適化</h3>
+<h4 id="6-1-1-リストの最適化">6.1.1 リストの最適化</h4>
+<figure class="code"><div class="code-head"><span>kotlin</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-kotlin">// LazyVerticalGrid / LazyColumn は画面に見えている要素だけを構成する。
+// RecyclerView の Adapter や、自前の仮想化は不要。
+
+LazyVerticalGrid(
+    columns = GridCells.Fixed(2),
+    contentPadding = PaddingValues(8.dp),
+) {
+    items(
+        items = pokemonList,
+        key = { it.id },        // key を渡すと差分更新が効き、スクロール位置も保たれる
+    ) { pokemon -&gt;
+        PokemonGridItem(pokemon = pokemon, onClick = { onPokemonClick(pokemon.id) })
+    }
+}
+
+// 再コンポジションを減らすための注意点
+// - ViewModel が公開する状態は不変（data class）にする
+// - ラムダを毎回生成しない。必要なら remember でキャッシュする
+// - 重い計算は remember(key) に包む</code></pre></figure>
+<h4 id="6-1-2-画像最適化">6.1.2 画像最適化</h4>
+<figure class="code"><div class="code-head"><span>kotlin</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-kotlin">// Coil はメモリ・ディスクの両方にキャッシュするため、自前のキャッシュ実装は不要。
+// 表示サイズを指定しておくと、デコード時に縮小されメモリ使用量が下がる。
+
+AsyncImage(
+    model = ImageRequest.Builder(LocalContext.current)
+        .data(pokemon.imageUrl)
+        .crossfade(true)
+        .size(240)              // 120dp 表示なら 240px で足りる
+        .build(),
+    contentDescription = pokemon.displayName,
+    placeholder = painterResource(R.drawable.ic_pokeball_placeholder),
+    error = painterResource(R.drawable.ic_pokeball_placeholder),
+    contentScale = ContentScale.Fit,
+    modifier = Modifier.size(120.dp),
+)</code></pre></figure>
+<h3 id="6-2-データベース最適化">6.2 データベース最適化</h3>
+<h4 id="6-2-1-インデックス設定">6.2.1 インデックス設定</h4>
+<p>Room ではインデックスを <code>@Entity(indices = [...])</code> で宣言します。生成される SQL は以下と同等です。</p>
+<figure class="code"><div class="code-head"><span>sql</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-sql">CREATE INDEX idx_pokemon_name    ON pokemon(name);
+CREATE INDEX idx_pokemon_name_ja ON pokemon(name_ja);
+CREATE INDEX idx_pokemon_type1   ON pokemon(type1);
+CREATE INDEX idx_pokemon_type2   ON pokemon(type2);
+CREATE INDEX idx_cache_last_accessed ON pokemon_detail_cache(last_accessed);</code></pre></figure>
+<figure class="code"><div class="code-head"><span>kotlin</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-kotlin">@Entity(
+    tableName = &quot;pokemon&quot;,
+    indices = [Index(&quot;name&quot;), Index(&quot;name_ja&quot;), Index(&quot;type1&quot;), Index(&quot;type2&quot;)],
+)
+data class PokemonEntity(/* ... */)</code></pre></figure>
+<blockquote>タイプを <code>type1</code> / <code>type2</code> に分けているのは、検索を等価比較にしてインデックスを効かせるためです。 JSON配列で持つと <code>LIKE &#x27;%&quot;grass&quot;%&#x27;</code> が必要になり、全件走査になります。</blockquote>
+<h4 id="6-2-2-バッチ処理最適化">6.2.2 バッチ処理最適化</h4>
+<figure class="code"><div class="code-head"><span>kotlin</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-kotlin">// 1件ずつ insert すると 151回のトランザクションになり、桁違いに遅くなる。
+// リストごと渡せば Room が1トランザクションにまとめる。
+
+@Dao
+interface PokemonDao {
+    @Upsert
+    suspend fun upsertAll(pokemon: List&lt;PokemonEntity&gt;)
+}
+
+// 呼び出し側
+val entities = results.mapNotNull { it.getOrNull() }
+dao.upsertAll(entities)      // 151件でも一度の書き込みで終わる
+
+// 複数の DAO をまたぐ処理は @Transaction を付けたメソッドにまとめる
+@Transaction
+suspend fun replaceAll(pokemon: List&lt;PokemonEntity&gt;) {
+    deleteAll()
+    upsertAll(pokemon)
+}</code></pre></figure>
+<hr>
+<p>この詳細設計書により、実装チームは各機能の具体的な実装方法、データフロー、エラーハンドリング、パフォーマンス要件を理解し、効率的に開発を進めることができます。</p></section></main>
+</div>
+
+<script>
+const NAV = [{"id": "doc-0", "file": "README.md", "label": "はじめに", "blurb": "課題の全体像と進め方", "toc": [{"lv": 2, "text": "何を作るのか", "id": "何を作るのか"}, {"lv": 2, "text": "どう作るのか", "id": "どう作るのか"}, {"lv": 2, "text": "今回どこまで作るのか", "id": "今回どこまで作るのか"}, {"lv": 2, "text": "手を動かす", "id": "手を動かす"}, {"lv": 2, "text": "実装する", "id": "実装する"}, {"lv": 2, "text": "素材", "id": "素材"}]}, {"id": "doc-1", "file": "05_環境構築ガイド.md", "label": "環境構築", "blurb": "プロジェクト作成から疎通確認まで", "toc": [{"lv": 2, "text": "1. 前提", "id": "1-前提"}, {"lv": 2, "text": "2. リポジトリを Fork して手元に置く", "id": "2-リポジトリを-fork-して手元に置く"}, {"lv": 3, "text": "2.1 Fork とは", "id": "2-1-fork-とは"}, {"lv": 3, "text": "2.2 Fork する", "id": "2-2-fork-する"}, {"lv": 3, "text": "2.3 clone して手元に持ってくる", "id": "2-3-clone-して手元に持ってくる"}, {"lv": 3, "text": "2.4 push できるようにする", "id": "2-4-push-できるようにする"}, {"lv": 3, "text": "2.5 コミットに使う名前を設定する", "id": "2-5-コミットに使う名前を設定する"}, {"lv": 3, "text": "2.6 作業ブランチを切る", "id": "2-6-作業ブランチを切る"}, {"lv": 2, "text": "3. プロジェクトを作る", "id": "3-プロジェクトを作る"}, {"lv": 2, "text": "4. 依存の追加", "id": "4-依存の追加"}, {"lv": 3, "text": "バージョンの扱い", "id": "バージョンの扱い"}, {"lv": 3, "text": "gradle/libs.versions.toml", "id": "gradle-libs-versions-toml"}, {"lv": 3, "text": "ルートの build.gradle.kts", "id": "ルートの-build-gradle-kts"}, {"lv": 3, "text": "app/build.gradle.kts", "id": "app-build-gradle-kts"}, {"lv": 2, "text": "5. AndroidManifest.xml", "id": "5-androidmanifest-xml"}, {"lv": 2, "text": "6. パッケージ構成", "id": "6-パッケージ構成"}, {"lv": 2, "text": "7. 疎通確認（#2）", "id": "7-疎通確認-2"}, {"lv": 2, "text": "8. プルリクエストを出す", "id": "8-プルリクエストを出す"}, {"lv": 3, "text": "8.1 コミットして push する", "id": "8-1-コミットして-push-する"}, {"lv": 3, "text": "8.2 プルリクエストを作る", "id": "8-2-プルリクエストを作る"}, {"lv": 3, "text": "8.3 本文を書く", "id": "8-3-本文を書く"}, {"lv": 3, "text": "8.4 レビューを依頼する", "id": "8-4-レビューを依頼する"}, {"lv": 2, "text": "9. よくあるつまずき", "id": "9-よくあるつまずき"}]}, {"id": "doc-2", "file": "04_実装仕様.md", "label": "実装仕様", "blurb": "スコープ・技術スタック・評価基準", "toc": [{"lv": 2, "text": "1. 学習目標", "id": "1-学習目標"}, {"lv": 2, "text": "2. アーキテクチャ", "id": "2-アーキテクチャ"}, {"lv": 3, "text": "2.1 レイヤー構成", "id": "2-1-レイヤー構成"}, {"lv": 3, "text": "2.2 主要コンポーネント", "id": "2-2-主要コンポーネント"}, {"lv": 3, "text": "2.3 実装の共通ルール", "id": "2-3-実装の共通ルール"}, {"lv": 2, "text": "3. 機能仕様", "id": "3-機能仕様"}, {"lv": 3, "text": "3.1 Phase 1: 基本機能（必須）", "id": "3-1-phase-1-基本機能-必須"}, {"lv": 3, "text": "3.2 Phase 2: 拡張機能（加点）", "id": "3-2-phase-2-拡張機能-加点"}, {"lv": 2, "text": "4. データベース設計", "id": "4-データベース設計"}, {"lv": 2, "text": "5. PokeAPI の実装上の注意", "id": "5-pokeapi-の実装上の注意"}, {"lv": 2, "text": "6. 技術スタック", "id": "6-技術スタック"}, {"lv": 3, "text": "6.1 加点対象（任意）", "id": "6-1-加点対象-任意"}, {"lv": 3, "text": "6.2 ビルド設定", "id": "6-2-ビルド設定"}, {"lv": 2, "text": "7. 実装手順", "id": "7-実装手順"}, {"lv": 3, "text": "7.1 Step 1: 環境構築（1週目）", "id": "7-1-step-1-環境構築-1週目"}, {"lv": 3, "text": "7.2 Step 2: データレイヤー実装（2週目）", "id": "7-2-step-2-データレイヤー実装-2週目"}, {"lv": 3, "text": "7.3 Step 3: UIレイヤー実装（3週目）", "id": "7-3-step-3-uiレイヤー実装-3週目"}, {"lv": 3, "text": "7.4 Step 4: 機能拡張（4週目）", "id": "7-4-step-4-機能拡張-4週目"}, {"lv": 2, "text": "8. 評価基準", "id": "8-評価基準"}, {"lv": 3, "text": "8.1 必須要件（70点）", "id": "8-1-必須要件-70点"}, {"lv": 3, "text": "8.2 高評価要件（+30点）", "id": "8-2-高評価要件-30点"}, {"lv": 3, "text": "8.3 ボーナス要件（+α）", "id": "8-3-ボーナス要件-α"}, {"lv": 2, "text": "9. 提出要件", "id": "9-提出要件"}, {"lv": 2, "text": "関連リソース", "id": "関連リソース"}]}, {"id": "doc-3", "file": "01_要件定義.md", "label": "要件定義", "blurb": "目的・機能要件・非機能要件", "toc": [{"lv": 2, "text": "1. 目的・ターゲットユーザー・スコープ", "id": "1-目的・ターゲットユーザー・スコープ"}, {"lv": 3, "text": "目的", "id": "目的"}, {"lv": 3, "text": "ターゲットユーザー", "id": "ターゲットユーザー"}, {"lv": 3, "text": "スコープ", "id": "スコープ"}, {"lv": 3, "text": "今回の開発で除外する機能", "id": "今回の開発で除外する機能"}, {"lv": 2, "text": "2. 機能要件", "id": "2-機能要件"}, {"lv": 3, "text": "2.1 ポケモン図鑑の機能", "id": "2-1-ポケモン図鑑の機能"}, {"lv": 3, "text": "2.2 オフライン機能", "id": "2-2-オフライン機能"}, {"lv": 3, "text": "2.3 新情報掲示板（次フェーズの開発スコープ）", "id": "2-3-新情報掲示板-次フェーズの開発スコープ"}, {"lv": 2, "text": "3. UI/UX要件", "id": "3-ui-ux要件"}, {"lv": 2, "text": "4. データ要件", "id": "4-データ要件"}, {"lv": 2, "text": "5. パフォーマンス要件", "id": "5-パフォーマンス要件"}, {"lv": 2, "text": "6. セキュリティ要件", "id": "6-セキュリティ要件"}, {"lv": 2, "text": "7. 非機能要件", "id": "7-非機能要件"}, {"lv": 2, "text": "8. スケジュールとマイルストーン", "id": "8-スケジュールとマイルストーン"}, {"lv": 2, "text": "9. フェーズ2開発計画（参考情報）", "id": "9-フェーズ2開発計画-参考情報"}, {"lv": 2, "text": "付録: 要件定義とは", "id": "付録-要件定義とは"}, {"lv": 3, "text": "要件定義の目的", "id": "要件定義の目的"}, {"lv": 3, "text": "要件定義のプロセス", "id": "要件定義のプロセス"}, {"lv": 3, "text": "要件定義書に含まれる内容", "id": "要件定義書に含まれる内容"}, {"lv": 3, "text": "要件定義の重要性", "id": "要件定義の重要性"}, {"lv": 3, "text": "未経験者が知っておくべきポイント", "id": "未経験者が知っておくべきポイント"}]}, {"id": "doc-4", "file": "02_基本設計.md", "label": "基本設計", "blurb": "システム構成・画面設計・IF設計", "toc": [{"lv": 2, "text": "1. はじめに", "id": "1-はじめに"}, {"lv": 2, "text": "2. 機能設計", "id": "2-機能設計"}, {"lv": 3, "text": "2.1 システム方式設計", "id": "2-1-システム方式設計"}, {"lv": 3, "text": "2.2 画面設計", "id": "2-2-画面設計"}, {"lv": 3, "text": "2.3 外部インターフェース設計", "id": "2-3-外部インターフェース設計"}, {"lv": 3, "text": "2.4 内部インターフェース定義", "id": "2-4-内部インターフェース定義"}, {"lv": 3, "text": "2.5 パフォーマンス設計", "id": "2-5-パフォーマンス設計"}, {"lv": 3, "text": "2.6 テスト計画", "id": "2-6-テスト計画"}, {"lv": 3, "text": "2.7 セキュリティ設計", "id": "2-7-セキュリティ設計"}, {"lv": 3, "text": "2.8 運用・保守計画", "id": "2-8-運用・保守計画"}, {"lv": 2, "text": "付録: 基本設計とは", "id": "付録-基本設計とは"}, {"lv": 3, "text": "開発プロジェクトとは", "id": "開発プロジェクトとは"}, {"lv": 3, "text": "基本設計の位置づけ", "id": "基本設計の位置づけ"}, {"lv": 3, "text": "基本設計のプロセス", "id": "基本設計のプロセス"}, {"lv": 3, "text": "基本設計の成果物", "id": "基本設計の成果物"}, {"lv": 3, "text": "基本設計の重要性", "id": "基本設計の重要性"}, {"lv": 3, "text": "まとめ", "id": "まとめ"}]}, {"id": "doc-5", "file": "03_詳細設計.md", "label": "詳細設計", "blurb": "型定義・シーケンス図・実装例", "toc": [{"lv": 2, "text": "はじめに", "id": "はじめに"}, {"lv": 3, "text": "設計原則", "id": "設計原則"}, {"lv": 3, "text": "この文書の構成", "id": "この文書の構成"}, {"lv": 2, "text": "1. 全体アーキテクチャ", "id": "1-全体アーキテクチャ"}, {"lv": 3, "text": "1.1 レイヤー構成", "id": "1-1-レイヤー構成"}, {"lv": 3, "text": "1.2 主要コンポーネント", "id": "1-2-主要コンポーネント"}, {"lv": 2, "text": "2. データ構造設計", "id": "2-データ構造設計"}, {"lv": 3, "text": "2.1 Pokemon基本情報", "id": "2-1-pokemon基本情報"}, {"lv": 3, "text": "2.2 Pokemon詳細情報", "id": "2-2-pokemon詳細情報"}, {"lv": 3, "text": "2.3 SQLiteテーブル設計", "id": "2-3-sqliteテーブル設計"}, {"lv": 2, "text": "3. API設計", "id": "3-api設計"}, {"lv": 3, "text": "3.1 PokeAPI エンドポイント仕様", "id": "3-1-pokeapi-エンドポイント仕様"}, {"lv": 3, "text": "3.2 内部API設計", "id": "3-2-内部api設計"}, {"lv": 2, "text": "4. 機能詳細設計", "id": "4-機能詳細設計"}, {"lv": 3, "text": "4.1 アプリ起動・初期化機能", "id": "4-1-アプリ起動・初期化機能"}, {"lv": 3, "text": "4.2 ポケモン一覧表示機能", "id": "4-2-ポケモン一覧表示機能"}, {"lv": 3, "text": "4.3 ポケモン検索機能", "id": "4-3-ポケモン検索機能"}, {"lv": 3, "text": "4.4 ポケモン詳細表示機能", "id": "4-4-ポケモン詳細表示機能"}, {"lv": 3, "text": "4.5 データ更新機能", "id": "4-5-データ更新機能"}, {"lv": 3, "text": "4.6 オフライン機能", "id": "4-6-オフライン機能"}, {"lv": 2, "text": "5. エラーハンドリング", "id": "5-エラーハンドリング"}, {"lv": 3, "text": "5.1 エラー分類と対応", "id": "5-1-エラー分類と対応"}, {"lv": 3, "text": "5.2 エラーの伝え方", "id": "5-2-エラーの伝え方"}, {"lv": 2, "text": "6. パフォーマンス設計", "id": "6-パフォーマンス設計"}, {"lv": 3, "text": "6.1 レンダリング最適化", "id": "6-1-レンダリング最適化"}, {"lv": 3, "text": "6.2 データベース最適化", "id": "6-2-データベース最適化"}]}];
+const KEY = "pokedex-kadai-progress";
+
+/* ---------- 目次の組み立て ---------- */
+const list = document.getElementById("doclist");
+NAV.forEach((d, i) => {
+  const li = document.createElement("li");
+  const btn = document.createElement("button");
+  btn.className = "docbtn";
+  btn.type = "button";
+  btn.dataset.target = d.id;
+  btn.innerHTML = '<span class="n"></span><span class="t"></span><span class="b"></span>';
+  btn.querySelector(".n").textContent = String(i).padStart(2, "0");
+  btn.querySelector(".t").textContent = d.label;
+  btn.querySelector(".b").textContent = d.blurb;
+  li.appendChild(btn);
+
+  const toc = document.createElement("ul");
+  toc.className = "toc";
+  toc.hidden = true;
+  d.toc.forEach(h => {
+    const item = document.createElement("li");
+    const a = document.createElement("a");
+    a.href = "#" + h.id;
+    a.textContent = h.text;
+    if (h.lv === 3) a.className = "lv3";
+    a.addEventListener("click", e => {
+      e.preventDefault();
+      goToAnchor(h.id, true);
+      setHash(h.id);
+      closeRail();
+    });
+    item.appendChild(a);
+    toc.appendChild(item);
+  });
+  li.appendChild(toc);
+  list.appendChild(li);
+  btn.addEventListener("click", () => { show(d.id); setHash(stem(d.file)); });
+});
+
+function show(id, keepScroll){
+  document.querySelectorAll(".doc").forEach(s => { s.hidden = s.id !== id; });
+  document.querySelectorAll(".docbtn").forEach(b => {
+    const on = b.dataset.target === id;
+    b.setAttribute("aria-current", on ? "true" : "false");
+    b.parentElement.querySelector(".toc").hidden = !on;
+  });
+  if (!keepScroll) window.scrollTo({top: 0});
+  closeRail();
+  observeHeadings(id);
+}
+
+/* ---------- URL のハッシュで直接その節を開く ---------- */
+const stem = f => f.replace(/\.md$/, "");
+function setHash(value){
+  history.replaceState(null, "", "#" + encodeURIComponent(value));
+}
+
+/** 見出しIDから、それを含む文書を開いてスクロールする */
+function goToAnchor(anchor, smooth){
+  const el = document.getElementById(anchor);
+  const doc = el && el.closest(".doc");
+  if (!doc) return false;
+  show(doc.id, true);
+  el.scrollIntoView({behavior: smooth ? "smooth" : "auto", block: "start"});
+  return true;
+}
+
+function applyHash(){
+  const raw = decodeURIComponent(location.hash.slice(1));
+  if (!raw) { show(NAV[0].id); return; }
+  if (goToAnchor(raw)) return;
+  const doc = NAV.find(d => stem(d.file) === raw);      // 文書だけを指す形も許す
+  show(doc ? doc.id : NAV[0].id);
+}
+window.addEventListener("hashchange", applyHash);
+
+/* 文書間リンクを画面切り替えに繋ぐ */
+document.querySelectorAll("a[data-doc]").forEach(a => {
+  const target = NAV.find(d => d.file === a.dataset.doc);
+  if (!target) return;
+  a.addEventListener("click", e => {
+    e.preventDefault();
+    const frag = (a.getAttribute("href").split("#")[1] || "");
+    if (frag && goToAnchor(decodeURIComponent(frag), true)) setHash(decodeURIComponent(frag));
+    else { show(target.id); setHash(stem(target.file)); }
+  });
+});
+
+/* ---------- 現在地のハイライト ---------- */
+let io = null;
+function observeHeadings(docId){
+  if (io) io.disconnect();
+  const doc = document.getElementById(docId);
+  const btn = document.querySelector('.docbtn[data-target="' + docId + '"]');
+  if (!doc || !btn) return;
+  const links = new Map();
+  btn.parentElement.querySelectorAll(".toc a").forEach(a => {
+    links.set(a.getAttribute("href").slice(1), a);
+  });
+  const heads = doc.querySelectorAll("h2, h3");
+  if (!heads.length) return;
+  io = new IntersectionObserver(entries => {
+    entries.forEach(en => {
+      if (!en.isIntersecting) return;
+      links.forEach(a => a.classList.remove("here"));
+      const hit = links.get(en.target.id);
+      if (hit) hit.classList.add("here");
+    });
+  }, {rootMargin: "0px 0px -75% 0px", threshold: 0});
+  heads.forEach(h => io.observe(h));
+}
+
+/* ---------- コードの色付け ---------- */
+const KEYWORDS = {
+  kotlin: /\b(?:val|var|fun|class|object|interface|data|sealed|suspend|override|private|internal|return|if|else|when|for|while|try|catch|finally|import|package|companion|const|by|in|is|as|null|true|false|this|super|enum|abstract|lateinit|init|throw|do|it)\b/g,
+  sql: /\b(?:CREATE|TABLE|INDEX|SELECT|FROM|WHERE|ORDER|BY|LIMIT|INSERT|INTO|VALUES|DELETE|UPDATE|SET|PRIMARY|KEY|FOREIGN|REFERENCES|NOT|NULL|DEFAULT|AUTOINCREMENT|INTEGER|TEXT|DATETIME|ON|AND|OR|IN|COUNT|MAX|CURRENT_TIMESTAMP)\b/g,
+  json: /\b(?:true|false|null)\b/g
+};
+
+function highlight(code, lang){
+  const marks = [];
+  /* 退避用の番兵。コード中に現れない私用領域の文字を実行時に作る。 */
+  const S0 = String.fromCharCode(0xE000), S1 = String.fromCharCode(0xE001);
+  const stash = (cls, txt) => S0 + (marks.push([cls, txt]) - 1) + S1;
+  let s = code
+    .replace(/(\/\/[^\n]*|--[^\n]*)/g, m => stash("tok-c", m))
+    .replace(/("(?:[^"\\\n]|\\.)*"|'(?:[^'\\\n]|\\.)*')/g, m => stash("tok-s", m))
+    .replace(/(@\w+)/g, m => stash("tok-a", m));
+  const kw = KEYWORDS[lang];
+  if (kw) s = s.replace(kw, m => stash("tok-k", m));
+  s = s.replace(/\b\d[\d_]*(?:\.\d+)?\b/g, m => stash("tok-n", m));
+  return s.replace(new RegExp(S0 + "(\\d+)" + S1, "g"), (_, i) => {
+    const [cls, txt] = marks[Number(i)];
+    return '<span class="' + cls + '">' + txt + "</span>";
+  });
+}
+
+document.querySelectorAll("figure.code code").forEach(el => {
+  const m = el.className.match(/lang-(\w+)/);
+  const lang = m ? m[1] : "";
+  if (["kotlin", "sql", "json"].indexOf(lang) !== -1) {
+    el.innerHTML = highlight(el.innerHTML, lang);
+  }
+});
+
+/* ---------- コピー ---------- */
+document.querySelectorAll(".copy").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const code = btn.closest("figure").querySelector("code");
+    navigator.clipboard.writeText(code.innerText).then(() => {
+      btn.textContent = "コピーしました";
+      btn.classList.add("done");
+      setTimeout(() => { btn.textContent = "コピー"; btn.classList.remove("done"); }, 1600);
+    }).catch(() => {
+      btn.textContent = "コピーできません";
+      setTimeout(() => { btn.textContent = "コピー"; }, 1600);
+    });
+  });
+});
+
+/* ---------- Issue のフェーズ表示と索引 ---------- */
+function phaseOf(n){
+  if (n <= 10) return {cls: "", text: "Phase 1 必須"};
+  if (n <= 14) return {cls: "p2", text: "Phase 2 加点"};
+  if (n === 15) return {cls: "bonus", text: "ボーナス"};
+  return {cls: "submit", text: "提出物"};
+}
+
+const issueDoc = document.querySelector('.doc[data-file*="Issue"]');
+let refreshIssueIndex = () => {};
+
+if (issueDoc) {
+  const entries = [];
+  issueDoc.querySelectorAll("h2").forEach(h => {
+    const m = h.textContent.match(/^#(\d+)\s+(.+)$/);
+    if (!m) return;
+    const num = Number(m[1]), phase = phaseOf(num);
+
+    const badge = document.createElement("span");
+    badge.className = "badge " + phase.cls;
+    badge.textContent = phase.text;
+    h.appendChild(badge);
+
+    // 見出しから次の見出しまでのチェックボックスを、この Issue のものとして数える
+    const boxes = [];
+    for (let el = h.nextElementSibling; el && el.tagName !== "H2"; el = el.nextElementSibling) {
+      el.querySelectorAll('li.task input').forEach(b => boxes.push(b));
+    }
+    entries.push({num: num, name: m[2], id: h.id, phase: phase, boxes: boxes});
+  });
+
+  if (entries.length) {
+    const index = document.createElement("div");
+    index.className = "issue-index";
+    index.innerHTML = '<p class="cap">Issue 索引 — 受け入れ条件をすべて満たすと色が変わります</p><div class="grid"></div>';
+    const grid = index.querySelector(".grid");
+
+    entries.forEach(e => {
+      const a = document.createElement("a");
+      a.href = "#" + e.id;
+      a.className = e.phase.cls;
+      a.innerHTML = '<span class="no"></span><span class="nm"></span>';
+      a.querySelector(".no").textContent = "#" + e.num;
+      a.querySelector(".nm").textContent = e.name;
+      a.title = e.name + "（" + e.phase.text + "）";
+      a.addEventListener("click", ev => {
+        ev.preventDefault();
+        document.getElementById(e.id).scrollIntoView({behavior: "smooth", block: "start"});
+      });
+      grid.appendChild(a);
+      e.cell = a;
+    });
+
+    const firstH2 = issueDoc.querySelector("h2");
+    if (firstH2) issueDoc.insertBefore(index, firstH2);
+
+    refreshIssueIndex = function(){
+      entries.forEach(e => {
+        const done = e.boxes.length > 0 && e.boxes.every(b => b.checked);
+        e.cell.classList.toggle("complete", done);
+      });
+    };
+  }
+}
+
+/* ---------- チェックリストの進捗（この端末にのみ保存） ---------- */
+document.querySelectorAll(".doc").forEach(doc => {
+  const boxes = Array.prototype.slice.call(doc.querySelectorAll("li.task input"));
+  if (!boxes.length) return;
+
+  const storeKey = KEY + ":" + doc.dataset.file;
+  const label = doc.dataset.file.indexOf("Issue") !== -1 ? "受け入れ条件の達成状況" : "評価基準の達成状況";
+
+  let saved = {};
+  try { saved = JSON.parse(localStorage.getItem(storeKey) || "{}"); } catch (e) { saved = {}; }
+  boxes.forEach((b, i) => { b.checked = !!saved[i]; });
+
+  const panel = document.createElement("div");
+  panel.className = "progress";
+  panel.innerHTML =
+    '<div class="row"><span class="lbl"></span><span class="num"></span></div>' +
+    '<div class="bar"><div class="fill"></div></div>' +
+    '<div class="row" style="margin-top:10px"><span class="lbl">チェックはこの端末にのみ保存されます</span>' +
+    '<button type="button">すべて解除</button></div>';
+  panel.querySelector(".lbl").textContent = label;
+  const anchor = doc.querySelector(".issue-index") || doc.querySelector("h2");
+  if (anchor) doc.insertBefore(panel, anchor); else doc.appendChild(panel);
+
+  const num = panel.querySelector(".num");
+  const fill = panel.querySelector(".fill");
+
+  function render(){
+    const n = boxes.filter(b => b.checked).length;
+    num.textContent = n + " / " + boxes.length;
+    fill.style.width = (n / boxes.length * 100) + "%";
+    refreshIssueIndex();
+  }
+  function persist(){
+    const o = {};
+    boxes.forEach((b, i) => { if (b.checked) o[i] = 1; });
+    try { localStorage.setItem(storeKey, JSON.stringify(o)); } catch (e) {}
+  }
+  boxes.forEach(b => b.addEventListener("change", () => { persist(); render(); }));
+  panel.querySelector("button").addEventListener("click", () => {
+    boxes.forEach(b => { b.checked = false; });
+    persist();
+    render();
+  });
+  render();
+});
+
+/* ---------- モバイルの目次 ---------- */
+const rail = document.querySelector(".rail");
+const toggle = document.querySelector(".railtoggle");
+function closeRail(){
+  rail.classList.remove("open");
+  toggle.setAttribute("aria-expanded", "false");
+}
+toggle.addEventListener("click", () => {
+  const open = rail.classList.toggle("open");
+  toggle.setAttribute("aria-expanded", String(open));
+});
+
+applyHash();
+</script>

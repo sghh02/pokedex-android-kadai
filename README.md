@@ -5,9 +5,7 @@
 
 ## 設計書
 
-**すべての設計書はこちらにまとまっています。**
-
-### 📘 [設計書を開く](https://claude.ai/code/artifact/02591d66-b87e-44f1-98d1-bc85ac2c19d3)
+### 📘 [設計書を開く](https://sghh02.github.io/pokedex-android-kadai/)
 
 要件定義・基本設計・詳細設計・実装仕様・環境構築ガイドが1つのページに入っています。
 左の目次から文書を切り替えられます。上から順に読んでいけば、
@@ -15,22 +13,30 @@
 
 | 文書 | 何が書いてあるか |
 | --- | --- |
-| [01 要件定義](https://claude.ai/code/artifact/02591d66-b87e-44f1-98d1-bc85ac2c19d3#01_要件定義) | なぜ作るのか、誰のためのものか、どこまでを対象にするか |
-| [02 基本設計](https://claude.ai/code/artifact/02591d66-b87e-44f1-98d1-bc85ac2c19d3#02_基本設計) | 画面の一覧と遷移図、PokeAPI とのやりとり、テーブル構成 |
-| [03 詳細設計](https://claude.ai/code/artifact/02591d66-b87e-44f1-98d1-bc85ac2c19d3#03_詳細設計) | 機能ごとのシーケンス図と Kotlin の実装例 |
-| [04 実装仕様](https://claude.ai/code/artifact/02591d66-b87e-44f1-98d1-bc85ac2c19d3#04_実装仕様) | 実装範囲、共通ルール、技術スタック、評価基準、スケジュール |
-| [05 環境構築ガイド](https://claude.ai/code/artifact/02591d66-b87e-44f1-98d1-bc85ac2c19d3#05_環境構築ガイド) | Fork から最初のビルドを通すまで |
+| [01 要件定義](https://sghh02.github.io/pokedex-android-kadai/#01_要件定義) | なぜ作るのか、誰のためのものか、どこまでを対象にするか |
+| [02 基本設計](https://sghh02.github.io/pokedex-android-kadai/#02_基本設計) | 画面の一覧と遷移図、PokeAPI とのやりとり、テーブル構成 |
+| [03 詳細設計](https://sghh02.github.io/pokedex-android-kadai/#03_詳細設計) | 機能ごとのシーケンス図と Kotlin の実装例 |
+| [04 実装仕様](https://sghh02.github.io/pokedex-android-kadai/#04_実装仕様) | 実装範囲、共通ルール、技術スタック、評価基準、スケジュール |
+| [05 環境構築ガイド](https://sghh02.github.io/pokedex-android-kadai/#05_環境構築ガイド) | Fork から最初のビルド、プルリクエストの出し方まで |
 
 ## 進め方
 
 1. このリポジトリを **Fork** する
-2. [環境構築ガイド](https://claude.ai/code/artifact/02591d66-b87e-44f1-98d1-bc85ac2c19d3#05_環境構築ガイド) に沿って、clone からビルドが通るまで進める
-3. Issues を `#1` から順に実装する
+2. [環境構築ガイド](https://sghh02.github.io/pokedex-android-kadai/#05_環境構築ガイド) に沿って、clone からビルドが通るまで進める
+3. [Issues](../../issues) を `#1` から順に実装する
 4. Issue ごとにブランチを切り、プルリクエストを作成する
 5. メンターに PR の URL を添えてレビューを依頼する
 6. LGTM をもらったら、その Issue は完了
 
 各 Issue には受け入れ条件が付いています。すべて満たしてからレビューを依頼してください。
+
+> **Issue は Fork にコピーされません**（GitHub の仕様です）。
+> 自分の Fork の Issues タブは空のままで問題ありません。実装タスクは
+> [このリポジトリの Issues](../../issues) を見てください。
+>
+> また、Fork から PR を作ると **base repository は初期状態でこのリポジトリ**になります。
+> **自分の Fork に変更してから** Create pull request を押してください。
+> 詳しくは [環境構築ガイド 8. プルリクエストを出す](https://sghh02.github.io/pokedex-android-kadai/#8-プルリクエストを出す) にあります。
 
 | 週 | Issue | やること |
 | --- | --- | --- |

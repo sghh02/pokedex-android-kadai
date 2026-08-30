@@ -1,6 +1,11 @@
 ## 対応 Issue
 
-Closes #
+<!--
+元リポジトリの Issue の URL を貼ってください。
+例: https://github.com/sghh02/pokedex-android-kadai/issues/1
+
+Issue は Fork にはコピーされないため、`Closes #1` のような書き方は使えません。
+-->
 
 ## 変更内容
 
@@ -19,3 +24,11 @@ Closes #
 ## スクリーンショット / 動画
 
 <!-- 画面に変更がある場合は添付してください -->
+
+---
+
+<!--
+PR の向き先を確認してください。
+base repository が「自分の Fork」になっていますか？
+初期状態では元リポジトリ（sghh02/pokedex-android-kadai）が選ばれています。
+-->
