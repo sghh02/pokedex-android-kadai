@@ -366,6 +366,7 @@ li.task input:checked+span{
 <section class="doc" id="doc-1" data-file="05_環境構築ガイド.md" hidden><h1 id="環境構築ガイド">環境構築ガイド</h1>
 <p><a class="lnk ext" href="https://github.com/sghh02/pokedex-android-kadai/issues" target="_blank" rel="noopener">Issue</a> の <code>#1</code> と <code>#2</code> を進めるための手順です。ここまで通れば、以降の Issue は実装に集中できます。</p>
 <h2 id="1-前提">1. 前提</h2>
+<blockquote><p>この構成は実際にビルドして確認しています（Gradle 9.4.1 / AGP 9.2.1 / Kotlin 2.2.10 /KSP 2.2.10-2.0.2 / Room 2.8.4 / Retrofit 3.0.0 / Coil 3.3.0、<code>compileDebugKotlin</code> 成功）。</p></blockquote>
 <div class="table-wrap"><table><thead><tr><th>項目</th><th>要件</th></tr></thead><tbody><tr><td>Android Studio</td><td>最新の安定版</td></tr><tr><td>JDK</td><td>Android Studio 同梱の JDK（17以上）</td></tr><tr><td>確認端末</td><td>エミュレータ（API 26 以上）または実機</td></tr></tbody></table></div>
 <h2 id="2-リポジトリを-fork-して手元に置く">2. リポジトリを Fork して手元に置く</h2>
 <h3 id="2-1-fork-とは">2.1 Fork とは</h3>
@@ -467,12 +468,13 @@ Remove-Item &quot;$HOME\tmp\Pokedex&quot; -Recurse -Force</code></pre></figure>
 <h3 id="バージョンの扱い">バージョンの扱い</h3>
 <p><strong>Kotlin / AGP / Compose のバージョンは、ウィザードが生成したものをそのまま使ってください。</strong>この3つは互いに強く結合しており、手で差し替えると噛み合わなくなります。</p>
 <p>一方、以下に挙げるライブラリは比較的独立しているので、明示的に追加します。記載のバージョンは執筆時点の安定版です。Android Studio が更新を提案してきたら従って構いません。</p>
-<blockquote><p><strong>KSP だけは注意。</strong> KSP のバージョンは Kotlin のバージョンに対応するものを選ぶ必要があります。ビルド時に「ksp が Kotlin x.y.z に対応していない」と怒られたら、<a class="lnk ext" href="https://github.com/google/ksp/releases" target="_blank" rel="noopener">KSP のリリース一覧</a>から対応する版を探してください。</p></blockquote>
+<blockquote><p><strong>KSP のバージョンは Kotlin と対で決まります。</strong> <code>2.2.10-2.0.2</code> のように<code>&lt;Kotlinのバージョン&gt;-&lt;KSPのビルド番号&gt;</code> の形です。前半をウィザードが生成した<code>kotlin</code> に合わせてください。単独の採番（<code>2.3.11</code> など）を指定すると、Kotlin と噛み合わずビルドが通りません。対応表は<a class="lnk ext" href="https://github.com/google/ksp/releases" target="_blank" rel="noopener">KSP のリリース一覧</a>にあります。</p></blockquote>
 <h3 id="gradle-libs-versions-toml"><code>gradle/libs.versions.toml</code></h3>
 <blockquote><p><strong>既存のファイルへの「追記」です。</strong> ウィザードが生成した <code>agp</code> / <code>kotlin</code> /<code>composeBom</code> などの行は消さずに残してください。消すとビルドが通らなくなります。</p></blockquote>
 <figure class="code"><div class="code-head"><span>toml</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-toml">[versions]
 # ↓ 既存の行はそのまま。以下を追記する
-ksp = &quot;2.3.11&quot;
+# ksp は kotlin と対で決まる。前半をウィザードが書いた kotlin に合わせること
+ksp = &quot;2.2.10-2.0.2&quot;
 room = &quot;2.8.4&quot;
 coroutines = &quot;1.10.2&quot;
 androidxTest = &quot;1.7.0&quot;
@@ -480,7 +482,7 @@ robolectric = &quot;4.16&quot;
 retrofit = &quot;3.0.0&quot;
 okhttp = &quot;5.5.0&quot;
 kotlinxSerialization = &quot;1.11.0&quot;
-coil = &quot;3.6.0&quot;
+coil = &quot;3.3.0&quot;
 navigation = &quot;2.10.0&quot;
 lifecycle = &quot;2.11.0&quot;
 datastore = &quot;1.2.1&quot;
@@ -513,27 +515,33 @@ androidx-test-core      = { module = &quot;androidx.test:core&quot;,   version.r
 robolectric             = { module = &quot;org.robolectric:robolectric&quot;, version.ref = &quot;robolectric&quot; }
 
 [plugins]
-# android-application / kotlin-android / kotlin-compose はウィザードが生成済みなので
-# そのまま残す。追記するのは次の2つだけ。
+# android-application / kotlin-compose はウィザードが生成済みなのでそのまま残す。
+# 追記するのは次の2つだけ。
 # version.ref = &quot;kotlin&quot; は、ウィザードが [versions] に書いた kotlin を参照する。
 kotlin-serialization = { id = &quot;org.jetbrains.kotlin.plugin.serialization&quot;, version.ref = &quot;kotlin&quot; }
 ksp                  = { id = &quot;com.google.devtools.ksp&quot;,                   version.ref = &quot;ksp&quot; }</code></pre></figure>
-<blockquote><p><strong>Coil 3 は artifact が2つに分かれています。</strong> <code>coil-compose</code> だけではネットワーク画像を読み込めません。<code>coil-network-okhttp</code> も必ず追加してください。ここを忘れて「画像が表示されない」で止まる人が多い箇所です。</p></blockquote>
+<blockquote><p><strong>Coil 3 は artifact が2つに分かれています。</strong> <code>coil-compose</code> だけではネットワーク画像を読み込めません。<code>coil-network-okhttp</code> も必ず追加してください。ここを忘れて「画像が表示されない」で止まる人が多い箇所です。</p>
+<p><strong>Coil のバージョンは Kotlin を選びます。</strong> 新しい Coil ほど新しい Kotlin を要求します。ウィザードが生成した Kotlin が 2.2 系なら 3.3.0、2.3 系なら 3.4.0 まで。合っていないと <code>Module was compiled with an incompatible version of Kotlin</code> という分かりにくいエラーで止まります。</p></blockquote>
 <h3 id="ルートの-build-gradle-kts">ルートの <code>build.gradle.kts</code></h3>
 <p>追加した2つのプラグインを、ルートで宣言します（<code>apply false</code> を付けるのがポイントです）。</p>
 <figure class="code"><div class="code-head"><span>kotlin</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-kotlin">plugins {
+    // ↓ ウィザードが生成した行はそのまま
     alias(libs.plugins.android.application) apply false
-    alias(libs.plugins.kotlin.android) apply false
     alias(libs.plugins.kotlin.compose) apply false
-    alias(libs.plugins.kotlin.serialization) apply false   // 追加
-    alias(libs.plugins.ksp) apply false                    // 追加
+
+    // ↓ ここから追記
+    alias(libs.plugins.kotlin.serialization) apply false
+    alias(libs.plugins.ksp) apply false
 }</code></pre></figure>
 <h3 id="app-build-gradle-kts"><code>app/build.gradle.kts</code></h3>
-<blockquote><p>ここも<strong>追記</strong>です。ウィザードが生成した <code>compileSdk</code> / <code>targetSdk</code> /<code>composeOptions</code> などの行はそのまま残してください。</p></blockquote>
+<blockquote><p>ここも<strong>追記</strong>です。ウィザードが生成した <code>compileSdk</code> / <code>targetSdk</code> /<code>composeOptions</code> などの行はそのまま残してください。</p>
+<p><code>plugins</code> ブロックも<strong>追記</strong>です。ウィザードが書いた行はそのまま残し、下2行だけを足してください。<strong><code>kotlin.android</code> を自分で足さないこと。</strong>AGP 9 以降は Kotlin を内蔵しており、重ねて適用すると<code>Cannot add extension with name &#x27;kotlin&#x27;</code> で失敗します。</p></blockquote>
 <figure class="code"><div class="code-head"><span>kotlin</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-kotlin">plugins {
+    // ↓ ウィザードが生成した行（環境によって内容が違う。触らない）
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+
+    // ↓ ここから追記
     alias(libs.plugins.kotlin.serialization)   // JSON の変換に必要
     alias(libs.plugins.ksp)                    // Room のコード生成に必要
 }
@@ -692,7 +700,7 @@ head repository: &lt;自分のアカウント&gt;/pokedex-android-kadai   compar
 git pull
 git switch -c feature/2-api</code></pre></figure>
 <h2 id="9-よくあるつまずき">9. よくあるつまずき</h2>
-<div class="table-wrap"><table><thead><tr><th>症状</th><th>原因と対処</th></tr></thead><tbody><tr><td><code>SecurityException: Permission denied</code></td><td><code>INTERNET</code> 権限が未指定</td></tr><tr><td>画像が表示されない</td><td>Coil 3 の <code>coil-network-okhttp</code> が未追加</td></tr><tr><td><code>lateinit property container has not been initialized</code></td><td>Manifest の <code>android:name=&quot;.PokedexApplication&quot;</code> が未指定</td></tr><tr><td><code>Unable to create converter for ...</code></td><td><code>@Serializable</code> の付け忘れ、または converter の未登録</td></tr><tr><td><code>Field &#x27;xxx&#x27; is required but was missing</code></td><td>API のレスポンスに null が入る。<code>Json { ignoreUnknownKeys = true }</code> と、DTO のフィールドを nullable にする</td></tr><tr><td>Room の <code>@Upsert</code> が見つからない</td><td>Room 2.5 未満。<code>libs.versions.toml</code> のバージョンを確認</td></tr><tr><td>ビルドが <code>ksp</code> で失敗する</td><td>KSP と Kotlin のバージョンが噛み合っていない。上記「バージョンの扱い」を参照</td></tr><tr><td><code>Unresolved reference: Icons</code></td><td><code>material-icons-core</code> が未追加。material3 1.4.0 以降は推移依存に含まれない</td></tr><tr><td><code>Serializer has not been found for type</code></td><td>ドメインモデルに <code>@Serializable</code> が付いていない</td></tr><tr><td>in-memory DB のテストが <code>Context</code> で落ちる</td><td>Robolectric が未追加、または <code>unitTests.isIncludeAndroidResources</code> が未設定</td></tr><tr><td>Robolectric が <code>targetSdk</code> に対応していないと言う</td><td>Robolectric の対応は Android の最新版より遅れる。<code>src/test/resources/robolectric.properties</code> に <code>sdk=36</code> のように対応済みの API を指定する</td></tr><tr><td>初回起動が終わらない</td><td>151回の詳細取得をスプラッシュで待っている、逐次実行している、または再試行の待機が長すぎる。取得の完了を待たずに遷移し、同時実行数を制限した並列取得にする（<a class="lnk" href="#5-pokeapi-の実装上の注意" data-doc="04_実装仕様.md">実装上の注意</a>）</td></tr></tbody></table></div></section>
+<div class="table-wrap"><table><thead><tr><th>症状</th><th>原因と対処</th></tr></thead><tbody><tr><td><code>SecurityException: Permission denied</code></td><td><code>INTERNET</code> 権限が未指定</td></tr><tr><td>画像が表示されない</td><td>Coil 3 の <code>coil-network-okhttp</code> が未追加</td></tr><tr><td><code>lateinit property container has not been initialized</code></td><td>Manifest の <code>android:name=&quot;.PokedexApplication&quot;</code> が未指定</td></tr><tr><td><code>Unable to create converter for ...</code></td><td><code>@Serializable</code> の付け忘れ、または converter の未登録</td></tr><tr><td><code>Field &#x27;xxx&#x27; is required but was missing</code></td><td>API のレスポンスに null が入る。<code>Json { ignoreUnknownKeys = true }</code> と、DTO のフィールドを nullable にする</td></tr><tr><td>Room の <code>@Upsert</code> が見つからない</td><td>Room 2.5 未満。<code>libs.versions.toml</code> のバージョンを確認</td></tr><tr><td>ビルドが <code>ksp</code> で失敗する</td><td>KSP と Kotlin のバージョンが噛み合っていない。上記「バージョンの扱い」を参照</td></tr><tr><td><code>Cannot add extension with name &#x27;kotlin&#x27;</code></td><td><code>kotlin.android</code> プラグインを自分で足している。AGP 9 以降は不要</td></tr><tr><td><code>Module was compiled with an incompatible version of Kotlin</code></td><td>ライブラリが要求する Kotlin のほうが新しい。多くは Coil。バージョンを下げるか Kotlin を上げる</td></tr><tr><td><code>Unresolved reference: Icons</code></td><td><code>material-icons-core</code> が未追加。material3 1.4.0 以降は推移依存に含まれない</td></tr><tr><td><code>Serializer has not been found for type</code></td><td>ドメインモデルに <code>@Serializable</code> が付いていない</td></tr><tr><td>in-memory DB のテストが <code>Context</code> で落ちる</td><td>Robolectric が未追加、または <code>unitTests.isIncludeAndroidResources</code> が未設定</td></tr><tr><td>Robolectric が <code>targetSdk</code> に対応していないと言う</td><td>Robolectric の対応は Android の最新版より遅れる。<code>src/test/resources/robolectric.properties</code> に <code>sdk=36</code> のように対応済みの API を指定する</td></tr><tr><td>初回起動が終わらない</td><td>151回の詳細取得をスプラッシュで待っている、逐次実行している、または再試行の待機が長すぎる。取得の完了を待たずに遷移し、同時実行数を制限した並列取得にする（<a class="lnk" href="#5-pokeapi-の実装上の注意" data-doc="04_実装仕様.md">実装上の注意</a>）</td></tr></tbody></table></div></section>
 <section class="doc" id="doc-2" data-file="04_実装仕様.md" hidden><h1 id="実装仕様-ポケモン図鑑アプリ">実装仕様 — ポケモン図鑑アプリ</h1>
 <p>実装するスコープ、使用する技術、評価の基準を定めます。何を作るかはこの文書が基準になります。背景は<a class="lnk" href="#01_要件定義" data-doc="01_要件定義.md">要件定義</a>、設計の詳細は<a class="lnk" href="#02_基本設計" data-doc="02_基本設計.md">基本設計</a>・<a class="lnk" href="#03_詳細設計" data-doc="03_詳細設計.md">詳細設計</a>を参照してください。</p>
 <h2 id="1-学習目標">1. 学習目標</h2>
