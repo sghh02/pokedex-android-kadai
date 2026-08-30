@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>設定画面</title>
+    <link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* 指定されたRGB値に基づくモノクロパレット */
+            --light-gray: #e8e8e8;    /* RGB(232,232,232) - 最も明るい色 */
+            --mid-gray: #a0a0a0;      /* RGB(160,160,160) - 中間色 */
+            --dark-gray: #585858;     /* RGB(88,88,88) - 暗い色 */
+            --darkest-gray: #101010;  /* RGB(16,16,16) - 最も暗い色 */
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            image-rendering: pixelated;
+        }
+        
+        body {
+            font-family: 'DotGothic16', sans-serif;
+            background-color: var(--mid-gray);
+            color: var(--darkest-gray);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 390px;
+            background-color: var(--light-gray);
+            /* 外枠を削除 */
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .header {
+            display: flex;
+            align-items: center;
+            background-color: var(--mid-gray);
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .title {
+            flex: 1;
+            text-align: center;
+            font-size: 16px;
+        }
+        
+        .setting-section {
+            margin: 10px;
+            margin-bottom: 15px;
+            border: 2px solid var(--darkest-gray); /* 内部コンポーネントの枠は維持 */
+        }
+        
+        .section-header {
+            background-color: var(--dark-gray);
+            color: var(--light-gray);
+            padding: 5px 10px;
+            font-size: 14px;
+            border-bottom: 2px solid var(--darkest-gray); /* セクションヘッダーの下枠線 */
+        }
+        
+        .section-content {
+            padding: 10px;
+            background-color: var(--mid-gray);
+        }
+        
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px;
+            background-color: var(--light-gray);
+            border: 2px solid var(--darkest-gray); /* 内部コンポーネントの枠は維持 */
+            margin-bottom: 8px;
+        }
+        
+        .setting-label {
+            flex: 1;
+            font-size: 14px;
+        }
+        
+        .update-button {
+            background-color: var(--dark-gray);
+            color: var(--light-gray);
+            border: 1px solid var(--darkest-gray); /* ボタンの枠線 */
+            padding: 5px 10px;
+            cursor: pointer;
+            font-family: 'DotGothic16', sans-serif;
+            font-size: 12px;
+        }
+        
+        .update-button:active {
+            background-color: var(--darkest-gray);
+        }
+        
+        .language-selector {
+            display: flex;
+        }
+        
+        .language-option {
+            padding: 3px 8px;
+            cursor: pointer;
+            background-color: var(--light-gray);
+            border: 1px solid var(--darkest-gray); /* 言語オプションの枠線 */
+            margin-right: 5px;
+        }
+        
+        .language-option.active {
+            background-color: var(--dark-gray);
+            color: var(--light-gray);
+        }
+        
+        .update-status {
+            font-size: 12px;
+            margin-top: 5px;
+        }
+        
+        .version-info {
+            margin: 10px;
+            padding: 10px;
+            text-align: center;
+            font-size: 12px;
+            background-color: var(--mid-gray);
+            border: 2px solid var(--darkest-gray); /* 内部コンポーネントの枠は維持 */
+        }
+        
+        .scanlines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 100%;
+            background: linear-gradient(
+                to bottom,
+                rgba(0, 0, 0, 0.05),
+                rgba(0, 0, 0, 0.05) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 10;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="title">設定</div>
+        </div>
+        
+        <div class="setting-section">
+            <div class="section-header">データ更新</div>
+            <div class="section-content">
+                <div class="setting-item">
+                    <div class="setting-label">ポケモンデータを更新</div>
+                    <button class="update-button">更新</button>
+                </div>
+                <div class="update-status">
+                    最終更新: 2025/03/03 10:15
+                </div>
+            </div>
+        </div>
+        
+        <div class="setting-section">
+            <div class="section-header">表示設定</div>
+            <div class="section-content">
+                <div class="setting-item">
+                    <div class="setting-label">言語</div>
+                    <div class="language-selector">
+                        <div class="language-option active">日本語</div>
+                        <div class="language-option">English</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="version-info">
+            <div>ポケモン図鑑アプリ v1.0.0</div>
+            <div>©2025 Game Freak Inc.</div>
+        </div>
+        
+        <div class="scanlines"></div>
+    </div>
+</body>
+
+</html>

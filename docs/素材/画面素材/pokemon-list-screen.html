@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ポケモン図鑑</title>
+    <link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* 指定されたRGB値に基づくモノクロパレット */
+            --light-gray: #e8e8e8;    /* RGB(232,232,232) - 最も明るい色 */
+            --mid-gray: #a0a0a0;      /* RGB(160,160,160) - 中間色 */
+            --dark-gray: #585858;     /* RGB(88,88,88) - 暗い色 */
+            --darkest-gray: #101010;  /* RGB(16,16,16) - 最も暗い色 */
+            --accent-color: #585858;  /* アクセントカラー（暗めのグレー） */
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            image-rendering: pixelated;
+        }
+
+        body {
+            font-family: 'DotGothic16', sans-serif;
+            background-color: var(--mid-gray);
+            color: var(--darkest-gray);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .gameboy-container {
+            width: 100%;
+            max-width: 390px;
+            background-color: var(--light-gray);
+        }
+
+        .screen-content {
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .search-section {
+            background-color: var(--mid-gray);
+            border: 2px solid var(--darkest-gray);
+            padding: 8px;
+        }
+
+        .filter-row {
+            display: flex;
+            gap: 6px;
+        }
+
+        .filter-col {
+            flex: 1;
+        }
+
+        .search-input {
+            width: 100%;
+            font-family: 'DotGothic16', sans-serif;
+            font-size: 12px;
+            padding: 4px;
+            background-color: var(--light-gray);
+            border: 2px solid var(--darkest-gray);
+            color: var(--darkest-gray);
+            outline: none;
+            border-radius: 0;
+        }
+
+        .filter-select {
+            width: 100%;
+            font-family: 'DotGothic16', sans-serif;
+            font-size: 12px;
+            padding: 4px;
+            background-color: var(--light-gray);
+            border: 2px solid var(--darkest-gray);
+            color: var(--darkest-gray);
+            appearance: none;
+            position: relative;
+            cursor: pointer;
+            border-radius: 0;
+        }
+
+        .pokemon-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            background-color: var(--mid-gray);
+            border: 2px solid var(--darkest-gray);
+            padding: 10px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .pokemon-card {
+            background-color: var(--light-gray);
+            border: 2px solid var(--darkest-gray);
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.1s ease;
+        }
+
+        .pokemon-card:active {
+            transform: scale(0.98);
+        }
+
+        .pokemon-number {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            font-size: 12px;
+            color: var(--darkest-gray);
+        }
+
+        .pokemon-image {
+            width: 80px;
+            height: 80px;
+            margin: 15px 0 10px;
+            display: block;
+            background-color: var(--light-gray); /* スプライトの背景色に合わせる */
+            filter: grayscale(100%); /* ポケモン画像をモノクロに変換 */
+        }
+
+        .pokemon-name {
+            font-size: 14px;
+            text-align: center;
+            margin-top: 5px;
+        }
+
+        .pokemon-type {
+            margin-top: 5px;
+            font-size: 12px;
+            padding: 3px 6px;
+            background-color: var(--mid-gray);
+            color: var(--darkest-gray);
+            text-align: center;
+        }
+
+        .scanlines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 100%;
+            background: linear-gradient(to bottom,
+                    rgba(0, 0, 0, 0.05),
+                    rgba(0, 0, 0, 0.05) 1px,
+                    transparent 1px,
+                    transparent 2px);
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 10;
+            opacity: 0.5;
+        }
+
+        .offline-indicator {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            font-size: 12px;
+            padding: 3px 6px;
+            background-color: var(--dark-gray);
+            color: var(--light-gray);
+            display: none;
+            /* Show when offline */
+        }
+
+        /* カスタムスクロールバー */
+        .pokemon-grid::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        .pokemon-grid::-webkit-scrollbar-track {
+            background: var(--mid-gray);
+        }
+
+        .pokemon-grid::-webkit-scrollbar-thumb {
+            background: var(--dark-gray);
+            border: 2px solid var(--mid-gray);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="gameboy-container">
+        <div class="screen-content">
+            <div class="offline-indicator">オフライン</div>
+
+            <div class="search-section">
+                <div class="filter-row">
+                    <div class="filter-col" style="flex: 6;">
+                        <input type="text" class="search-input" placeholder="名前または番号">
+                    </div>
+                    <div class="filter-col" style="flex: 2;">
+                        <select class="filter-select">
+                            <option>昇順</option>
+                            <option>降順</option>
+                        </select>
+                    </div>
+                    <div class="filter-col" style="flex: 2;">
+                        <select class="filter-select">
+                            <option>すべて</option>
+                            <option>ノーマル</option>
+                            <option>ほのお</option>
+                            <option>みず</option>
+                            <option>でんき</option>
+                            <option>くさ</option>
+                            <option>こおり</option>
+                            <option>かくとう</option>
+                            <option>どく</option>
+                            <option>じめん</option>
+                            <option>ひこう</option>
+                            <option>エスパー</option>
+                            <option>むし</option>
+                            <option>いわ</option>
+                            <option>ゴースト</option>
+                            <option>ドラゴン</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pokemon-grid">
+                <div class="pokemon-card">
+                    <div class="pokemon-number">No.001</div>
+                    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-i/yellow/1.png"
+                        alt="フシギダネ" class="pokemon-image">
+                    <div class="pokemon-name">フシギダネ</div>
+                </div>
+                <div class="pokemon-card">
+                    <div class="pokemon-number">No.002</div>
+                    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-i/yellow/2.png"
+                        alt="フシギソウ" class="pokemon-image">
+                    <div class="pokemon-name">フシギソウ</div>
+                </div>
+                <div class="pokemon-card">
+                    <div class="pokemon-number">No.003</div>
+                    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-i/yellow/3.png"
+                        alt="フシギバナ" class="pokemon-image">
+                    <div class="pokemon-name">フシギバナ</div>
+                </div>
+                <div class="pokemon-card">
+                    <div class="pokemon-number">No.004</div>
+                    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-i/yellow/4.png"
+                        alt="ヒトカゲ" class="pokemon-image">
+                    <div class="pokemon-name">ヒトカゲ</div>
+                </div>
+                <div class="pokemon-card">
+                    <div class="pokemon-number">No.005</div>
+                    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-i/yellow/5.png"
+                        alt="リザード" class="pokemon-image">
+                    <div class="pokemon-name">リザード</div>
+                </div>
+                <div class="pokemon-card">
+                    <div class="pokemon-number">No.006</div>
+                    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-i/yellow/6.png"
+                        alt="リザードン" class="pokemon-image">
+                    <div class="pokemon-name">リザードン</div>
+                </div>
+                <div class="pokemon-card">
+                    <div class="pokemon-number">No.007</div>
+                    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-i/yellow/7.png"
+                        alt="ゼニガメ" class="pokemon-image">
+                    <div class="pokemon-name">ゼニガメ</div>
+                </div>
+                <div class="pokemon-card">
+                    <div class="pokemon-number">No.008</div>
+                    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-i/yellow/8.png"
+                        alt="カメール" class="pokemon-image">
+                    <div class="pokemon-name">カメール</div>
+                </div>
+                <div class="pokemon-card">
+                    <div class="pokemon-number">No.009</div>
+                    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-i/yellow/9.png"
+                        alt="カメックス" class="pokemon-image">
+                    <div class="pokemon-name">カメックス</div>
+                </div>
+                <div class="pokemon-card">
+                    <div class="pokemon-number">No.010</div>
+                    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-i/yellow/10.png"
+                        alt="キャタピー" class="pokemon-image">
+                    <div class="pokemon-name">キャタピー</div>
+                </div>
+                <div class="pokemon-card">
+                    <div class="pokemon-number">No.011</div>
+                    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-i/yellow/11.png"
+                        alt="トランセル" class="pokemon-image">
+                    <div class="pokemon-name">トランセル</div>
+                </div>
+                <div class="pokemon-card">
+                    <div class="pokemon-number">No.012</div>
+                    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-i/yellow/12.png"
+                        alt="バタフリー" class="pokemon-image">
+                    <div class="pokemon-name">バタフリー</div>
+                </div>
+                <!-- 13-24 -->
+                <div class="pokemon-card">
+                    <div class="pokemon-number">No.013</div>
+                    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-i/yellow/13.png"
+                        alt="ビードル" class="pokemon-image">
+                    <div class="pokemon-name">ビードル</div>
+                </div>
+                <div class="pokemon-card">
+                    <div class="pokemon-number">No.014</div>
+                    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-i/yellow/14.png"
+                        alt="コクーン" class="pokemon-image">
+                    <div class="pokemon-name">コクーン</div>
+                </div>
+                <div class="pokemon-card">
+                    <div class="pokemon-number">No.015</div>
+                    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-i/yellow/15.png"
+                        alt="スピアー" class="pokemon-image">
+                    <div class="pokemon-name">スピアー</div>
+                </div>
+                <div class="pokemon-card">
+                    <div class="pokemon-number">No.016</div>
+                    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-i/yellow/16.png"
+                        alt="ポッポ" class="pokemon-image">
+                    <div class="pokemon-name">ポッポ</div>
+                </div>
+                <div class="pokemon-card">
+                    <div class="pokemon-number">No.017</div>
+                    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-i/yellow/17.png"
+                        alt="ピジョン" class="pokemon-image">
+                    <div class="pokemon-name">ピジョン</div>
+                </div>
+                <div class="pokemon-card">
+                    <div class="pokemon-number">No.018</div>
+                    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-i/yellow/18.png"
+                        alt="ピジョット" class="pokemon-image">
+                    <div class="pokemon-name">ピジョット</div>
+                </div>
+                <div class="pokemon-card">
+                    <div class="pokemon-number">No.019</div>
+                    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-i/yellow/19.png"
+                        alt="コラッタ" class="pokemon-image">
+                    <div class="pokemon-name">コラッタ</div>
+                </div>
+                <div class="pokemon-card">
+                    <div class="pokemon-number">No.020</div>
+                    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-i/yellow/20.png"
+                        alt="ラッタ" class="pokemon-image">
+                    <div class="pokemon-name">ラッタ</div>
+                </div>
+                <div class="pokemon-card">
+                    <div class="pokemon-number">No.021</div>
+                    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-i/yellow/21.png"
+                        alt="オニスズメ" class="pokemon-image">
+                    <div class="pokemon-name">オニスズメ</div>
+                </div>
+                <div class="pokemon-card">
+                    <div class="pokemon-number">No.022</div>
+                    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-i/yellow/22.png"
+                        alt="オニドリル" class="pokemon-image">
+                    <div class="pokemon-name">オニドリル</div>
+                </div>
+                <div class="pokemon-card">
+                    <div class="pokemon-number">No.023</div>
+                    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-i/yellow/23.png"
+                        alt="アーボ" class="pokemon-image">
+                    <div class="pokemon-name">アーボ</div>
+                </div>
+                <div class="pokemon-card">
+                    <div class="pokemon-number">No.024</div>
+                    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-i/yellow/24.png"
+                        alt="アーボック" class="pokemon-image">
+                    <div class="pokemon-name">アーボック</div>
+                </div>
+                <!-- 他のポケモンも同様に追加（25-151） -->
+                <div class="pokemon-card">
+                    <div class="pokemon-number">No.025</div>
+                    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-i/yellow/25.png"
+                        alt="ピカチュウ" class="pokemon-image">
+                    <div class="pokemon-name">ピカチュウ</div>
+                </div>
+                <div class="pokemon-card">
+                    <div class="pokemon-number">No.026</div>
+                    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-i/yellow/26.png"
+                        alt="ライチュウ" class="pokemon-image">
+                    <div class="pokemon-name">ライチュウ</div>
+                </div>
+                <div class="pokemon-card">
+                    <div class="pokemon-number">No.027</div>
+                    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-i/yellow/27.png"
+                        alt="サンド" class="pokemon-image">
+                    <div class="pokemon-name">サンド</div>
+                </div>
+                <div class="pokemon-card">
+                    <div class="pokemon-number">No.028</div>
+                    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-i/yellow/28.png"
+                        alt="サンドパン" class="pokemon-image">
+                    <div class="pokemon-name">サンドパン</div>
+                </div>
+                <div class="pokemon-card">
+                    <div class="pokemon-number">No.029</div>
+                    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-i/yellow/29.png"
+                        alt="ニドラン♀" class="pokemon-image">
+                    <div class="pokemon-name">ニドラン♀</div>
+                </div>
+                <div class="pokemon-card">
+                    <div class="pokemon-number">No.030</div>
+                    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-i/yellow/30.png"
+                        alt="ニドリーナ" class="pokemon-image">
+                    <div class="pokemon-name">ニドリーナ</div>
+                </div>
+            </div>
+        </div>
+        <div class="scanlines"></div>
+    </div>
+</body>
+
+</html>

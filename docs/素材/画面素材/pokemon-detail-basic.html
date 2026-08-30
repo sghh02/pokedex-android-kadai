@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ポケモン詳細</title>
+    <link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* 指定されたRGB値に基づくモノクロパレット */
+            --light-gray: #e8e8e8;    /* RGB(232,232,232) - 最も明るい色 */
+            --mid-gray: #a0a0a0;      /* RGB(160,160,160) - 中間色 */
+            --dark-gray: #585858;     /* RGB(88,88,88) - 暗い色 */
+            --darkest-gray: #101010;  /* RGB(16,16,16) - 最も暗い色 */
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            image-rendering: pixelated;
+        }
+        
+        body {
+            font-family: 'DotGothic16', sans-serif;
+            background-color: var(--mid-gray);
+            color: var(--darkest-gray);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 390px;
+            background-color: var(--light-gray);
+            /* 外枠を削除 */
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .header {
+            display: flex;
+            align-items: center;
+            background-color: var(--mid-gray);
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .back-button {
+            font-size: 16px;
+            margin-right: 10px;
+            cursor: pointer;
+            color: var(--darkest-gray);
+        }
+        
+        .title {
+            flex: 1;
+            text-align: center;
+            font-size: 16px;
+        }
+        
+        .content {
+            padding: 10px;
+        }
+        
+        .pokemon-info {
+            display: flex;
+            margin-bottom: 15px;
+            background-color: var(--mid-gray);
+            padding: 12px;
+            border: 2px solid var(--darkest-gray); /* 内部コンポーネントの枠は維持 */
+        }
+        
+        .pokemon-image {
+            width: 96px;
+            height: 96px;
+            margin-right: 12px;
+            background-color: var(--light-gray);
+            filter: grayscale(100%);
+            border: 2px solid var(--darkest-gray); /* 画像にも枠を追加 */
+        }
+        
+        .info-text {
+            flex: 1;
+        }
+        
+        .pokemon-number {
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+        
+        .pokemon-name {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        
+        .pokemon-types {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+        
+        .type {
+            font-size: 12px;
+            padding: 3px 8px;
+            background-color: var(--dark-gray);
+            color: var(--light-gray);
+            border: 1px solid var(--darkest-gray); /* タイプバッジにも枠を追加 */
+        }
+        
+        .stats {
+            font-size: 12px;
+            line-height: 1.4;
+        }
+        
+        .section {
+            margin-bottom: 15px;
+            border: 2px solid var(--darkest-gray); /* 内部コンポーネントの枠は維持 */
+        }
+        
+        .section-title {
+            background-color: var(--dark-gray);
+            color: var(--light-gray);
+            padding: 5px 10px;
+            font-size: 14px;
+            border-bottom: 2px solid var(--darkest-gray); /* セクションタイトルの下に枠線 */
+        }
+        
+        .section-content {
+            padding: 10px;
+            font-size: 14px;
+            background-color: var(--mid-gray);
+            line-height: 1.4;
+        }
+        
+        .evolution {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .evolution-item {
+            text-align: center;
+        }
+        
+        .evolution-image {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 5px;
+            background-color: var(--light-gray);
+            filter: grayscale(100%);
+            border: 2px solid var(--darkest-gray); /* 進化画像にも枠を追加 */
+        }
+        
+        .evolution-name {
+            font-size: 12px;
+        }
+        
+        .arrow {
+            font-size: 20px;
+            color: var(--darkest-gray);
+        }
+        
+        .moves-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+        
+        .move {
+            padding: 5px;
+            font-size: 14px;
+            background-color: var(--light-gray);
+            border: 1px solid var(--darkest-gray); /* 技リストアイテムにも枠を追加 */
+        }
+        
+        .footer {
+            text-align: right;
+            font-size: 10px;
+            padding: 5px 10px;
+            background-color: var(--mid-gray);
+            margin-top: 15px;
+            border: 2px solid var(--darkest-gray); /* フッターにも枠を追加 */
+        }
+        
+        .scanlines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 100%;
+            background: linear-gradient(
+                to bottom,
+                rgba(0, 0, 0, 0.05),
+                rgba(0, 0, 0, 0.05) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 10;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="back-button">←</div>
+            <div class="title">ポケモン詳細</div>
+        </div>
+        
+        <div class="content">
+            <div class="pokemon-info">
+                <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-i/yellow/25.png" alt="ピカチュウ" class="pokemon-image">
+                <div class="info-text">
+                    <div class="pokemon-number">No.025</div>
+                    <div class="pokemon-name">ピカチュウ</div>
+                    <div class="pokemon-types">
+                        <div class="type">でんき</div>
+                    </div>
+                    <div class="stats">
+                        <div>たかさ: 0.4m</div>
+                        <div>おもさ: 6.0kg</div>
+                        <div>ぶんるい: ねずみポケモン</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-title">ずかんデータ</div>
+                <div class="section-content">
+                    でんきを ためる せいしつを もつ。
+                    ときどき たいないに ためすぎて
+                    でんげきを もらすことがある。
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-title">しんか</div>
+                <div class="section-content">
+                    <div class="evolution">
+                        <div class="evolution-item">
+                            <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-i/yellow/25.png" alt="ピカチュウ" class="evolution-image">
+                            <div class="evolution-name">ピカチュウ</div>
+                        </div>
+                        <div class="arrow">→</div>
+                        <div class="evolution-item">
+                            <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-i/yellow/26.png" alt="ライチュウ" class="evolution-image">
+                            <div class="evolution-name">ライチュウ</div>
+                        </div>
+                    </div>
+                    <div>なかよし度を高めるとピカチュウに、かみなりの石を使うとライチュウに進化する。</div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-title">おぼえる技</div>
+                <div class="section-content">
+                    <div class="moves-grid">
+                        <div class="move">でんきショック</div>
+                        <div class="move">しっぽをふる</div>
+                        <div class="move">でんこうせっか</div>
+                        <div class="move">なきごえ</div>
+                        <div class="move">10まんボルト</div>
+                        <div class="move">でんじは</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer">
+                データ更新: 2025/03/03
+            </div>
+        </div>
+        <div class="scanlines"></div>
+    </div>
+</body>
+</html>
