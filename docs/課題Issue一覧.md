@@ -101,7 +101,7 @@ com.example.pokedex
     - Room（`room-runtime` / `room-ktx` / KSP で `room-compiler`）
     - Retrofit + OkHttp（`logging-interceptor` を含む）
     - Kotlinx Serialization
-    - Coil（`coil-compose`）
+    - Coil（`coil-compose` と `coil-network-okhttp` の両方。片方だけでは画像が読み込めない）
     - Navigation Compose
     - `lifecycle-viewmodel-compose`
 - 上記「パッケージ構成」のディレクトリを作成する
