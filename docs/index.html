@@ -328,15 +328,15 @@ li.task input:checked+span{
 <p>上から順に読んでいけば、何を作るのか、どう作るのか、どこから手をつけるのかが分かります。</p>
 <h2 id="何を作るのか">何を作るのか</h2>
 <p>PokeAPI からカントー地方の151匹を取得して、一覧と詳細を表示する図鑑アプリです。一度取得したデータは端末に保存し、電波がなくても見られるようにします。</p>
-<p>なぜ作るのか、誰のためのものか、どこまでを対象にするのかは<a class="lnk" href="01_要件定義.md" data-doc="01_要件定義.md">01 要件定義</a> に書いてあります。</p>
+<p>なぜ作るのか、誰のためのものか、どこまでを対象にするのかは<a class="lnk" href="#01_要件定義" data-doc="01_要件定義.md">01 要件定義</a> に書いてあります。</p>
 <h2 id="どう作るのか">どう作るのか</h2>
-<p><a class="lnk" href="02_基本設計.md" data-doc="02_基本設計.md">02 基本設計</a> が全体の骨組みです。画面の一覧と遷移図、PokeAPI とのやりとり、テーブル構成といった「形」が決まります。</p>
-<p>そのうえで <a class="lnk" href="03_詳細設計.md" data-doc="03_詳細設計.md">03 詳細設計</a> が、機能ごとのシーケンス図とKotlin の実装例まで踏み込みます。分量があるので、実装する機能のところだけ読めば十分です。</p>
+<p><a class="lnk" href="#02_基本設計" data-doc="02_基本設計.md">02 基本設計</a> が全体の骨組みです。画面の一覧と遷移図、PokeAPI とのやりとり、テーブル構成といった「形」が決まります。</p>
+<p>そのうえで <a class="lnk" href="#03_詳細設計" data-doc="03_詳細設計.md">03 詳細設計</a> が、機能ごとのシーケンス図とKotlin の実装例まで踏み込みます。分量があるので、実装する機能のところだけ読めば十分です。</p>
 <h2 id="今回どこまで作るのか">今回どこまで作るのか</h2>
-<p><a class="lnk" href="04_実装仕様.md" data-doc="04_実装仕様.md">04 実装仕様</a> が課題としての範囲を決めます。必須機能と加点機能、実装の共通ルール、技術スタック、評価基準の配点、4週間のスケジュール。迷ったらこの文書が基準です。</p>
+<p><a class="lnk" href="#04_実装仕様" data-doc="04_実装仕様.md">04 実装仕様</a> が課題としての範囲を決めます。必須機能と加点機能、実装の共通ルール、技術スタック、評価基準の配点、4週間のスケジュール。迷ったらこの文書が基準です。</p>
 <p>Kotlin / Jetpack Compose / ViewModel + StateFlow / Room / Retrofit / Coil / Navigation Compose、<code>minSdk</code> は 26（Android 8.0）を使います。</p>
 <h2 id="手を動かす">手を動かす</h2>
-<p><a class="lnk" href="05_環境構築ガイド.md" data-doc="05_環境構築ガイド.md">05 環境構築ガイド</a> に沿って、Fork から最初のビルドまで通します。リポジトリを Fork して clone し、プロジェクトを作り、依存を追加して、PokeAPI に繋がるところまで。ここまでで Issue <code>#1</code> と <code>#2</code> が終わります。</p>
+<p><a class="lnk" href="#05_環境構築ガイド" data-doc="05_環境構築ガイド.md">05 環境構築ガイド</a> に沿って、Fork から最初のビルドまで通します。リポジトリを Fork して clone し、プロジェクトを作り、依存を追加して、PokeAPI に繋がるところまで。ここまでで Issue <code>#1</code> と <code>#2</code> が終わります。</p>
 <h2 id="実装する">実装する</h2>
 <p>あとは <a class="lnk ext" href="https://github.com/sghh02/pokedex-android-kadai/issues" target="_blank" rel="noopener">Issues</a> を <code>#1</code> から順に進めるだけです。</p>
 <ol>
@@ -691,9 +691,9 @@ head repository: &lt;自分のアカウント&gt;/pokedex-android-kadai   compar
 git pull
 git switch -c feature/2-api</code></pre></figure>
 <h2 id="9-よくあるつまずき">9. よくあるつまずき</h2>
-<div class="table-wrap"><table><thead><tr><th>症状</th><th>原因と対処</th></tr></thead><tbody><tr><td><code>SecurityException: Permission denied</code></td><td><code>INTERNET</code> 権限が未指定</td></tr><tr><td>画像が表示されない</td><td>Coil 3 の <code>coil-network-okhttp</code> が未追加</td></tr><tr><td><code>lateinit property container has not been initialized</code></td><td>Manifest の <code>android:name=&quot;.PokedexApplication&quot;</code> が未指定</td></tr><tr><td><code>Unable to create converter for ...</code></td><td><code>@Serializable</code> の付け忘れ、または converter の未登録</td></tr><tr><td><code>Field &#x27;xxx&#x27; is required but was missing</code></td><td>API のレスポンスに null が入る。<code>Json { ignoreUnknownKeys = true }</code> と、DTO のフィールドを nullable にする</td></tr><tr><td>Room の <code>@Upsert</code> が見つからない</td><td>Room 2.5 未満。<code>libs.versions.toml</code> のバージョンを確認</td></tr><tr><td>ビルドが <code>ksp</code> で失敗する</td><td>KSP と Kotlin のバージョンが噛み合っていない。上記「バージョンの扱い」を参照</td></tr><tr><td><code>Unresolved reference: Icons</code></td><td><code>material-icons-core</code> が未追加。material3 1.4.0 以降は推移依存に含まれない</td></tr><tr><td><code>Serializer has not been found for type</code></td><td>ドメインモデルに <code>@Serializable</code> が付いていない</td></tr><tr><td>in-memory DB のテストが <code>Context</code> で落ちる</td><td>Robolectric が未追加、または <code>unitTests.isIncludeAndroidResources</code> が未設定</td></tr><tr><td>初回起動が終わらない</td><td>151回の詳細取得をスプラッシュで待っている、逐次実行している、または再試行の待機が長すぎる。取得の完了を待たずに遷移し、同時実行数を制限した並列取得にする（<a class="lnk" href="04_実装仕様.md#5-pokeapi-の実装上の注意" data-doc="04_実装仕様.md">実装上の注意</a>）</td></tr></tbody></table></div></section>
+<div class="table-wrap"><table><thead><tr><th>症状</th><th>原因と対処</th></tr></thead><tbody><tr><td><code>SecurityException: Permission denied</code></td><td><code>INTERNET</code> 権限が未指定</td></tr><tr><td>画像が表示されない</td><td>Coil 3 の <code>coil-network-okhttp</code> が未追加</td></tr><tr><td><code>lateinit property container has not been initialized</code></td><td>Manifest の <code>android:name=&quot;.PokedexApplication&quot;</code> が未指定</td></tr><tr><td><code>Unable to create converter for ...</code></td><td><code>@Serializable</code> の付け忘れ、または converter の未登録</td></tr><tr><td><code>Field &#x27;xxx&#x27; is required but was missing</code></td><td>API のレスポンスに null が入る。<code>Json { ignoreUnknownKeys = true }</code> と、DTO のフィールドを nullable にする</td></tr><tr><td>Room の <code>@Upsert</code> が見つからない</td><td>Room 2.5 未満。<code>libs.versions.toml</code> のバージョンを確認</td></tr><tr><td>ビルドが <code>ksp</code> で失敗する</td><td>KSP と Kotlin のバージョンが噛み合っていない。上記「バージョンの扱い」を参照</td></tr><tr><td><code>Unresolved reference: Icons</code></td><td><code>material-icons-core</code> が未追加。material3 1.4.0 以降は推移依存に含まれない</td></tr><tr><td><code>Serializer has not been found for type</code></td><td>ドメインモデルに <code>@Serializable</code> が付いていない</td></tr><tr><td>in-memory DB のテストが <code>Context</code> で落ちる</td><td>Robolectric が未追加、または <code>unitTests.isIncludeAndroidResources</code> が未設定</td></tr><tr><td>初回起動が終わらない</td><td>151回の詳細取得をスプラッシュで待っている、逐次実行している、または再試行の待機が長すぎる。取得の完了を待たずに遷移し、同時実行数を制限した並列取得にする（<a class="lnk" href="#5-pokeapi-の実装上の注意" data-doc="04_実装仕様.md">実装上の注意</a>）</td></tr></tbody></table></div></section>
 <section class="doc" id="doc-2" data-file="04_実装仕様.md" hidden><h1 id="実装仕様-ポケモン図鑑アプリ">実装仕様 — ポケモン図鑑アプリ</h1>
-<p>実装するスコープ、使用する技術、評価の基準を定めます。何を作るかはこの文書が基準になります。背景は<a class="lnk" href="01_要件定義.md" data-doc="01_要件定義.md">要件定義</a>、設計の詳細は<a class="lnk" href="02_基本設計.md" data-doc="02_基本設計.md">基本設計</a>・<a class="lnk" href="03_詳細設計.md" data-doc="03_詳細設計.md">詳細設計</a>を参照してください。</p>
+<p>実装するスコープ、使用する技術、評価の基準を定めます。何を作るかはこの文書が基準になります。背景は<a class="lnk" href="#01_要件定義" data-doc="01_要件定義.md">要件定義</a>、設計の詳細は<a class="lnk" href="#02_基本設計" data-doc="02_基本設計.md">基本設計</a>・<a class="lnk" href="#03_詳細設計" data-doc="03_詳細設計.md">詳細設計</a>を参照してください。</p>
 <h2 id="1-学習目標">1. 学習目標</h2>
 <p>この課題を通じて次のスキルを習得します。</p>
 <div class="table-wrap"><table><thead><tr><th>領域</th><th>身につけること</th></tr></thead><tbody><tr><td>REST API連携</td><td>Retrofit による PokeAPI との通信</td></tr><tr><td>ローカルデータベース</td><td>Room（SQLite）によるデータ永続化</td></tr><tr><td>状態管理</td><td>ViewModel + StateFlow による MVVM</td></tr><tr><td>宣言的UI</td><td>Jetpack Compose による画面実装</td></tr><tr><td>非同期処理</td><td>Kotlin Coroutines / Flow の実践</td></tr><tr><td>エラーハンドリング</td><td>ネットワークエラーとユーザーへのフィードバック</td></tr></tbody></table></div>
@@ -728,7 +728,7 @@ git switch -c feature/2-api</code></pre></figure>
 <ul>
 <li><strong>エラーの扱い</strong> — Repository より下では例外を投げず <code>Result</code> で返す。
 </li></ul>
-<p>例外の分類とユーザー向け文言への変換は <a class="lnk" href="03_詳細設計.md" data-doc="03_詳細設計.md">詳細設計 5. エラーハンドリング</a> の<code>AppException</code> / <code>toUserMessage()</code> に従う。画面はメッセージ文字列だけを扱う。</p>
+<p>例外の分類とユーザー向け文言への変換は <a class="lnk" href="#03_詳細設計" data-doc="03_詳細設計.md">詳細設計 5. エラーハンドリング</a> の<code>AppException</code> / <code>toUserMessage()</code> に従う。画面はメッセージ文字列だけを扱う。</p>
 <ul>
 <li><strong>DI</strong> — Phase 1 は <code>PokedexApplication</code> が持つ <code>AppContainer</code> による手動DIとする。
 </li></ul>
@@ -821,7 +821,7 @@ CREATE INDEX idx_cache_last_accessed ON pokemon_detail_cache(last_accessed);</co
 </li>
 <li>Android Studio は最新の安定版を使用する
 </li></ul>
-<p>具体的な依存の書き方は<a class="lnk" href="05_環境構築ガイド.md" data-doc="05_環境構築ガイド.md">環境構築ガイド</a>にあります。</p>
+<p>具体的な依存の書き方は<a class="lnk" href="#05_環境構築ガイド" data-doc="05_環境構築ガイド.md">環境構築ガイド</a>にあります。</p>
 <h2 id="7-実装手順">7. 実装手順</h2>
 <p>4週間で完成する構成です。各週の作業は <a class="lnk ext" href="https://github.com/sghh02/pokedex-android-kadai/issues" target="_blank" rel="noopener">GitHub Issues</a> の Issue に対応します。</p>
 <div class="table-wrap"><table><thead><tr><th>週</th><th>作業</th><th>Issue</th></tr></thead><tbody><tr><td>1週目</td><td>環境構築</td><td>#1 〜 #2</td></tr><tr><td>2週目</td><td>データレイヤー実装</td><td>#3 〜 #5</td></tr><tr><td>3週目</td><td>UIレイヤー実装</td><td>#6 〜 #10</td></tr><tr><td>4週目</td><td>機能拡張・提出</td><td>#11 〜 #16</td></tr></tbody></table></div>
@@ -917,7 +917,7 @@ CREATE INDEX idx_cache_last_accessed ON pokemon_detail_cache(last_accessed);</co
 <li><a class="lnk ext" href="https://coil-kt.github.io/coil/compose/" target="_blank" rel="noopener">Coil（画像読み込み）</a>
 </li></ul></section>
 <section class="doc" id="doc-3" data-file="01_要件定義.md" hidden><h1 id="要件定義書-ポケモン図鑑アプリ-カントー地方">要件定義書 — ポケモン図鑑アプリ（カントー地方）</h1>
-<blockquote><p><strong>本課題の実装対象は Android のみです。</strong>iOS や他フレームワークに関する記述は、実際の製品を想定した設計として残しています。実装スコープは <a class="lnk" href="04_実装仕様.md" data-doc="04_実装仕様.md">実装仕様</a> と <a class="lnk ext" href="https://github.com/sghh02/pokedex-android-kadai/issues" target="_blank" rel="noopener">GitHub Issues</a> を参照してください。</p></blockquote>
+<blockquote><p><strong>本課題の実装対象は Android のみです。</strong>iOS や他フレームワークに関する記述は、実際の製品を想定した設計として残しています。実装スコープは <a class="lnk" href="#04_実装仕様" data-doc="04_実装仕様.md">実装仕様</a> と <a class="lnk ext" href="https://github.com/sghh02/pokedex-android-kadai/issues" target="_blank" rel="noopener">GitHub Issues</a> を参照してください。</p></blockquote>
 <h2 id="1-目的・ターゲットユーザー・スコープ">1. 目的・ターゲットユーザー・スコープ</h2>
 <h3 id="目的">目的</h3>
 <ul>
@@ -1353,7 +1353,7 @@ CREATE INDEX idx_cache_last_accessed ON pokemon_detail_cache(last_accessed);</co
 </li></ol>
 <p>要件定義はプロジェクトの成功を左右する重要なプロセスです。十分な時間をかけて丁寧に行うことで、後の工程をスムーズに進めることができます。</p></section>
 <section class="doc" id="doc-4" data-file="02_基本設計.md" hidden><h1 id="基本設計書-ポケモン図鑑アプリ-カントー地方">基本設計書 — ポケモン図鑑アプリ（カントー地方）</h1>
-<blockquote><p><strong>本課題の実装対象は Android のみです。</strong>iOS や他フレームワークに関する記述は、実際の製品を想定した設計として残しています。実装スコープは <a class="lnk" href="04_実装仕様.md" data-doc="04_実装仕様.md">実装仕様</a> と <a class="lnk ext" href="https://github.com/sghh02/pokedex-android-kadai/issues" target="_blank" rel="noopener">GitHub Issues</a> を参照してください。</p></blockquote>
+<blockquote><p><strong>本課題の実装対象は Android のみです。</strong>iOS や他フレームワークに関する記述は、実際の製品を想定した設計として残しています。実装スコープは <a class="lnk" href="#04_実装仕様" data-doc="04_実装仕様.md">実装仕様</a> と <a class="lnk ext" href="https://github.com/sghh02/pokedex-android-kadai/issues" target="_blank" rel="noopener">GitHub Issues</a> を参照してください。</p></blockquote>
 <h2 id="1-はじめに">1. はじめに</h2>
 <p>この基本設計書は、「ポケモン図鑑アプリケーション」のシステム全体像や主要機能の概要を示すものです。システム設計の基礎となる部分であり、今後の開発作業を進めるための指針となります。</p>
 <hr>
@@ -1641,7 +1641,7 @@ CREATE INDEX idx_cache_last_accessed ON pokemon_detail_cache(last_accessed);</co
 </li></ol>
 <h4 id="2-3-3-外部インターフェース定義">2.3.3 外部インターフェース定義</h4>
 <p><strong>1. PokeAPI</strong></p>
-<p>利用するエンドポイントと、レスポンスから取り出す項目は<a class="lnk" href="03_詳細設計.md" data-doc="03_詳細設計.md">詳細設計 3. API設計</a>にまとめています。公式の仕様は <a class="lnk ext" href="https://pokeapi.co/docs/v2" target="_blank" rel="noopener">PokeAPI ドキュメント</a> を参照してください。</p>
+<p>利用するエンドポイントと、レスポンスから取り出す項目は<a class="lnk" href="#03_詳細設計" data-doc="03_詳細設計.md">詳細設計 3. API設計</a>にまとめています。公式の仕様は <a class="lnk ext" href="https://pokeapi.co/docs/v2" target="_blank" rel="noopener">PokeAPI ドキュメント</a> を参照してください。</p>
 <h5 id="エラー処理">エラー処理</h5>
 <p>PokeAPIを利用する際のエラー処理は、以下の通り定義します。</p>
 <ol>
@@ -1748,7 +1748,7 @@ CREATE INDEX idx_cache_last_accessed ON pokemon_detail_cache(last_accessed);</co
 </li></ul>
 </li></ol>
 <h4 id="2-4-3-テーブル構成">2.4.3 テーブル構成</h4>
-<blockquote><p>物理スキーマの正は<a class="lnk" href="04_実装仕様.md" data-doc="04_実装仕様.md">実装仕様 4. データベース設計</a>です。ここでは持つ情報の種類だけを示します。</p></blockquote>
+<blockquote><p>物理スキーマの正は<a class="lnk" href="#04_実装仕様" data-doc="04_実装仕様.md">実装仕様 4. データベース設計</a>です。ここでは持つ情報の種類だけを示します。</p></blockquote>
 <p><strong>1. テーブル名: pokemon</strong>（ポケモンの基本情報）</p>
 <div class="table-wrap"><table><thead><tr><th>カラム名</th><th>データ型</th><th>説明</th></tr></thead><tbody><tr><td><strong>id</strong></td><td><code>INTEGER</code></td><td>主キー。図鑑番号をそのまま使う。</td></tr><tr><td><strong>name</strong></td><td><code>TEXT</code></td><td>英語名。一覧APIから取得。</td></tr><tr><td><strong>name_ja</strong></td><td><code>TEXT</code></td><td>日本語名。pokemon-species から取得（Phase 2）。</td></tr><tr><td><strong>image_url</strong></td><td><code>TEXT</code></td><td>画像のURL。</td></tr><tr><td><strong>height</strong></td><td><code>INTEGER</code></td><td>身長。APIの生値（デシメートル）。</td></tr><tr><td><strong>weight</strong></td><td><code>INTEGER</code></td><td>体重。APIの生値（ヘクトグラム）。</td></tr><tr><td><strong>type1</strong></td><td><code>TEXT</code></td><td>主タイプ。</td></tr><tr><td><strong>type2</strong></td><td><code>TEXT</code></td><td>副タイプ。単タイプのポケモンは NULL。</td></tr><tr><td><strong>created_at</strong></td><td><code>INTEGER</code></td><td>保存日時（エポックミリ秒）。</td></tr></tbody></table></div>
 <p><strong>2. テーブル名: pokemon_detail_cache</strong>（詳細情報のキャッシュ・直近10件）</p>
@@ -1870,7 +1870,7 @@ CREATE INDEX idx_cache_last_accessed ON pokemon_detail_cache(last_accessed);</co
 <p>基本設計とは、開発プロジェクトにおいて「何を」「どのように」作るかの骨組みを決める重要なプロセスです。明確で適切な基本設計があれば、後の工程がスムーズに進み、品質の高いシステムを効率的に開発することができます。</p></section>
 <section class="doc" id="doc-5" data-file="03_詳細設計.md" hidden><h1 id="詳細設計書-ポケモン図鑑アプリ-カントー地方">詳細設計書 — ポケモン図鑑アプリ（カントー地方）</h1>
 <h2 id="はじめに">はじめに</h2>
-<p>この詳細設計書は、<a class="lnk" href="01_要件定義.md" data-doc="01_要件定義.md">要件定義</a>と<a class="lnk" href="02_基本設計.md" data-doc="02_基本設計.md">基本設計</a>に基づき、そのまま実装に着手できる粒度まで設計を具体化したものです。</p>
+<p>この詳細設計書は、<a class="lnk" href="#01_要件定義" data-doc="01_要件定義.md">要件定義</a>と<a class="lnk" href="#02_基本設計" data-doc="02_基本設計.md">基本設計</a>に基づき、そのまま実装に着手できる粒度まで設計を具体化したものです。</p>
 <p>コード例は <strong>Kotlin + Jetpack Compose</strong> で記載しています。そのまま貼って動くものではなく、設計の意図を伝えるためのスケッチです。import 文とテーマ定義は省略しています。</p>
 <p>次のものは意図的に省いています。各 Issue で自分で実装してください。</p>
 <ul>
@@ -1880,7 +1880,7 @@ CREATE INDEX idx_cache_last_accessed ON pokemon_detail_cache(last_accessed);</co
 </li>
 <li>画面遷移の定義（<code>PokedexNavHost</code>）
 </li></ul>
-<p>実装するスコープと評価の基準は<a class="lnk" href="04_実装仕様.md" data-doc="04_実装仕様.md">実装仕様</a>、作業の単位は <a class="lnk ext" href="https://github.com/sghh02/pokedex-android-kadai/issues" target="_blank" rel="noopener">GitHub Issues</a> にまとめてあります。</p>
+<p>実装するスコープと評価の基準は<a class="lnk" href="#04_実装仕様" data-doc="04_実装仕様.md">実装仕様</a>、作業の単位は <a class="lnk ext" href="https://github.com/sghh02/pokedex-android-kadai/issues" target="_blank" rel="noopener">GitHub Issues</a> にまとめてあります。</p>
 <h3 id="設計原則">設計原則</h3>
 <ul>
 <li><strong>レイヤードアーキテクチャ</strong>: Presentation / Business / Data / Infrastructure の4層構成
@@ -1918,7 +1918,7 @@ CREATE INDEX idx_cache_last_accessed ON pokemon_detail_cache(last_accessed);</co
 ├─────────────────────────────────────┤
 │      Infrastructure Layer           │ ← PokeApiService / Room / NetworkMonitor
 └─────────────────────────────────────┘</code></pre></figure>
-<p><a class="lnk" href="04_実装仕様.md" data-doc="04_実装仕様.md">実装仕様</a>では同じ構造を Android の慣用名で「UI / ViewModel / Repository / Data Sources」と呼んでいます。対応は次のとおりです。</p>
+<p><a class="lnk" href="#04_実装仕様" data-doc="04_実装仕様.md">実装仕様</a>では同じ構造を Android の慣用名で「UI / ViewModel / Repository / Data Sources」と呼んでいます。対応は次のとおりです。</p>
 <div class="table-wrap"><table><thead><tr><th>本書</th><th>実装仕様</th><th>実装上の型</th></tr></thead><tbody><tr><td>Presentation</td><td>UI Layer</td><td><code>@Composable fun *Screen</code></td></tr><tr><td>Business</td><td>ViewModel Layer</td><td><code>*ViewModel</code>（<code>StateFlow</code> で状態を公開）</td></tr><tr><td>Data</td><td>Repository Layer</td><td><code>PokemonRepository</code> / <code>UpdateService</code> / <code>DetailCache</code></td></tr><tr><td>Infrastructure</td><td>Data Sources Layer</td><td><code>PokeApiService</code> / <code>PokemonDao</code> / <code>NetworkMonitor</code></td></tr></tbody></table></div>
 <h3 id="1-2-主要コンポーネント">1.2 主要コンポーネント</h3>
 <div class="table-wrap"><table><thead><tr><th>コンポーネント</th><th>役割</th><th>層</th></tr></thead><tbody><tr><td><code>PokemonRepository</code></td><td>API とローカルDBを束ね、画面に単一の入口を提供する</td><td>Data</td></tr><tr><td><code>PokeApiService</code></td><td>PokeAPI との通信（Retrofit インターフェース）</td><td>Infrastructure</td></tr><tr><td><code>PokemonDao</code> / <code>AppDatabase</code></td><td>Room によるローカル永続化</td><td>Infrastructure</td></tr><tr><td><code>DetailCache</code></td><td>詳細情報のキャッシュ（直近10件・LRU）</td><td>Data</td></tr><tr><td><code>UpdateService</code></td><td>151匹ぶんの取得と再試行の制御</td><td>Data</td></tr><tr><td><code>NetworkMonitor</code></td><td>ネットワーク状態の監視</td><td>Infrastructure</td></tr><tr><td><code>*ViewModel</code></td><td>画面ごとの状態保持（StateFlow で公開）</td><td>Business</td></tr><tr><td><code>*Screen</code></td><td>Composable による画面描画</td><td>Presentation</td></tr></tbody></table></div>
