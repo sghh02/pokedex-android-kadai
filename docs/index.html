@@ -301,6 +301,7 @@ li.task input:checked+span{
   .main{grid-column:1}
   .doc{padding:80px 20px 120px}
   .table-wrap,figure.code,figure.diagram{width:calc(100vw - 40px)}
+  .progress{top:56px}   /* 固定の目次ボタンと重ならないよう下げる */
   .railtoggle{
     display:flex; align-items:center; gap:8px; position:fixed; top:12px; left:12px; z-index:30;
     font:inherit; font-size:.82rem; background:var(--surface); color:var(--ink);
@@ -691,7 +692,7 @@ head repository: &lt;自分のアカウント&gt;/pokedex-android-kadai   compar
 git pull
 git switch -c feature/2-api</code></pre></figure>
 <h2 id="9-よくあるつまずき">9. よくあるつまずき</h2>
-<div class="table-wrap"><table><thead><tr><th>症状</th><th>原因と対処</th></tr></thead><tbody><tr><td><code>SecurityException: Permission denied</code></td><td><code>INTERNET</code> 権限が未指定</td></tr><tr><td>画像が表示されない</td><td>Coil 3 の <code>coil-network-okhttp</code> が未追加</td></tr><tr><td><code>lateinit property container has not been initialized</code></td><td>Manifest の <code>android:name=&quot;.PokedexApplication&quot;</code> が未指定</td></tr><tr><td><code>Unable to create converter for ...</code></td><td><code>@Serializable</code> の付け忘れ、または converter の未登録</td></tr><tr><td><code>Field &#x27;xxx&#x27; is required but was missing</code></td><td>API のレスポンスに null が入る。<code>Json { ignoreUnknownKeys = true }</code> と、DTO のフィールドを nullable にする</td></tr><tr><td>Room の <code>@Upsert</code> が見つからない</td><td>Room 2.5 未満。<code>libs.versions.toml</code> のバージョンを確認</td></tr><tr><td>ビルドが <code>ksp</code> で失敗する</td><td>KSP と Kotlin のバージョンが噛み合っていない。上記「バージョンの扱い」を参照</td></tr><tr><td><code>Unresolved reference: Icons</code></td><td><code>material-icons-core</code> が未追加。material3 1.4.0 以降は推移依存に含まれない</td></tr><tr><td><code>Serializer has not been found for type</code></td><td>ドメインモデルに <code>@Serializable</code> が付いていない</td></tr><tr><td>in-memory DB のテストが <code>Context</code> で落ちる</td><td>Robolectric が未追加、または <code>unitTests.isIncludeAndroidResources</code> が未設定</td></tr><tr><td>初回起動が終わらない</td><td>151回の詳細取得をスプラッシュで待っている、逐次実行している、または再試行の待機が長すぎる。取得の完了を待たずに遷移し、同時実行数を制限した並列取得にする（<a class="lnk" href="#5-pokeapi-の実装上の注意" data-doc="04_実装仕様.md">実装上の注意</a>）</td></tr></tbody></table></div></section>
+<div class="table-wrap"><table><thead><tr><th>症状</th><th>原因と対処</th></tr></thead><tbody><tr><td><code>SecurityException: Permission denied</code></td><td><code>INTERNET</code> 権限が未指定</td></tr><tr><td>画像が表示されない</td><td>Coil 3 の <code>coil-network-okhttp</code> が未追加</td></tr><tr><td><code>lateinit property container has not been initialized</code></td><td>Manifest の <code>android:name=&quot;.PokedexApplication&quot;</code> が未指定</td></tr><tr><td><code>Unable to create converter for ...</code></td><td><code>@Serializable</code> の付け忘れ、または converter の未登録</td></tr><tr><td><code>Field &#x27;xxx&#x27; is required but was missing</code></td><td>API のレスポンスに null が入る。<code>Json { ignoreUnknownKeys = true }</code> と、DTO のフィールドを nullable にする</td></tr><tr><td>Room の <code>@Upsert</code> が見つからない</td><td>Room 2.5 未満。<code>libs.versions.toml</code> のバージョンを確認</td></tr><tr><td>ビルドが <code>ksp</code> で失敗する</td><td>KSP と Kotlin のバージョンが噛み合っていない。上記「バージョンの扱い」を参照</td></tr><tr><td><code>Unresolved reference: Icons</code></td><td><code>material-icons-core</code> が未追加。material3 1.4.0 以降は推移依存に含まれない</td></tr><tr><td><code>Serializer has not been found for type</code></td><td>ドメインモデルに <code>@Serializable</code> が付いていない</td></tr><tr><td>in-memory DB のテストが <code>Context</code> で落ちる</td><td>Robolectric が未追加、または <code>unitTests.isIncludeAndroidResources</code> が未設定</td></tr><tr><td>Robolectric が <code>targetSdk</code> に対応していないと言う</td><td>Robolectric の対応は Android の最新版より遅れる。<code>src/test/resources/robolectric.properties</code> に <code>sdk=36</code> のように対応済みの API を指定する</td></tr><tr><td>初回起動が終わらない</td><td>151回の詳細取得をスプラッシュで待っている、逐次実行している、または再試行の待機が長すぎる。取得の完了を待たずに遷移し、同時実行数を制限した並列取得にする（<a class="lnk" href="#5-pokeapi-の実装上の注意" data-doc="04_実装仕様.md">実装上の注意</a>）</td></tr></tbody></table></div></section>
 <section class="doc" id="doc-2" data-file="04_実装仕様.md" hidden><h1 id="実装仕様-ポケモン図鑑アプリ">実装仕様 — ポケモン図鑑アプリ</h1>
 <p>実装するスコープ、使用する技術、評価の基準を定めます。何を作るかはこの文書が基準になります。背景は<a class="lnk" href="#01_要件定義" data-doc="01_要件定義.md">要件定義</a>、設計の詳細は<a class="lnk" href="#02_基本設計" data-doc="02_基本設計.md">基本設計</a>・<a class="lnk" href="#03_詳細設計" data-doc="03_詳細設計.md">詳細設計</a>を参照してください。</p>
 <h2 id="1-学習目標">1. 学習目標</h2>
@@ -804,7 +805,7 @@ CREATE INDEX idx_cache_last_accessed ON pokemon_detail_cache(last_accessed);</co
 <p><code>sprites.other.official-artwork.front_default</code> が最も画質が良く、一覧・詳細の両方に使えます。</p>
 <h2 id="6-技術スタック">6. 技術スタック</h2>
 <p><strong>Android ネイティブ（Kotlin）</strong> で実装します。以下は必須構成です。</p>
-<div class="table-wrap"><table><thead><tr><th>領域</th><th>ライブラリ</th><th>備考</th></tr></thead><tbody><tr><td>言語</td><td>Kotlin</td><td>—</td></tr><tr><td>UI</td><td>Jetpack Compose</td><td>Material 3</td></tr><tr><td>状態管理</td><td>ViewModel + StateFlow</td><td>MVVM</td></tr><tr><td>非同期</td><td>Kotlin Coroutines / Flow</td><td>—</td></tr><tr><td>DB</td><td>Room</td><td>SQLite ラッパー</td></tr><tr><td>通信</td><td>Retrofit + OkHttp</td><td>—</td></tr><tr><td>JSON</td><td>Kotlinx Serialization</td><td>Moshi でも可</td></tr><tr><td>画像</td><td>Coil</td><td><code>coil-compose</code> と <code>coil-network-okhttp</code></td></tr><tr><td>画面遷移</td><td>Navigation Compose</td><td>—</td></tr></tbody></table></div>
+<div class="table-wrap"><table><thead><tr><th>領域</th><th>ライブラリ</th><th>備考</th></tr></thead><tbody><tr><td>言語</td><td>Kotlin</td><td>—</td></tr><tr><td>UI</td><td>Jetpack Compose</td><td>Material 3</td></tr><tr><td>状態管理</td><td>ViewModel + StateFlow</td><td>MVVM</td></tr><tr><td>非同期</td><td>Kotlin Coroutines / Flow</td><td>—</td></tr><tr><td>DB</td><td>Room</td><td>SQLite ラッパー</td></tr><tr><td>通信</td><td>Retrofit + OkHttp</td><td>—</td></tr><tr><td>JSON</td><td>Kotlinx Serialization</td><td>詳細設計のコード例が <code>@Serializable</code> 前提のため</td></tr><tr><td>画像</td><td>Coil</td><td><code>coil-compose</code> と <code>coil-network-okhttp</code></td></tr><tr><td>画面遷移</td><td>Navigation Compose</td><td>—</td></tr></tbody></table></div>
 <h3 id="6-1-加点対象-任意">6.1 加点対象（任意）</h3>
 <ul>
 <li><strong>Hilt</strong> — DIコンテナ。Phase 1 は手動DI（Application が保持するコンテナ）で構いません
@@ -1752,7 +1753,7 @@ CREATE INDEX idx_cache_last_accessed ON pokemon_detail_cache(last_accessed);</co
 <p><strong>1. テーブル名: pokemon</strong>（ポケモンの基本情報）</p>
 <div class="table-wrap"><table><thead><tr><th>カラム名</th><th>データ型</th><th>説明</th></tr></thead><tbody><tr><td><strong>id</strong></td><td><code>INTEGER</code></td><td>主キー。図鑑番号をそのまま使う。</td></tr><tr><td><strong>name</strong></td><td><code>TEXT</code></td><td>英語名。一覧APIから取得。</td></tr><tr><td><strong>name_ja</strong></td><td><code>TEXT</code></td><td>日本語名。pokemon-species から取得（Phase 2）。</td></tr><tr><td><strong>image_url</strong></td><td><code>TEXT</code></td><td>画像のURL。</td></tr><tr><td><strong>height</strong></td><td><code>INTEGER</code></td><td>身長。APIの生値（デシメートル）。</td></tr><tr><td><strong>weight</strong></td><td><code>INTEGER</code></td><td>体重。APIの生値（ヘクトグラム）。</td></tr><tr><td><strong>type1</strong></td><td><code>TEXT</code></td><td>主タイプ。</td></tr><tr><td><strong>type2</strong></td><td><code>TEXT</code></td><td>副タイプ。単タイプのポケモンは NULL。</td></tr><tr><td><strong>created_at</strong></td><td><code>INTEGER</code></td><td>保存日時（エポックミリ秒）。</td></tr></tbody></table></div>
 <p><strong>2. テーブル名: pokemon_detail_cache</strong>（詳細情報のキャッシュ・直近10件）</p>
-<div class="table-wrap"><table><thead><tr><th>カラム名</th><th>データ型</th><th>説明</th></tr></thead><tbody><tr><td><strong>id</strong></td><td><code>INTEGER</code></td><td>主キー。<code>pokemon.id</code> への外部キー。</td></tr><tr><td><strong>detail_json</strong></td><td><code>TEXT</code></td><td>特性・進化などの詳細をJSONで保存。</td></tr><tr><td><strong>cached_at</strong></td><td><code>INTEGER</code></td><td>キャッシュした日時。鮮度の判定用。</td></tr><tr><td><strong>last_accessed</strong></td><td><code>INTEGER</code></td><td>最後に参照した日時。古い順に削除するため。</td></tr></tbody></table></div>
+<div class="table-wrap"><table><thead><tr><th>カラム名</th><th>データ型</th><th>説明</th></tr></thead><tbody><tr><td><strong>id</strong></td><td><code>INTEGER</code></td><td>主キー。<code>pokemon.id</code> と同じ図鑑番号を使う。</td></tr><tr><td><strong>detail_json</strong></td><td><code>TEXT</code></td><td>特性・進化などの詳細をJSONで保存。</td></tr><tr><td><strong>cached_at</strong></td><td><code>INTEGER</code></td><td>キャッシュした日時。鮮度の判定用。</td></tr><tr><td><strong>last_accessed</strong></td><td><code>INTEGER</code></td><td>最後に参照した日時。古い順に削除するため。</td></tr></tbody></table></div>
 <hr>
 <h3 id="2-5-パフォーマンス設計">2.5 パフォーマンス設計</h3>
 <p>パフォーマンス設計では、アプリが効率的に動作するための性能基準を定義します。</p>
@@ -2073,29 +2074,30 @@ interface PokemonRepository {
     participant User
     participant SplashScreen
     participant SplashViewModel
+    participant PokemonRepository
     participant PokemonDao
     participant PokeApiService
     participant PokemonListScreen
 
     User-&gt;&gt;SplashScreen: アプリ起動
-    SplashScreen-&gt;&gt;SplashViewModel: 初期化開始
-    SplashViewModel-&gt;&gt;PokemonDao: ローカルDB確認
+    SplashScreen-&gt;&gt;SplashViewModel: startInitialLoad()
+    SplashViewModel-&gt;&gt;PokemonDao: count()
 
-    alt ローカルDBにデータなし
-        SplashViewModel-&gt;&gt;PokeApiService: 初回データ取得開始
-        PokeApiService-&gt;&gt;PokeApiService: PokeAPI呼び出し(非同期)
-        SplashViewModel-&gt;&gt;PokemonDao: 基本テーブル作成
-    else ローカルDBにデータあり
-        SplashViewModel-&gt;&gt;PokemonDao: データ存在確認
-        SplashViewModel-&gt;&gt;PokeApiService: バックグラウンド更新開始(非同期)
+    alt DBが空（初回起動）
+        SplashViewModel-&gt;&gt;PokemonRepository: refresh()
+        Note over SplashViewModel,PokemonRepository: applicationScope で開始する。完了は待たない
+    else データあり
+        Note over SplashViewModel: 何もしない。日次の更新は AutoUpdateEffect が受け持つ
     end
 
-    SplashViewModel-&gt;&gt;SplashScreen: 初期化完了通知
-    SplashScreen-&gt;&gt;PokemonListScreen: 画面遷移(0.5-1秒後)
+    SplashScreen-&gt;&gt;SplashScreen: delay(500ms)
+    SplashScreen-&gt;&gt;PokemonListScreen: 画面遷移
     SplashScreen-&gt;&gt;User: 一覧画面表示
 
-    Note over PokeApiService: バックグラウンドで継続実行
-    PokeApiService-&gt;&gt;PokemonDao: データ更新(完了後)</pre></figure>
+    Note over PokemonRepository,PokemonDao: 取得は画面遷移後も継続し、保存されると一覧が自動で更新される
+    PokemonRepository-&gt;&gt;PokeApiService: 151匹ぶんの詳細取得（同時実行10）
+    PokeApiService--&gt;&gt;PokemonRepository: レスポンス
+    PokemonRepository-&gt;&gt;PokemonDao: upsertAll()</pre></figure>
 <h4 id="4-1-3-実装仕様">4.1.3 実装仕様</h4>
 <h5 id="splashscreen-composable">SplashScreen（Composable）</h5>
 <figure class="code"><div class="code-head"><span>kotlin</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-kotlin">// ui/splash/SplashScreen.kt
@@ -2137,12 +2139,12 @@ class SplashViewModel(
      */
     fun startInitialLoad() {
         applicationScope.launch {
-            // 毎起動で151回叩かない。DBが空か、その日まだ更新していないときだけ取得する。
-            if (repository.isEmpty() || policy.shouldUpdate()) {
-                repository.refresh()
-                    .onSuccess { policy.recordSuccess() }
-                    .onFailure { Log.w(TAG, &quot;初期データの取得に失敗。保存済みデータで継続する&quot;, it) }
-            }
+            // ここが受け持つのは「初回起動でDBが空のとき」だけ。
+            // 日次の自動更新は AutoUpdateEffect に一本化する（二重に走らせない）。
+            if (!repository.isEmpty()) return@launch
+            repository.refresh()
+                .onSuccess { policy.recordSuccess() }
+                .onFailure { Log.w(TAG, &quot;初期データの取得に失敗。保存済みデータで継続する&quot;, it) }
         }
     }
 
@@ -2195,6 +2197,13 @@ class AppContainer(context: Context) {
     /** 画面のライフサイクルから独立して走らせたい処理に使う */
     val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
+    /** 自動更新の判定に使う小さな設定領域 */
+    private val preferences: DataStore&lt;Preferences&gt; =
+        PreferenceDataStoreFactory.create { context.preferencesDataStoreFile(&quot;settings&quot;) }
+
+    /** MainActivity の AutoUpdateEffect からも参照する */
+    val autoUpdatePolicy = AutoUpdatePolicy(preferences)
+
     val pokemonRepository: PokemonRepository = DefaultPokemonRepository(
         api = api,
         dao = database.pokemonDao(),
@@ -2205,7 +2214,7 @@ class AppContainer(context: Context) {
 
     /** ViewModel に依存を渡すためのファクトリ */
     val viewModelFactory = viewModelFactory {
-        initializer { SplashViewModel(pokemonRepository) }
+        initializer { SplashViewModel(pokemonRepository, autoUpdatePolicy, applicationScope) }
         initializer { PokemonListViewModel(pokemonRepository, networkMonitor) }
         initializer { PokemonDetailViewModel(pokemonRepository) }
     }
@@ -2218,9 +2227,8 @@ val LocalAppContainer = staticCompositionLocalOf&lt;AppContainer&gt; {
 
 // MainActivity の setContent で流し込む
 setContent {
-    CompositionLocalProvider(
-        LocalAppContainer provides (application as PokedexApplication).container
-    ) {
+    val container = (application as PokedexApplication).container
+    CompositionLocalProvider(LocalAppContainer provides container) {
         PokedexTheme { PokedexNavHost() }
     }
 }</code></pre></figure>
@@ -2285,21 +2293,30 @@ fun PokemonListScreen(
             isRefreshing = uiState.isRefreshing,
             onRefresh = viewModel::refresh,
         ) {
-            // LazyVerticalGrid は画面に見えているセルだけを構成するため、
-            // 151件をそのまま渡してよい。手動のページングは不要。
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
-                contentPadding = PaddingValues(8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                items(uiState.pokemonList, key = { it.id }) { pokemon -&gt;
-                    PokemonGridItem(
-                        pokemon = pokemon,
-                        onClick = { onPokemonClick(pokemon.id) },
-                    )
-                }
+            when {
+                // 初回起動はスプラッシュ側で取得が走っている最中なので、待機を示す
+                uiState.isInitialLoading -&gt; LoadingIndicator()
+                uiState.errorMessage != null -&gt;
+                    ErrorMessage(uiState.errorMessage, onRetry = viewModel::refresh)
+                uiState.isSearchEmpty -&gt; EmptyMessage(&quot;該当するポケモンがいません&quot;)
+                else -&gt; PokemonGrid(uiState.pokemonList, onPokemonClick)
             }
+        }
+    }
+}
+
+@Composable
+private fun PokemonGrid(pokemonList: List&lt;Pokemon&gt;, onPokemonClick: (Int) -&gt; Unit) {
+    // LazyVerticalGrid は画面に見えているセルだけを構成するため、
+    // 151件をそのまま渡してよい。手動のページングは不要。
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(2),
+        contentPadding = PaddingValues(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        items(pokemonList, key = { it.id }) { pokemon -&gt;
+            PokemonGridItem(pokemon = pokemon, onClick = { onPokemonClick(pokemon.id) })
         }
     }
 }</code></pre></figure>
@@ -2312,7 +2329,13 @@ data class PokemonListUiState(
     val isOffline: Boolean = false,
     val errorMessage: String? = null,
 ) {
-    val isEmpty: Boolean get() = pokemonList.isEmpty() &amp;&amp; query.isNotBlank()
+    /** 初回取得中。スプラッシュは取得を待たずに遷移するので、一覧側で待機を示す */
+    val isInitialLoading: Boolean
+        get() = pokemonList.isEmpty() &amp;&amp; query.isBlank() &amp;&amp; errorMessage == null
+
+    /** 検索したが該当が無い。データが無いだけの状態と区別する */
+    val isSearchEmpty: Boolean
+        get() = pokemonList.isEmpty() &amp;&amp; query.isNotBlank()
 }
 
 @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
@@ -2479,30 +2502,32 @@ override fun searchPokemon(query: String): Flow&lt;List&lt;Pokemon&gt;&gt; {
 
     User-&gt;&gt;PokemonListScreen: ポケモン選択
     PokemonListScreen-&gt;&gt;PokemonDetailScreen: navigate(pokemonId)
-    PokemonDetailScreen-&gt;&gt;PokemonDetailViewModel: loadPokemonDetail(id)
+    PokemonDetailScreen-&gt;&gt;PokemonDetailViewModel: load(id)
 
-    PokemonDetailViewModel-&gt;&gt;PokemonRepository: getPokemonById(id)
-    PokemonRepository-&gt;&gt;DetailCache: checkCache(id)
+    PokemonDetailViewModel-&gt;&gt;PokemonRepository: getPokemonDetail(id)
+    PokemonRepository-&gt;&gt;DetailCache: get(id)
+    DetailCache-&gt;&gt;PokemonDao: SELECT from pokemon_detail_cache
 
-    alt キャッシュあり
-        DetailCache-&gt;&gt;PokemonDao: SELECT from pokemon_detail_cache
-        PokemonDao--&gt;&gt;DetailCache: キャッシュデータ
-        DetailCache--&gt;&gt;PokemonRepository: キャッシュデータ返却
-        PokemonRepository--&gt;&gt;PokemonDetailViewModel: 詳細データ
-        PokemonDetailViewModel--&gt;&gt;PokemonDetailScreen: データ更新通知
-        PokemonDetailScreen--&gt;&gt;User: 詳細画面表示
-
-        Note over DetailCache: バックグラウンドで最新データチェック
-        DetailCache-&gt;&gt;PokeApiService: 最新データ取得(非同期)
-    else キャッシュなし
-        PokemonRepository-&gt;&gt;PokeApiService: API詳細データ取得
-        PokeApiService--&gt;&gt;PokemonRepository: 詳細データ
-        PokemonRepository-&gt;&gt;DetailCache: キャッシュ保存
-        DetailCache-&gt;&gt;PokemonDao: INSERT/UPDATE cache
-        PokemonRepository--&gt;&gt;PokemonDetailViewModel: 詳細データ
-        PokemonDetailViewModel--&gt;&gt;PokemonDetailScreen: データ更新通知
-        PokemonDetailScreen--&gt;&gt;User: 詳細画面表示
+    alt キャッシュあり（24時間以内）
+        PokemonDao--&gt;&gt;DetailCache: キャッシュ
+        DetailCache-&gt;&gt;PokemonDao: last_accessed を更新
+        DetailCache--&gt;&gt;PokemonRepository: PokemonDetail
+    else キャッシュなし／期限切れ
+        alt オフライン
+            PokemonRepository--&gt;&gt;PokemonDetailViewModel: Result.failure(OfflineException)
+            PokemonDetailViewModel--&gt;&gt;PokemonDetailScreen: DetailUiState.Error
+            PokemonDetailScreen--&gt;&gt;User: 「オフラインのため表示できません」＋再試行
+        else オンライン
+            PokemonRepository-&gt;&gt;PokeApiService: getPokemon(id)
+            PokeApiService--&gt;&gt;PokemonRepository: レスポンス
+            PokemonRepository-&gt;&gt;DetailCache: put(id, detail)
+            DetailCache-&gt;&gt;PokemonDao: upsert ＋ 直近10件に切り詰め
+        end
     end
+
+    PokemonRepository--&gt;&gt;PokemonDetailViewModel: Result&lt;PokemonDetail&gt;
+    PokemonDetailViewModel--&gt;&gt;PokemonDetailScreen: DetailUiState.Success
+    PokemonDetailScreen--&gt;&gt;User: 詳細画面表示
 
     User-&gt;&gt;PokemonDetailScreen: 戻るボタン
     PokemonDetailScreen-&gt;&gt;PokemonListScreen: navigate back</pre></figure>
@@ -2650,38 +2675,38 @@ class DetailCache(
 <figure class="diagram"><pre class="mermaid">sequenceDiagram
     participant User
     participant SettingsScreen
-    participant UpdateService
+    participant SettingsViewModel
     participant PokemonRepository
+    participant UpdateService
     participant PokeApiService
     participant PokemonDao
-    participant ProgressIndicator
 
     User-&gt;&gt;SettingsScreen: 手動更新ボタン押下
-    SettingsScreen-&gt;&gt;UpdateService: startManualUpdate()
-    UpdateService-&gt;&gt;ProgressIndicator: 進捗ダイアログ表示
+    SettingsScreen-&gt;&gt;SettingsViewModel: refresh()
+    Note over SettingsScreen: 実行中はボタンを無効にする（連打で多重に走らせない）
 
-    UpdateService-&gt;&gt;PokeApiService: checkApiVersion()
-    PokeApiService--&gt;&gt;UpdateService: バージョン情報
+    SettingsViewModel-&gt;&gt;PokemonRepository: refresh(onProgress)
+    PokemonRepository-&gt;&gt;UpdateService: update(onProgress)
+    Note over UpdateService: Mutex で直列化する
 
-    alt 更新が必要
-        UpdateService-&gt;&gt;PokemonRepository: startBatchUpdate()
-
-        loop 全ポケモン（151匹）
-            PokemonRepository-&gt;&gt;PokeApiService: getPokemonData(id)
-            PokeApiService--&gt;&gt;PokemonRepository: ポケモンデータ
-            PokemonRepository-&gt;&gt;PokemonDao: updatePokemonData()
-            PokemonRepository-&gt;&gt;ProgressIndicator: 進捗更新(id/151)
+    par 同時実行10まで
+        loop 151匹
+            UpdateService-&gt;&gt;PokeApiService: getPokemon(id)
+            PokeApiService--&gt;&gt;UpdateService: レスポンス
+            UpdateService--&gt;&gt;SettingsViewModel: onProgress(done, 151)
+            SettingsViewModel--&gt;&gt;SettingsScreen: 進捗表示を更新
         end
+    end
 
-        PokemonRepository-&gt;&gt;PokemonDao: データ整合性チェック
-        PokemonRepository--&gt;&gt;UpdateService: 更新完了
-        UpdateService-&gt;&gt;ProgressIndicator: 完了ダイアログ表示
-        UpdateService--&gt;&gt;SettingsScreen: 更新結果通知
-        SettingsScreen--&gt;&gt;User: 完了メッセージ表示
+    UpdateService-&gt;&gt;PokemonDao: upsertAll(取得できたぶん)
+    UpdateService--&gt;&gt;PokemonRepository: UpdateResult(updated, failed)
 
-    else 更新不要
-        UpdateService--&gt;&gt;SettingsScreen: 「最新です」メッセージ
-        SettingsScreen--&gt;&gt;User: メッセージ表示
+    alt 1件も取得できなかった
+        PokemonRepository--&gt;&gt;SettingsViewModel: Result.failure(AppUpdateFailedException)
+        SettingsScreen--&gt;&gt;User: エラー表示＋再試行
+    else 取得できた
+        PokemonRepository--&gt;&gt;SettingsViewModel: Result.success
+        SettingsScreen--&gt;&gt;User: 完了メッセージ／最終更新日時を更新
     end</pre></figure>
 <h4 id="4-5-3-実装仕様">4.5.3 実装仕様</h4>
 <h5 id="updateservice">UpdateService</h5>
@@ -2720,9 +2745,8 @@ class UpdateService(
             }
 
             // 取得できたぶんだけ保存する。途中で通信が切れても取得済みは残る。
-            // 件数が多いので、まとめすぎず小分けに保存していく。
             val fetched = results.mapNotNull { it.getOrNull() }
-            fetched.chunked(25).forEach { dao.upsertAll(it) }
+            dao.upsertAll(fetched)
 
             UpdateResult(updated = fetched.size, failed = results.count { it.isFailure })
         }
@@ -2730,12 +2754,14 @@ class UpdateService(
     /**
       * 1件あたりの再試行。短い指数バックオフ（0.5s → 1s → 2s）で待つ。
       *
-      * 要件定義の「最大3回・30秒間隔」は refresh 全体に対するポリシーであり、
-      * 1匹ごとの待機ではない。ここで30秒待つと、通信が不安定なときに
-      * 151件の取得が分単位まで伸びてしまう。
+      * 要件定義の「最大3回・30秒間隔」のうち、**回数**をここで受け持つ。
+      * 30秒はユーザーが再試行できるようになるまでの間隔であり、1匹ごとの
+      * 待機ではない。ここで30秒待つと151件の取得が分単位に伸びてしまう。
+      * 3回とも失敗した分は諦め、再取得はユーザーの操作か翌日の自動更新に任せる。
       */
     private suspend fun fetchWithRetry(id: Int): PokemonEntity {
         var lastError: Throwable? = null
+        // 待機は 0.5s → 1s の2回。3回目の試行後は待たずに諦める。
         repeat(MAX_RETRIES) { attempt -&gt;
             try {
                 return api.getPokemon(id).toEntity()
@@ -2793,7 +2819,8 @@ fun AutoUpdateEffect(policy: AutoUpdatePolicy, repository: PokemonRepository) {
     val lifecycleOwner = LocalLifecycleOwner.current
     LaunchedEffect(lifecycleOwner) {
         lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-            if (policy.shouldUpdate()) {
+            // 空のときの初回取得は SplashViewModel が済ませている
+            if (!repository.isEmpty() &amp;&amp; policy.shouldUpdate()) {
                 repository.refresh().onSuccess { policy.recordSuccess() }
             }
         }
@@ -2820,33 +2847,32 @@ fun AutoUpdateEffect(policy: AutoUpdatePolicy, repository: PokemonRepository) {
     alt オフライン状態
         NetworkMonitor--&gt;&gt;App: オフライン通知
         App-&gt;&gt;OfflineBanner: オフライン表示
-        App-&gt;&gt;PokemonRepository: ローカルデータのみ使用設定
 
-        User-&gt;&gt;App: ポケモン一覧要求
-        App-&gt;&gt;PokemonRepository: getAllPokemon(offlineMode: true)
-        PokemonRepository-&gt;&gt;PokemonDao: ローカルデータ取得
-        PokemonDao--&gt;&gt;PokemonRepository: 保存済みデータ
-        PokemonRepository--&gt;&gt;App: データ返却
+        Note over PokemonRepository: 一覧は常にDBを見るので、オフラインでも同じ経路で表示できる
+        User-&gt;&gt;App: ポケモン一覧
+        App-&gt;&gt;PokemonRepository: observePokemonList()
+        PokemonRepository-&gt;&gt;PokemonDao: observeAll()
+        PokemonDao--&gt;&gt;PokemonRepository: Flow&lt;List&lt;PokemonEntity&gt;&gt;
+        PokemonRepository--&gt;&gt;App: Flow&lt;List&lt;Pokemon&gt;&gt;
         App--&gt;&gt;User: 一覧表示（オフライン表示付き）
 
-        User-&gt;&gt;App: 詳細情報要求
-        App-&gt;&gt;PokemonRepository: getPokemonDetail(id, offlineMode: true)
+        User-&gt;&gt;App: 詳細情報
+        App-&gt;&gt;PokemonRepository: getPokemonDetail(id)
 
         alt キャッシュあり
-            PokemonRepository-&gt;&gt;PokemonDao: キャッシュ取得
-            PokemonDao--&gt;&gt;PokemonRepository: キャッシュデータ
-            PokemonRepository--&gt;&gt;App: 詳細データ
+            PokemonRepository-&gt;&gt;PokemonDao: pokemon_detail_cache から取得
+            PokemonDao--&gt;&gt;PokemonRepository: PokemonDetail
+            PokemonRepository--&gt;&gt;App: Result.success
             App--&gt;&gt;User: 詳細表示
         else キャッシュなし
-            PokemonRepository--&gt;&gt;App: エラー（オフラインメッセージ）
-            App--&gt;&gt;User: 「オフラインでは表示できません」表示
+            PokemonRepository--&gt;&gt;App: Result.failure(OfflineException)
+            App--&gt;&gt;User: 「オフラインのため表示できません」表示
         end
 
     else オンライン復帰
         NetworkMonitor--&gt;&gt;App: オンライン通知
-        App-&gt;&gt;OfflineBanner: オフライン表示削除
-        App-&gt;&gt;PokemonRepository: 通常モード復帰
-        App-&gt;&gt;PokemonRepository: バックグラウンド同期開始
+        App-&gt;&gt;OfflineBanner: オフライン表示を消す
+        Note over App: 更新は Pull to refresh か設定画面の手動更新で行う
     end</pre></figure>
 <h4 id="4-6-3-実装仕様">4.6.3 実装仕様</h4>
 <h5 id="networkmonitor">NetworkMonitor</h5>
@@ -2928,6 +2954,8 @@ class DefaultPokemonRepository(
     }
 
     override suspend fun lastUpdatedAt(): Long? = dao.latestCreatedAt()
+
+    override suspend fun isEmpty(): Boolean = dao.count() == 0
 }</code></pre></figure>
 <h5 id="offlinebanner-composable">OfflineBanner（Composable）</h5>
 <figure class="code"><div class="code-head"><span>kotlin</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-kotlin">// ui/component/OfflineBanner.kt
@@ -3146,7 +3174,7 @@ interface PokemonDao {
     suspend fun upsertAll(pokemon: List&lt;PokemonEntity&gt;)
 }
 
-// 呼び出し側
+// 呼び出し側（UpdateService から）
 val entities = results.mapNotNull { it.getOrNull() }
 dao.upsertAll(entities)      // 151件でも一度の書き込みで終わる
 
@@ -3297,10 +3325,14 @@ function highlight(code, lang){
   const S0 = String.fromCharCode(0xE000), S1 = String.fromCharCode(0xE001);
   // 番号の前に文字を置く。そうしないと数値の色付けが退避番号自体を拾ってしまう
   const stash = (cls, txt) => S0 + "t" + (marks.push([cls, txt]) - 1) + S1;
+  // 文字列とコメントは1本の正規表現で、先に現れたほうを優先させる。
+  // 分けて処理すると "https://..." の // がコメント扱いになりコードが壊れる。
   let s = code
-    .replace(/(\/\/[^\n]*|--[^\n]*)/g, m => stash("tok-c", m))
-    .replace(/("(?:[^"\\\n]|\\.)*"|'(?:[^'\\\n]|\\.)*')/g, m => stash("tok-s", m))
-    .replace(/(@\w+)/g, m => stash("tok-a", m));
+    .replace(
+      /"(?:[^"\\\n]|\\.)*"|'(?:[^'\\\n]|\\.)*'|\/\/[^\n]*|--[^\n]*/g,
+      m => stash(m[0] === '"' || m[0] === "'" ? "tok-s" : "tok-c", m)
+    )
+    .replace(/@\w+/g, m => stash("tok-a", m));
   const kw = KEYWORDS[lang];
   if (kw) s = s.replace(kw, m => stash("tok-k", m));
   s = s.replace(/\b\d[\d_]*(?:\.\d+)?\b/g, m => stash("tok-n", m));
