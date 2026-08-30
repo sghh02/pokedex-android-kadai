@@ -1,0 +1,14 @@
+# Gradle / Android Studio
+*.iml
+.gradle/
+local.properties
+.idea/
+.DS_Store
+build/
+captures/
+.externalNativeBuild/
+.cxx/
+
+# 署名鍵は絶対にコミットしない
+*.jks
+*.keystore
