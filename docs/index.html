@@ -196,8 +196,11 @@ figure.code code{
 .tok-a{color:var(--lens)}
 .tok-n{color:var(--lens)}
 
+/* 図は両テーマとも明るい面に固定する。mermaid の配色を地色に合わせ込むより、
+   常に同じ条件で描くほうが読み違いがない。 */
 figure.diagram{
-  border:1px solid var(--line); border-radius:10px; background:var(--surface);
+  border:1px solid var(--line); border-radius:10px;
+  background:#FAFBFA; color:#16201A;
   padding:20px; overflow-x:auto;
 }
 figure.diagram pre{margin:0}
@@ -2237,7 +2240,7 @@ setContent {
     User-&gt;&gt;PokemonListScreen: 画面表示
     PokemonListScreen-&gt;&gt;PokemonListViewModel: uiState を購読
 
-    rect rgb(240, 245, 240)
+    rect rgb(238, 244, 238)
         Note over PokemonListViewModel,PokemonDao: 表示 — DBが唯一の情報源
         PokemonListViewModel-&gt;&gt;PokemonRepository: observePokemonList()
         PokemonRepository-&gt;&gt;PokemonDao: observeAll()
@@ -2247,7 +2250,7 @@ setContent {
         PokemonListScreen--&gt;&gt;User: 一覧表示
     end
 
-    rect rgb(245, 240, 240)
+    rect rgb(248, 238, 240)
         Note over PokemonListViewModel,PokeApiService: 更新 — 画面は待たない
         User-&gt;&gt;PokemonListScreen: Pull to refresh
         PokemonListScreen-&gt;&gt;PokemonListViewModel: refresh()
@@ -3466,10 +3469,8 @@ applyHash();
   script.src = "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js";
   script.onload = async () => {
     if (document.querySelector("figure.diagram svg")) return;   // 既に描画済みなら何もしない
-    const dark = document.documentElement.dataset.theme === "dark"
-      || (document.documentElement.dataset.theme !== "light"
-          && window.matchMedia("(prefers-color-scheme: dark)").matches);
-    mermaid.initialize({startOnLoad: false, theme: dark ? "dark" : "default", securityLevel: "loose"});
+    // 図の面は常に明るいので、テーマも既定（明るい配色）で固定する
+    mermaid.initialize({startOnLoad: false, theme: "default", securityLevel: "loose"});
 
     // 非表示の文書は採寸できないので、描画のあいだだけ画面外に出す
     const docs = Array.prototype.slice.call(document.querySelectorAll(".doc"));
@@ -3494,10 +3495,6 @@ applyHash();
   script.onerror = () => {};   // 読み込めない環境では素のテキストのまま
   document.head.appendChild(script);
 
-  // OS のライト/ダーク切り替えに図の配色を追従させる
-  const mq = window.matchMedia("(prefers-color-scheme: dark)");
-  const onThemeChange = () => location.reload();
-  if (mq.addEventListener) mq.addEventListener("change", onThemeChange);
 })();
 </script>
 
