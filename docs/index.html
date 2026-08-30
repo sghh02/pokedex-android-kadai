@@ -458,7 +458,7 @@ Remove-Item &quot;$HOME\tmp\Pokedex&quot; -Recurse -Force</code></pre></figure>
 <ol>
 <li>Android Studio で clone したディレクトリを <strong>Open</strong> し直し、ビルドが通ることを確認する
 </li></ol>
-<blockquote><p><code>minSdk</code> を 26 にすることで <code>java.time</code>（<code>LocalDate</code> / <code>LocalTime</code>）がdesugaring なしで使えます。自動更新の判定（<code>#14</code>）で必要になります。</p></blockquote>
+<blockquote><p><code>minSdk</code> を 26 にすることで <code>java.time</code>（<code>LocalDate</code> / <code>LocalTime</code>）がdesugaring なしで使えます。</p></blockquote>
 <h2 id="4-依存の追加">4. 依存の追加</h2>
 <h3 id="バージョンの扱い">バージョンの扱い</h3>
 <p><strong>Kotlin / AGP / Compose のバージョンは、ウィザードが生成したものをそのまま使ってください。</strong>この3つは互いに強く結合しており、手で差し替えると噛み合わなくなります。</p>
@@ -688,7 +688,7 @@ head repository: &lt;自分のアカウント&gt;/pokedex-android-kadai   compar
 git pull
 git switch -c feature/2-api</code></pre></figure>
 <h2 id="9-よくあるつまずき">9. よくあるつまずき</h2>
-<div class="table-wrap"><table><thead><tr><th>症状</th><th>原因と対処</th></tr></thead><tbody><tr><td><code>SecurityException: Permission denied</code></td><td><code>INTERNET</code> 権限が未指定</td></tr><tr><td>画像が表示されない</td><td>Coil 3 の <code>coil-network-okhttp</code> が未追加</td></tr><tr><td><code>lateinit property container has not been initialized</code></td><td>Manifest の <code>android:name=&quot;.PokedexApplication&quot;</code> が未指定</td></tr><tr><td><code>Unable to create converter for ...</code></td><td><code>@Serializable</code> の付け忘れ、または converter の未登録</td></tr><tr><td><code>Field &#x27;xxx&#x27; is required but was missing</code></td><td>API のレスポンスに null が入る。<code>Json { ignoreUnknownKeys = true }</code> と、DTO のフィールドを nullable にする</td></tr><tr><td>Room の <code>@Upsert</code> が見つからない</td><td>Room 2.5 未満。<code>libs.versions.toml</code> のバージョンを確認</td></tr><tr><td>ビルドが <code>ksp</code> で失敗する</td><td>KSP と Kotlin のバージョンが噛み合っていない。上記「バージョンの扱い」を参照</td></tr><tr><td><code>Unresolved reference: Icons</code></td><td><code>material-icons-core</code> が未追加。material3 1.4.0 以降は推移依存に含まれない</td></tr><tr><td><code>Serializer has not been found for type</code></td><td>ドメインモデルに <code>@Serializable</code> が付いていない</td></tr><tr><td>in-memory DB のテストが <code>Context</code> で落ちる</td><td>Robolectric が未追加、または <code>unitTests.isIncludeAndroidResources</code> が未設定</td></tr><tr><td>初回起動が終わらない</td><td>151回の詳細取得を逐次実行している。同時実行数を制限した並列取得にする（<a class="lnk" href="04_実装仕様.md#5-pokeapi-の実装上の注意" data-doc="04_実装仕様.md">実装上の注意</a>）</td></tr></tbody></table></div></section>
+<div class="table-wrap"><table><thead><tr><th>症状</th><th>原因と対処</th></tr></thead><tbody><tr><td><code>SecurityException: Permission denied</code></td><td><code>INTERNET</code> 権限が未指定</td></tr><tr><td>画像が表示されない</td><td>Coil 3 の <code>coil-network-okhttp</code> が未追加</td></tr><tr><td><code>lateinit property container has not been initialized</code></td><td>Manifest の <code>android:name=&quot;.PokedexApplication&quot;</code> が未指定</td></tr><tr><td><code>Unable to create converter for ...</code></td><td><code>@Serializable</code> の付け忘れ、または converter の未登録</td></tr><tr><td><code>Field &#x27;xxx&#x27; is required but was missing</code></td><td>API のレスポンスに null が入る。<code>Json { ignoreUnknownKeys = true }</code> と、DTO のフィールドを nullable にする</td></tr><tr><td>Room の <code>@Upsert</code> が見つからない</td><td>Room 2.5 未満。<code>libs.versions.toml</code> のバージョンを確認</td></tr><tr><td>ビルドが <code>ksp</code> で失敗する</td><td>KSP と Kotlin のバージョンが噛み合っていない。上記「バージョンの扱い」を参照</td></tr><tr><td><code>Unresolved reference: Icons</code></td><td><code>material-icons-core</code> が未追加。material3 1.4.0 以降は推移依存に含まれない</td></tr><tr><td><code>Serializer has not been found for type</code></td><td>ドメインモデルに <code>@Serializable</code> が付いていない</td></tr><tr><td>in-memory DB のテストが <code>Context</code> で落ちる</td><td>Robolectric が未追加、または <code>unitTests.isIncludeAndroidResources</code> が未設定</td></tr><tr><td>初回起動が終わらない</td><td>151回の詳細取得をスプラッシュで待っている、逐次実行している、または再試行の待機が長すぎる。取得の完了を待たずに遷移し、同時実行数を制限した並列取得にする（<a class="lnk" href="04_実装仕様.md#5-pokeapi-の実装上の注意" data-doc="04_実装仕様.md">実装上の注意</a>）</td></tr></tbody></table></div></section>
 <section class="doc" id="doc-2" data-file="04_実装仕様.md" hidden><h1 id="実装仕様-ポケモン図鑑アプリ">実装仕様 — ポケモン図鑑アプリ</h1>
 <p>実装するスコープ、使用する技術、評価の基準を定めます。何を作るかはこの文書が基準になります。背景は<a class="lnk" href="01_要件定義.md" data-doc="01_要件定義.md">要件定義</a>、設計の詳細は<a class="lnk" href="02_基本設計.md" data-doc="02_基本設計.md">基本設計</a>・<a class="lnk" href="03_詳細設計.md" data-doc="03_詳細設計.md">詳細設計</a>を参照してください。</p>
 <h2 id="1-学習目標">1. 学習目標</h2>
@@ -739,7 +739,7 @@ git switch -c feature/2-api</code></pre></figure>
 <h3 id="3-1-phase-1-基本機能-必須">3.1 Phase 1: 基本機能（必須）</h3>
 <div class="table-wrap"><table><thead><tr><th>機能</th><th>内容</th></tr></thead><tbody><tr><td>ポケモン一覧表示</td><td>カントー地方151匹を2列グリッドで表示。図鑑番号・画像・名前</td></tr><tr><td>ポケモン詳細表示</td><td>タイプ・身長・体重・画像を表示。戻る操作に対応</td></tr><tr><td>オフライン対応</td><td>一度取得したデータをローカル保存し、オフラインでも表示</td></tr></tbody></table></div>
 <h3 id="3-2-phase-2-拡張機能-加点">3.2 Phase 2: 拡張機能（加点）</h3>
-<div class="table-wrap"><table><thead><tr><th>機能</th><th>内容</th></tr></thead><tbody><tr><td>検索機能</td><td>名前の部分一致、図鑑番号、タイプでの絞り込み</td></tr><tr><td>詳細情報の拡張</td><td>日本語名、特性、進化チェーン（簡易版）</td></tr><tr><td>UI/UX改善</td><td>ローディング表示、エラーハンドリング、Pull to refresh</td></tr></tbody></table></div>
+<div class="table-wrap"><table><thead><tr><th>機能</th><th>内容</th></tr></thead><tbody><tr><td>ローディング・エラーハンドリング</td><td>状態の出し分け、再試行、Pull to refresh（#11）</td></tr><tr><td>検索機能</td><td>名前の部分一致、図鑑番号、タイプでの絞り込み（#12）</td></tr><tr><td>詳細情報の拡張</td><td>日本語名、特性、進化チェーン（簡易版）（#13）</td></tr><tr><td>設定画面と手動更新</td><td>ボトムナビでの切り替え、手動更新、最終更新日時の表示（#14）</td></tr></tbody></table></div>
 <h2 id="4-データベース設計">4. データベース設計</h2>
 <p>Room で次のスキーマを構成します。日付はエポックミリ秒（<code>INTEGER</code>）で保持します。</p>
 <figure class="code"><div class="code-head"><span>sql</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-sql">-- ポケモン基本情報
@@ -748,8 +748,8 @@ CREATE TABLE pokemon (
     name       TEXT    NOT NULL,      -- 英語名。一覧APIから取得
     name_ja    TEXT,                  -- 日本語名。pokemon-species から取得（Phase 2）
     image_url  TEXT,
-    height     INTEGER,               -- デシメートル（APIの生値）
-    weight     INTEGER,               -- ヘクトグラム（APIの生値）
+    height     INTEGER NOT NULL,      -- デシメートル（APIの生値）
+    weight     INTEGER NOT NULL,      -- ヘクトグラム（APIの生値）
     type1      TEXT,
     type2      TEXT,                  -- 単タイプのポケモンは NULL
     created_at INTEGER NOT NULL
@@ -765,8 +765,7 @@ CREATE TABLE pokemon_detail_cache (
     id            INTEGER PRIMARY KEY,
     detail_json   TEXT    NOT NULL,
     cached_at     INTEGER NOT NULL,
-    last_accessed INTEGER NOT NULL,   -- LRU の判定に使う
-    FOREIGN KEY (id) REFERENCES pokemon(id)
+    last_accessed INTEGER NOT NULL    -- LRU の判定に使う
 );
 
 CREATE INDEX idx_cache_last_accessed ON pokemon_detail_cache(last_accessed);</code></pre></figure>
@@ -849,11 +848,13 @@ CREATE INDEX idx_cache_last_accessed ON pokemon_detail_cache(last_accessed);</co
 </li></ol>
 <h3 id="7-4-step-4-機能拡張-4週目">7.4 Step 4: 機能拡張（4週目）</h3>
 <ol>
-<li>検索機能（名前の部分一致・図鑑番号）
+<li>ローディング表示・エラーハンドリング・Pull to refresh（#11）
 </li>
-<li>エラーハンドリングとオフライン表示
+<li>検索機能（名前の部分一致・図鑑番号・タイプ絞り込み）（#12）
 </li>
-<li>ローディング表示・Pull to refresh などの UI/UX 改善
+<li>詳細情報の拡張（日本語名・特性・進化チェーン）（#13）
+</li>
+<li>設定画面と手動更新（#14）
 </li></ol>
 <h2 id="8-評価基準">8. 評価基準</h2>
 <h3 id="8-1-必須要件-70点">8.1 必須要件（70点）</h3>
@@ -868,14 +869,15 @@ CREATE INDEX idx_cache_last_accessed ON pokemon_detail_cache(last_accessed);</co
 </li></ul>
 <h3 id="8-2-高評価要件-30点">8.2 高評価要件（+30点）</h3>
 <ul>
-<li class="task"><label><input type="checkbox"><span><strong>検索機能</strong>: 名前・番号・タイプ検索</span></label>
+<li class="task"><label><input type="checkbox"><span><strong>ローディング・エラーハンドリング</strong>（#11）: 状態の出し分け、再試行、Pull to refresh</span></label>
 </li>
-<li class="task"><label><input type="checkbox"><span><strong>エラーハンドリング</strong>: 適切なエラー表示</span></label>
+<li class="task"><label><input type="checkbox"><span><strong>検索機能</strong>（#12）: 名前・番号・タイプ検索</span></label>
 </li>
-<li class="task"><label><input type="checkbox"><span><strong>UI/UX</strong>: ローディング、Pull to refresh</span></label>
+<li class="task"><label><input type="checkbox"><span><strong>詳細情報の拡張</strong>（#13）: 日本語名・特性・進化チェーン</span></label>
 </li>
-<li class="task"><label><input type="checkbox"><span><strong>コード品質</strong>: Kotlin らしい記述、適切な設計パターン（MVVM／単方向データフロー）</span></label>
+<li class="task"><label><input type="checkbox"><span><strong>設定画面と手動更新</strong>（#14）: ボトムナビ、手動更新、最終更新日時</span></label>
 </li></ul>
+<p>なお <strong>コード品質</strong>（Kotlin らしい記述、MVVM／単方向データフロー）は、上記すべてに共通してレビューで見る観点です。単独の配点項目ではありません。</p>
 <h3 id="8-3-ボーナス要件-α">8.3 ボーナス要件（+α）</h3>
 <ul>
 <li class="task"><label><input type="checkbox"><span><strong>テスト実装</strong>: ユニットテスト</span></label>
@@ -1996,8 +1998,8 @@ CREATE TABLE pokemon (
     name       TEXT    NOT NULL,      -- 英語名
     name_ja    TEXT,                  -- 日本語名（Phase 2）
     image_url  TEXT,
-    height     INTEGER,               -- デシメートル（APIの生値）
-    weight     INTEGER,               -- ヘクトグラム（APIの生値）
+    height     INTEGER NOT NULL,      -- デシメートル（APIの生値）
+    weight     INTEGER NOT NULL,      -- ヘクトグラム（APIの生値）
     type1      TEXT,
     type2      TEXT,                  -- 単タイプのポケモンは NULL
     created_at INTEGER NOT NULL
@@ -2013,8 +2015,7 @@ CREATE TABLE pokemon_detail_cache (
     id            INTEGER PRIMARY KEY,
     detail_json   TEXT    NOT NULL,
     cached_at     INTEGER NOT NULL,
-    last_accessed INTEGER NOT NULL,   -- LRU の判定に使う
-    FOREIGN KEY (id) REFERENCES pokemon(id)
+    last_accessed INTEGER NOT NULL    -- LRU の判定に使う
 );
 
 CREATE INDEX idx_cache_last_accessed ON pokemon_detail_cache(last_accessed);</code></pre></figure>
@@ -2234,28 +2235,31 @@ setContent {
     participant PokeApiService
 
     User-&gt;&gt;PokemonListScreen: 画面表示
-    PokemonListScreen-&gt;&gt;PokemonListViewModel: loadPokemonList()
-    PokemonListViewModel-&gt;&gt;PokemonRepository: getAllPokemon()
+    PokemonListScreen-&gt;&gt;PokemonListViewModel: uiState を購読
 
-    PokemonRepository-&gt;&gt;PokemonDao: ローカルデータ取得
-    PokemonDao--&gt;&gt;PokemonRepository: ローカルデータ返却
-
-    alt ローカルデータあり
-        PokemonRepository--&gt;&gt;PokemonListViewModel: ポケモンリスト返却
-        PokemonListViewModel--&gt;&gt;PokemonListScreen: データ更新通知
-        PokemonListScreen--&gt;&gt;User: 一覧表示
-    else ローカルデータなし
-        PokemonRepository-&gt;&gt;PokeApiService: API呼び出し
-        PokeApiService--&gt;&gt;PokemonRepository: API レスポンス
-        PokemonRepository-&gt;&gt;PokemonDao: データ保存
-        PokemonRepository--&gt;&gt;PokemonListViewModel: ポケモンリスト返却
-        PokemonListViewModel--&gt;&gt;PokemonListScreen: データ更新通知
+    rect rgb(240, 245, 240)
+        Note over PokemonListViewModel,PokemonDao: 表示 — DBが唯一の情報源
+        PokemonListViewModel-&gt;&gt;PokemonRepository: observePokemonList()
+        PokemonRepository-&gt;&gt;PokemonDao: observeAll()
+        PokemonDao--&gt;&gt;PokemonRepository: Flow&lt;List&lt;PokemonEntity&gt;&gt;
+        PokemonRepository--&gt;&gt;PokemonListViewModel: Flow&lt;List&lt;Pokemon&gt;&gt;
+        PokemonListViewModel--&gt;&gt;PokemonListScreen: uiState 更新
         PokemonListScreen--&gt;&gt;User: 一覧表示
     end
 
-    User-&gt;&gt;PokemonListScreen: スクロール(ページング)
-    PokemonListScreen-&gt;&gt;PokemonListViewModel: loadMorePokemon()
-    Note over PokemonListViewModel: 同様の処理を繰り返し</pre></figure>
+    rect rgb(245, 240, 240)
+        Note over PokemonListViewModel,PokeApiService: 更新 — 画面は待たない
+        User-&gt;&gt;PokemonListScreen: Pull to refresh
+        PokemonListScreen-&gt;&gt;PokemonListViewModel: refresh()
+        PokemonListViewModel-&gt;&gt;PokemonRepository: refresh(onProgress)
+        PokemonRepository-&gt;&gt;PokeApiService: 151匹ぶんの詳細取得（同時実行10）
+        PokeApiService--&gt;&gt;PokemonRepository: レスポンス
+        PokemonRepository-&gt;&gt;PokemonDao: upsertAll()
+    end
+
+    Note over PokemonDao,PokemonListScreen: 保存されると上の Flow が発火し、画面が自動で更新される
+
+    Note over PokemonListScreen: LazyVerticalGrid が可視分だけ構成するため、ページングは不要</pre></figure>
 <h4 id="4-2-3-実装仕様">4.2.3 実装仕様</h4>
 <h5 id="pokemonlistscreen-composable">PokemonListScreen（Composable）</h5>
 <figure class="code"><div class="code-head"><span>kotlin</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-kotlin">// ui/list/PokemonListScreen.kt
@@ -2359,30 +2363,30 @@ class PokemonListViewModel(
     participant PokemonDao
 
     User-&gt;&gt;SearchField: 検索文字入力
-    SearchField-&gt;&gt;PokemonListViewModel: onSearchTextChanged(text)
+    SearchField-&gt;&gt;PokemonListViewModel: onQueryChange(text)
+    PokemonListViewModel-&gt;&gt;PokemonListViewModel: デバウンス(300ms) / 同じ値は捨てる
+    PokemonListViewModel-&gt;&gt;PokemonRepository: searchPokemon(query)
 
-    alt 文字数 &gt;= 2
-        PokemonListViewModel-&gt;&gt;PokemonListViewModel: デバウンス処理(300ms)
-        PokemonListViewModel-&gt;&gt;PokemonRepository: searchPokemon(query, type)
-        PokemonRepository-&gt;&gt;PokemonDao: SQL検索実行
+    alt query が空
+        PokemonRepository-&gt;&gt;PokemonDao: observeAll()
+        PokemonDao-&gt;&gt;PokemonDao: SELECT * FROM pokemon ORDER BY id
+    else 数字のみ（図鑑番号）
+        PokemonRepository-&gt;&gt;PokemonDao: observeById(id)
+        PokemonDao-&gt;&gt;PokemonDao: SELECT * FROM pokemon WHERE id = :id
+    else タイプ名と一致
+        PokemonRepository-&gt;&gt;PokemonDao: searchByType(type)
+        PokemonDao-&gt;&gt;PokemonDao: SELECT * WHERE type1 = :type OR type2 = :type
+    else それ以外（名前）
+        PokemonRepository-&gt;&gt;PokemonDao: searchByName(query)
+        PokemonDao-&gt;&gt;PokemonDao: SELECT * WHERE name LIKE '%:q%' OR name_ja LIKE '%:q%'
+    end
 
-        alt 名前検索
-            PokemonDao-&gt;&gt;PokemonDao: SELECT * WHERE name LIKE '%query%'
-        else 図鑑番号検索
-            PokemonDao-&gt;&gt;PokemonDao: SELECT * WHERE id = query
-        else タイプ検索
-            PokemonDao-&gt;&gt;PokemonDao: SELECT * WHERE types LIKE '%query%'
-        end
+    PokemonDao--&gt;&gt;PokemonRepository: Flow&lt;List&lt;PokemonEntity&gt;&gt;
+    PokemonRepository--&gt;&gt;PokemonListViewModel: Flow&lt;List&lt;Pokemon&gt;&gt;
+    PokemonListViewModel--&gt;&gt;SearchField: uiState 更新
+    SearchField--&gt;&gt;User: 検索結果表示
 
-        PokemonDao--&gt;&gt;PokemonRepository: 検索結果
-        PokemonRepository-&gt;&gt;PokemonDao: 検索履歴保存
-        PokemonRepository--&gt;&gt;PokemonListViewModel: 検索結果返却
-        PokemonListViewModel--&gt;&gt;SearchField: UI更新
-        SearchField--&gt;&gt;User: 検索結果表示
-    else 文字数 &lt; 2
-        PokemonListViewModel--&gt;&gt;SearchField: 検索結果クリア
-        SearchField--&gt;&gt;User: 全件表示
-    end</pre></figure>
+    Note over PokemonListViewModel,PokemonDao: Flow なので、DBが変われば購読側へ自動で流れる</pre></figure>
 <h4 id="4-3-3-実装仕様">4.3.3 実装仕様</h4>
 <h5 id="検索の状態管理">検索の状態管理</h5>
 <figure class="code"><div class="code-head"><span>kotlin</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-kotlin">// 検索は一覧画面の ViewModel に統合する。専用の ViewModel は作らない。
@@ -2685,7 +2689,9 @@ class UpdateService(
     private val api: PokeApiService,
     private val dao: PokemonDao,
 ) {
-    private val mutex = Mutex()   // 手動更新と自動更新の二重起動を防ぐ
+    // 同時に2つの更新が走らないよう直列化する。2回目の呼び出し自体は止まらないので、
+    // 更新ボタンは実行中に無効化すること。
+    private val mutex = Mutex()
 
     /**
      * 151匹ぶんの詳細を取得して DB に保存する。
@@ -2710,17 +2716,21 @@ class UpdateService(
                 }.awaitAll()
             }
 
-            // 取得できたぶんだけ保存する。途中で失敗しても次回に持ち越せる
+            // 取得できたぶんだけ保存する。途中で通信が切れても取得済みは残る。
+            // 件数が多いので、まとめすぎず小分けに保存していく。
             val fetched = results.mapNotNull { it.getOrNull() }
-            dao.upsertAll(fetched)
+            fetched.chunked(25).forEach { dao.upsertAll(it) }
 
             UpdateResult(updated = fetched.size, failed = results.count { it.isFailure })
         }
 
     /**
-     * 要件定義の再試行ポリシー: 最大3回・30秒間隔。
-     * 手動更新でユーザーを待たせたくない場合は、指数バックオフに変えてもよい。
-     */
+      * 1件あたりの再試行。短い指数バックオフ（0.5s → 1s → 2s）で待つ。
+      *
+      * 要件定義の「最大3回・30秒間隔」は refresh 全体に対するポリシーであり、
+      * 1匹ごとの待機ではない。ここで30秒待つと、通信が不安定なときに
+      * 151件の取得が分単位まで伸びてしまう。
+      */
     private suspend fun fetchWithRetry(id: Int): PokemonEntity {
         var lastError: Throwable? = null
         repeat(MAX_RETRIES) { attempt -&gt;
@@ -2732,7 +2742,7 @@ class UpdateService(
                     (e is HttpException &amp;&amp; (e.code() == 429 || e.code() &gt;= 500))
                 if (!retryable) throw e
                 lastError = e
-                if (attempt &lt; MAX_RETRIES - 1) delay(RETRY_INTERVAL_MS)
+                if (attempt &lt; MAX_RETRIES - 1) delay(RETRY_BASE_DELAY_MS shl attempt)
             }
         }
         throw lastError ?: IllegalStateException(&quot;取得に失敗しました: id=$id&quot;)
@@ -2742,7 +2752,7 @@ class UpdateService(
         const val KANTO_POKEMON_COUNT = 151
         const val CONCURRENCY = 10          // PokeAPI のフェアユースに配慮する
         const val MAX_RETRIES = 3
-        const val RETRY_INTERVAL_MS = 30_000L
+        const val RETRY_BASE_DELAY_MS = 500L
     }
 }</code></pre></figure>
 <h5 id="自動更新の判定">自動更新の判定</h5>
