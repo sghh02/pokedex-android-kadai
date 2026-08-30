@@ -1,3 +1,10 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<meta name="description" content="ポケモン図鑑アプリ最終課題の設計書一式。要件定義・基本設計・詳細設計・実装仕様・環境構築ガイド。">
 <title>ポケモン図鑑アプリ 最終課題</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -5,7 +12,7 @@
 <style>
 :root{
   --paper:#F2F5F1; --surface:#FFFFFF; --surface-2:#E8EDE6; --surface-3:#DFE6DC;
-  --ink:#16201A; --ink-2:#4C574E; --ink-3:#727D74;
+  --ink:#16201A; --ink-2:#4C574E; --ink-3:#5E6960;
   --line:#D2DACE; --line-soft:#E2E8DF;
   --accent:#A81E36; --accent-ink:#8E1A2E; --accent-soft:#F5DFE3;
   --lens:#1B6A80; --lens-soft:#DCEBEF;
@@ -115,10 +122,10 @@ h1,h2,h3,h4,h5,h6{font-family:"Zen Old Mincho",serif; text-wrap:balance; letter-
 /* 目次から飛んだとき、上に固定された進捗バーで見出しが隠れないようにする */
 .doc h2,.doc h3{scroll-margin-top:96px}
 .doc h4{
-  font-size:.82rem; font-weight:700; margin:28px 0 10px; color:var(--ink-3);
-  letter-spacing:.13em; font-family:"Zen Kaku Gothic New",sans-serif;
+  font-size:1rem; font-weight:700; margin:30px 0 10px; color:var(--ink-2);
+  letter-spacing:.02em;
 }
-.doc h5,.doc h6{font-size:.95rem; font-weight:700; margin:24px 0 8px; color:var(--ink-2)}
+.doc h5,.doc h6{font-size:.9rem; font-weight:700; margin:22px 0 8px; color:var(--ink-2)}
 .doc p{margin:0 0 1.25em}
 hr{border:0; border-top:1px solid var(--line); margin:56px 0}
 
@@ -199,7 +206,7 @@ figure.diagram pre{margin:0}
   display:block !important; position:fixed !important;
   left:-99999px !important; top:0 !important; width:47rem !important;
 }
-figure.diagram svg{max-width:none; height:auto}
+figure.diagram svg{height:auto}
 
 /* ---------- チェックリスト ---------- */
 li.task{list-style:none; margin-left:-1.5em; padding-left:0}
@@ -300,7 +307,8 @@ li.task input:checked+span{
 }
 @media (prefers-reduced-motion:reduce){*{transition:none !important; animation:none !important}}
 </style>
-
+</head>
+<body>
 <button class="railtoggle" type="button" aria-expanded="false">目次</button>
 
 <div class="shell">
@@ -344,13 +352,13 @@ li.task input:checked+span{
 <p><code>#1</code> 〜 <code>#10</code> が必須要件（70点）、<code>#11</code> 〜 <code>#14</code> が加点要件（+30点）、<code>#15</code> がボーナス、<code>#16</code> が提出物です。</p>
 <h2 id="素材">素材</h2>
 <ul>
-<li><a class="lnk" href="素材/画面素材" data-doc="素材/画面素材">画面素材</a> — 画面モック（HTML）とスクリーンショット
+<li><a class="lnk ext" href="https://github.com/sghh02/pokedex-android-kadai/tree/main/素材/画面素材" target="_blank" rel="noopener">画面素材</a> — 画面モック（HTML）とスクリーンショット
 </li>
-<li><a class="lnk" href="素材/launcher_icon" data-doc="素材/launcher_icon">launcher_icon</a> — アプリアイコン
+<li><a class="lnk ext" href="https://github.com/sghh02/pokedex-android-kadai/tree/main/素材/launcher_icon" target="_blank" rel="noopener">launcher_icon</a> — アプリアイコン
 </li>
 <li><a class="lnk ext" href="https://www.figma.com/design/b0kI8aTikCubCeKQdcSKEC/%E3%83%9D%E3%82%B1%E3%83%A2%E3%83%B3%E5%9B%B3%E9%91%91%28%E3%82%AB%E3%83%B3%E3%83%88%E3%83%BC%E5%9C%B0%E6%96%B9%29%E3%83%87%E3%82%B6%E3%82%A4%E3%83%B3?node-id=3-40&amp;t=c3mklPkvnhvy8Sp5-1" target="_blank" rel="noopener">Figma デザイン</a> — 画面レイアウト
 </li></ul>
-<p>01・02 の末尾には、要件定義・基本設計という工程そのものの解説を付録として収録しています。<a class="lnk" href="最終課題_全文.md" data-doc="最終課題_全文.md">最終課題_全文.md</a> は設計書5冊を1ファイルに結合したものです。</p></section>
+<p>01・02 の末尾には、要件定義・基本設計という工程そのものの解説を付録として収録しています。</p></section>
 <section class="doc" id="doc-1" data-file="05_環境構築ガイド.md" hidden><h1 id="環境構築ガイド">環境構築ガイド</h1>
 <p><a class="lnk ext" href="https://github.com/sghh02/pokedex-android-kadai/issues" target="_blank" rel="noopener">Issue</a> の <code>#1</code> と <code>#2</code> を進めるための手順です。ここまで通れば、以降の Issue は実装に集中できます。</p>
 <h2 id="1-前提">1. 前提</h2>
@@ -377,7 +385,7 @@ li.task input:checked+span{
 <li><strong>Create fork</strong> を押す
 </li></ol>
 <p>数秒で <code>https://github.com/&lt;自分のアカウント&gt;/pokedex-android-kadai</code> ができます。以降の作業はすべてこの<strong>自分の</strong>リポジトリに対して行います。</p>
-<blockquote><strong>Issue は Fork にコピーされません。</strong> これは GitHub の仕様です。 自分の Fork の Issues タブは空のままで問題ありません。 実装タスクは元のリポジトリの <a class="lnk ext" href="https://github.com/sghh02/pokedex-android-kadai/issues" target="_blank" rel="noopener">Issues</a> を見てください。</blockquote>
+<blockquote><p><strong>Issue は Fork にコピーされません。</strong> これは GitHub の仕様です。自分の Fork の Issues タブは空のままで問題ありません。実装タスクは元のリポジトリの<a class="lnk ext" href="https://github.com/sghh02/pokedex-android-kadai/issues" target="_blank" rel="noopener">Issues</a> を見てください。</p></blockquote>
 <h3 id="2-3-clone-して手元に持ってくる">2.3 clone して手元に持ってくる</h3>
 <p>Fork したリポジトリのページで緑の <strong>Code</strong> ボタンを押し、<strong>HTTPS</strong> のURLをコピーします。<code>https://github.com/&lt;自分のアカウント&gt;/pokedex-android-kadai.git</code> の形です。</p>
 <figure class="code"><div class="code-head"><span>bash</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-bash">cd ~          # 作業したい場所へ移動する
@@ -403,7 +411,7 @@ cd pokedex-android-kadai</code></pre></figure>
 </li>
 <li><strong>Generate token</strong> を押し、表示された文字列をコピーする
 </li></ol>
-<blockquote><strong>トークンは一度しか表示されません。</strong> その場でパスワード管理ツールなどに保存してください。 紛失したら作り直します。</blockquote>
+<blockquote><p><strong>トークンは一度しか表示されません。</strong> その場でパスワード管理ツールなどに保存してください。紛失したら作り直します。</p></blockquote>
 <p>push 時に聞かれたら、Username には GitHub のアカウント名、Password にはこのトークンを貼り付けます。毎回聞かれないよう、保存しておくと楽です。</p>
 <figure class="code"><div class="code-head"><span>bash</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-bash">git config --global credential.helper osxkeychain   # macOS
 # Windows は Git for Windows 同梱の manager が既定で有効</code></pre></figure>
@@ -436,24 +444,35 @@ git config --global user.email &quot;you@example.com&quot;</code></pre></figure>
 </li>
 <li>生成されたファイルを、clone したディレクトリの直下へ移す
 </li></ol>
-<figure class="code"><div class="code-head"><span>bash</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-bash"># clone したディレクトリで実行する
-rsync -a --exclude .git ~/tmp/Pokedex/ .
+<p><strong>macOS / Linux</strong></p>
+<figure class="code"><div class="code-head"><span>bash</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-bash"># clone したディレクトリで実行する。.git と .gitignore は上書きしない
+rsync -a --exclude .git --exclude .gitignore ~/tmp/Pokedex/ .
 rm -rf ~/tmp/Pokedex</code></pre></figure>
+<p><strong>Windows（PowerShell）</strong></p>
+<figure class="code"><div class="code-head"><span>powershell</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-powershell"># clone したディレクトリで実行する
+Get-ChildItem &quot;$HOME\tmp\Pokedex&quot; -Force |
+  Where-Object { $_.Name -ne &quot;.git&quot; -and $_.Name -ne &quot;.gitignore&quot; } |
+  Copy-Item -Destination . -Recurse -Force
+Remove-Item &quot;$HOME\tmp\Pokedex&quot; -Recurse -Force</code></pre></figure>
+<p>エクスプローラや Finder で手作業でコピーしても構いません。その場合も <strong><code>.git</code> と <code>.gitignore</code> は上書きしない</strong>でください。<code>.gitignore</code> はこのリポジトリ用に用意したもので、Android Studio が生成する版より除外設定が広く、署名鍵の混入を防ぎます。</p>
 <ol>
 <li>Android Studio で clone したディレクトリを <strong>Open</strong> し直し、ビルドが通ることを確認する
 </li></ol>
-<blockquote><code>minSdk</code> を 26 にすることで <code>java.time</code>（<code>LocalDate</code> / <code>LocalTime</code>）が desugaring なしで使えます。自動更新の判定（<code>#14</code>）で必要になります。</blockquote>
+<blockquote><p><code>minSdk</code> を 26 にすることで <code>java.time</code>（<code>LocalDate</code> / <code>LocalTime</code>）がdesugaring なしで使えます。自動更新の判定（<code>#14</code>）で必要になります。</p></blockquote>
 <h2 id="4-依存の追加">4. 依存の追加</h2>
 <h3 id="バージョンの扱い">バージョンの扱い</h3>
 <p><strong>Kotlin / AGP / Compose のバージョンは、ウィザードが生成したものをそのまま使ってください。</strong>この3つは互いに強く結合しており、手で差し替えると噛み合わなくなります。</p>
 <p>一方、以下に挙げるライブラリは比較的独立しているので、明示的に追加します。記載のバージョンは執筆時点の安定版です。Android Studio が更新を提案してきたら従って構いません。</p>
-<blockquote><strong>KSP だけは注意。</strong> KSP のバージョンは Kotlin のバージョンに対応するものを選ぶ必要があります。 ビルド時に「ksp が Kotlin x.y.z に対応していない」と怒られたら、 <a class="lnk ext" href="https://github.com/google/ksp/releases" target="_blank" rel="noopener">KSP のリリース一覧</a>から対応する版を探してください。</blockquote>
+<blockquote><p><strong>KSP だけは注意。</strong> KSP のバージョンは Kotlin のバージョンに対応するものを選ぶ必要があります。ビルド時に「ksp が Kotlin x.y.z に対応していない」と怒られたら、<a class="lnk ext" href="https://github.com/google/ksp/releases" target="_blank" rel="noopener">KSP のリリース一覧</a>から対応する版を探してください。</p></blockquote>
 <h3 id="gradle-libs-versions-toml"><code>gradle/libs.versions.toml</code></h3>
-<blockquote><strong>既存のファイルへの「追記」です。</strong> ウィザードが生成した <code>agp</code> / <code>kotlin</code> / <code>composeBom</code> などの行は消さずに残してください。消すとビルドが通らなくなります。</blockquote>
+<blockquote><p><strong>既存のファイルへの「追記」です。</strong> ウィザードが生成した <code>agp</code> / <code>kotlin</code> /<code>composeBom</code> などの行は消さずに残してください。消すとビルドが通らなくなります。</p></blockquote>
 <figure class="code"><div class="code-head"><span>toml</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-toml">[versions]
 # ↓ 既存の行はそのまま。以下を追記する
 ksp = &quot;2.3.11&quot;
 room = &quot;2.8.4&quot;
+coroutines = &quot;1.10.2&quot;
+androidxTest = &quot;1.7.0&quot;
+robolectric = &quot;4.16&quot;
 retrofit = &quot;3.0.0&quot;
 okhttp = &quot;5.5.0&quot;
 kotlinxSerialization = &quot;1.11.0&quot;
@@ -481,13 +500,21 @@ lifecycle-viewmodel-compose = { module = &quot;androidx.lifecycle:lifecycle-view
 lifecycle-runtime-compose   = { module = &quot;androidx.lifecycle:lifecycle-runtime-compose&quot;,   version.ref = &quot;lifecycle&quot; }
 datastore-preferences       = { module = &quot;androidx.datastore:datastore-preferences&quot;,       version.ref = &quot;datastore&quot; }
 
+# アイコン。material3 1.4.0 以降、これは推移依存に含まれないので明示的に追加する
+compose-material-icons-core = { module = &quot;androidx.compose.material:material-icons-core&quot; }
+
+# テスト（Issue #3 / #5 / #15 の受け入れ条件で使う）
+kotlinx-coroutines-test = { module = &quot;org.jetbrains.kotlinx:kotlinx-coroutines-test&quot;, version.ref = &quot;coroutines&quot; }
+androidx-test-core      = { module = &quot;androidx.test:core&quot;,   version.ref = &quot;androidxTest&quot; }
+robolectric             = { module = &quot;org.robolectric:robolectric&quot;, version.ref = &quot;robolectric&quot; }
+
 [plugins]
 # android-application / kotlin-android / kotlin-compose はウィザードが生成済みなので
 # そのまま残す。追記するのは次の2つだけ。
 # version.ref = &quot;kotlin&quot; は、ウィザードが [versions] に書いた kotlin を参照する。
 kotlin-serialization = { id = &quot;org.jetbrains.kotlin.plugin.serialization&quot;, version.ref = &quot;kotlin&quot; }
 ksp                  = { id = &quot;com.google.devtools.ksp&quot;,                   version.ref = &quot;ksp&quot; }</code></pre></figure>
-<blockquote><strong>Coil 3 は artifact が2つに分かれています。</strong> <code>coil-compose</code> だけでは ネットワーク画像を読み込めません。<code>coil-network-okhttp</code> も必ず追加してください。 ここを忘れて「画像が表示されない」で止まる人が多い箇所です。</blockquote>
+<blockquote><p><strong>Coil 3 は artifact が2つに分かれています。</strong> <code>coil-compose</code> だけではネットワーク画像を読み込めません。<code>coil-network-okhttp</code> も必ず追加してください。ここを忘れて「画像が表示されない」で止まる人が多い箇所です。</p></blockquote>
 <h3 id="ルートの-build-gradle-kts">ルートの <code>build.gradle.kts</code></h3>
 <p>追加した2つのプラグインを、ルートで宣言します（<code>apply false</code> を付けるのがポイントです）。</p>
 <figure class="code"><div class="code-head"><span>kotlin</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-kotlin">plugins {
@@ -498,6 +525,7 @@ ksp                  = { id = &quot;com.google.devtools.ksp&quot;,              
     alias(libs.plugins.ksp) apply false                    // 追加
 }</code></pre></figure>
 <h3 id="app-build-gradle-kts"><code>app/build.gradle.kts</code></h3>
+<blockquote><p>ここも<strong>追記</strong>です。ウィザードが生成した <code>compileSdk</code> / <code>targetSdk</code> /<code>composeOptions</code> などの行はそのまま残してください。</p></blockquote>
 <figure class="code"><div class="code-head"><span>kotlin</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-kotlin">plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -508,6 +536,10 @@ ksp                  = { id = &quot;com.google.devtools.ksp&quot;,              
 
 android {
     namespace = &quot;com.example.pokedex&quot;
+
+    testOptions {
+        unitTests.isIncludeAndroidResources = true   // Robolectric に必要
+    }
     defaultConfig {
         minSdk = 26
     }
@@ -534,8 +566,14 @@ dependencies {
     implementation(libs.lifecycle.viewmodel.compose)
     implementation(libs.lifecycle.runtime.compose)      // collectAsStateWithLifecycle
     implementation(libs.datastore.preferences)
+    implementation(libs.compose.material.icons.core)   // Icons.Filled / Icons.AutoMirrored
 
+    // テスト。Room の in-memory テストは Android の Context が要るため
+    // Robolectric を使い、JVM 上（./gradlew test）で実行できるようにする。
     testImplementation(libs.room.testing)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.androidx.test.core)
+    testImplementation(libs.robolectric)
 }</code></pre></figure>
 <p><code>libs.plugins.ksp</code> は <code>[plugins]</code> に宣言した ID から解決されます。<code>Plugin [id: &#x27;com.google.devtools.ksp&#x27;] was not found</code> と出たら、ルートの <code>build.gradle.kts</code> への <code>apply false</code> 付きの宣言を忘れていないか確認してください。</p>
 <h2 id="5-androidmanifest-xml">5. <code>AndroidManifest.xml</code></h2>
@@ -626,7 +664,11 @@ git commit -m &quot;feat: プロジェクトの初期セットアップ&quot;
 git push -u origin feature/1-setup</code></pre></figure>
 <h3 id="8-2-プルリクエストを作る">8.2 プルリクエストを作る</h3>
 <p>push すると、GitHub のリポジトリページに<strong>Compare &amp; pull request</strong> のボタンが出るので押します。</p>
-<blockquote><strong>向き先に注意してください。</strong> Fork から PR を作ると、GitHub は初期状態で <strong>base repository を元のリポジトリ（sghh02/pokedex-android-kadai）</strong> にします。 そのままだと課題リポジトリへの PR になってしまいます。  <strong>base repository を自分の Fork に変更してください。</strong>  <code></code><code> base repository: &lt;自分のアカウント&gt;/pokedex-android-kadai   base: main ← head repository: &lt;自分のアカウント&gt;/pokedex-android-kadai   compare: feature/1-setup </code><code></code></blockquote>
+<blockquote><p><strong>向き先に注意してください。</strong> Fork から PR を作ると、GitHub は初期状態で<strong>base repository を元のリポジトリ（sghh02/pokedex-android-kadai）</strong> にします。そのままだと課題リポジトリへの PR になってしまいます。</p>
+<p><strong>base repository を自分の Fork に変更してください。</strong></p>
+<figure class="code"><div class="code-head"><span>text</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-text">base repository: &lt;自分のアカウント&gt;/pokedex-android-kadai   base: main
+←
+head repository: &lt;自分のアカウント&gt;/pokedex-android-kadai   compare: feature/1-setup</code></pre></figure></blockquote>
 <h3 id="8-3-本文を書く">8.3 本文を書く</h3>
 <p>テンプレートが自動で入ります。埋めるのは次の4つです。</p>
 <ul>
@@ -646,7 +688,7 @@ git push -u origin feature/1-setup</code></pre></figure>
 git pull
 git switch -c feature/2-api</code></pre></figure>
 <h2 id="9-よくあるつまずき">9. よくあるつまずき</h2>
-<div class="table-wrap"><table><thead><tr><th>症状</th><th>原因と対処</th></tr></thead><tbody><tr><td><code>SecurityException: Permission denied</code></td><td><code>INTERNET</code> 権限が未指定</td></tr><tr><td>画像が表示されない</td><td>Coil 3 の <code>coil-network-okhttp</code> が未追加</td></tr><tr><td><code>lateinit property container has not been initialized</code></td><td>Manifest の <code>android:name=&quot;.PokedexApplication&quot;</code> が未指定</td></tr><tr><td><code>Unable to create converter for ...</code></td><td><code>@Serializable</code> の付け忘れ、または converter の未登録</td></tr><tr><td><code>Field &#x27;xxx&#x27; is required but was missing</code></td><td>API のレスポンスに null が入る。<code>Json { ignoreUnknownKeys = true }</code> と、DTO のフィールドを nullable にする</td></tr><tr><td>Room の <code>@Upsert</code> が見つからない</td><td>Room 2.5 未満。<code>libs.versions.toml</code> のバージョンを確認</td></tr><tr><td>ビルドが <code>ksp</code> で失敗する</td><td>KSP と Kotlin のバージョンが噛み合っていない。上記「バージョンの扱い」を参照</td></tr><tr><td>初回起動が終わらない</td><td>151回の詳細取得を逐次実行している。同時実行数を制限した並列取得にする（<a class="lnk" href="04_実装仕様.md#5-pokeapi-の実装上の注意" data-doc="04_実装仕様.md">実装上の注意</a>）</td></tr></tbody></table></div></section>
+<div class="table-wrap"><table><thead><tr><th>症状</th><th>原因と対処</th></tr></thead><tbody><tr><td><code>SecurityException: Permission denied</code></td><td><code>INTERNET</code> 権限が未指定</td></tr><tr><td>画像が表示されない</td><td>Coil 3 の <code>coil-network-okhttp</code> が未追加</td></tr><tr><td><code>lateinit property container has not been initialized</code></td><td>Manifest の <code>android:name=&quot;.PokedexApplication&quot;</code> が未指定</td></tr><tr><td><code>Unable to create converter for ...</code></td><td><code>@Serializable</code> の付け忘れ、または converter の未登録</td></tr><tr><td><code>Field &#x27;xxx&#x27; is required but was missing</code></td><td>API のレスポンスに null が入る。<code>Json { ignoreUnknownKeys = true }</code> と、DTO のフィールドを nullable にする</td></tr><tr><td>Room の <code>@Upsert</code> が見つからない</td><td>Room 2.5 未満。<code>libs.versions.toml</code> のバージョンを確認</td></tr><tr><td>ビルドが <code>ksp</code> で失敗する</td><td>KSP と Kotlin のバージョンが噛み合っていない。上記「バージョンの扱い」を参照</td></tr><tr><td><code>Unresolved reference: Icons</code></td><td><code>material-icons-core</code> が未追加。material3 1.4.0 以降は推移依存に含まれない</td></tr><tr><td><code>Serializer has not been found for type</code></td><td>ドメインモデルに <code>@Serializable</code> が付いていない</td></tr><tr><td>in-memory DB のテストが <code>Context</code> で落ちる</td><td>Robolectric が未追加、または <code>unitTests.isIncludeAndroidResources</code> が未設定</td></tr><tr><td>初回起動が終わらない</td><td>151回の詳細取得を逐次実行している。同時実行数を制限した並列取得にする（<a class="lnk" href="04_実装仕様.md#5-pokeapi-の実装上の注意" data-doc="04_実装仕様.md">実装上の注意</a>）</td></tr></tbody></table></div></section>
 <section class="doc" id="doc-2" data-file="04_実装仕様.md" hidden><h1 id="実装仕様-ポケモン図鑑アプリ">実装仕様 — ポケモン図鑑アプリ</h1>
 <p>実装するスコープ、使用する技術、評価の基準を定めます。何を作るかはこの文書が基準になります。背景は<a class="lnk" href="01_要件定義.md" data-doc="01_要件定義.md">要件定義</a>、設計の詳細は<a class="lnk" href="02_基本設計.md" data-doc="02_基本設計.md">基本設計</a>・<a class="lnk" href="03_詳細設計.md" data-doc="03_詳細設計.md">詳細設計</a>を参照してください。</p>
 <h2 id="1-学習目標">1. 学習目標</h2>
@@ -749,7 +791,7 @@ CREATE INDEX idx_cache_last_accessed ON pokemon_detail_cache(last_accessed);</co
 <ol>
 <li><strong>名前は英語で返る</strong>
 </li></ol>
-<p>一覧・詳細APIの <code>name</code> は <code>bulbasaur</code> のような英語名です。日本語名は <code>GET /pokemon-species/{id}</code> の <code>names</code> から <code>language.name == &quot;ja-Hrkt&quot;</code> を選びます。Phase 1 は英語名のままで構いません。日本語名の取得は <code>#13</code> で扱います。</p>
+<p>一覧・詳細APIの <code>name</code> は <code>bulbasaur</code> のような英語名です。日本語名は <code>GET /pokemon-species/{id}</code> の <code>names</code> から <code>language.name == &quot;ja-hrkt&quot;</code> を選びます。<strong>すべて小文字</strong>です。<code>ja-Hrkt</code> と書くと完全一致せず、日本語名が永久に取れません。Phase 1 は英語名のままで構いません。日本語名の取得は <code>#13</code> で扱います。</p>
 <ol>
 <li><strong>身長・体重の単位に注意</strong>
 </li></ol>
@@ -870,7 +912,7 @@ CREATE INDEX idx_cache_last_accessed ON pokemon_detail_cache(last_accessed);</co
 <li><a class="lnk ext" href="https://coil-kt.github.io/coil/compose/" target="_blank" rel="noopener">Coil（画像読み込み）</a>
 </li></ul></section>
 <section class="doc" id="doc-3" data-file="01_要件定義.md" hidden><h1 id="要件定義書-ポケモン図鑑アプリ-カントー地方">要件定義書 — ポケモン図鑑アプリ（カントー地方）</h1>
-<blockquote><strong>本課題の実装対象は Android のみです。</strong> iOS や他フレームワークに関する記述は、実際の製品を想定した設計として残しています。 実装スコープは <a class="lnk" href="04_実装仕様.md" data-doc="04_実装仕様.md">実装仕様</a> と <a class="lnk ext" href="https://github.com/sghh02/pokedex-android-kadai/issues" target="_blank" rel="noopener">GitHub Issues</a> を参照してください。</blockquote>
+<blockquote><p><strong>本課題の実装対象は Android のみです。</strong>iOS や他フレームワークに関する記述は、実際の製品を想定した設計として残しています。実装スコープは <a class="lnk" href="04_実装仕様.md" data-doc="04_実装仕様.md">実装仕様</a> と <a class="lnk ext" href="https://github.com/sghh02/pokedex-android-kadai/issues" target="_blank" rel="noopener">GitHub Issues</a> を参照してください。</p></blockquote>
 <h2 id="1-目的・ターゲットユーザー・スコープ">1. 目的・ターゲットユーザー・スコープ</h2>
 <h3 id="目的">目的</h3>
 <ul>
@@ -1032,7 +1074,7 @@ CREATE INDEX idx_cache_last_accessed ON pokemon_detail_cache(last_accessed);</co
 </li></ul>
 </li></ol>
 <h3 id="2-3-新情報掲示板-次フェーズの開発スコープ">2.3 新情報掲示板（次フェーズの開発スコープ）</h3>
-<blockquote>このセクションは次フェーズの開発内容です。初期リリースには含まれません。</blockquote>
+<blockquote><p>このセクションは次フェーズの開発内容です。初期リリースには含まれません。</p></blockquote>
 <ol>
 <li>掲示板表示機能
 <ul>
@@ -1237,7 +1279,7 @@ CREATE INDEX idx_cache_last_accessed ON pokemon_detail_cache(last_accessed);</co
 </li></ul>
 <hr>
 <h2 id="付録-要件定義とは">付録: 要件定義とは</h2>
-<blockquote>設計工程そのものの解説です。アプリの仕様ではありません。</blockquote>
+<blockquote><p>設計工程そのものの解説です。アプリの仕様ではありません。</p></blockquote>
 <p>要件定義とは、ソフトウェア開発プロジェクトの最初の重要なステップで、開発するシステムが「何をするべきか」を明確にする作業です。簡単に言えば、完成するシステムの設計図を作る前に、そのシステムに必要な機能や特性を文書化する過程です。</p>
 <h3 id="要件定義の目的">要件定義の目的</h3>
 <p>要件定義の主な目的は以下の通りです：</p>
@@ -1306,7 +1348,7 @@ CREATE INDEX idx_cache_last_accessed ON pokemon_detail_cache(last_accessed);</co
 </li></ol>
 <p>要件定義はプロジェクトの成功を左右する重要なプロセスです。十分な時間をかけて丁寧に行うことで、後の工程をスムーズに進めることができます。</p></section>
 <section class="doc" id="doc-4" data-file="02_基本設計.md" hidden><h1 id="基本設計書-ポケモン図鑑アプリ-カントー地方">基本設計書 — ポケモン図鑑アプリ（カントー地方）</h1>
-<blockquote><strong>本課題の実装対象は Android のみです。</strong> iOS や他フレームワークに関する記述は、実際の製品を想定した設計として残しています。 実装スコープは <a class="lnk" href="04_実装仕様.md" data-doc="04_実装仕様.md">実装仕様</a> と <a class="lnk ext" href="https://github.com/sghh02/pokedex-android-kadai/issues" target="_blank" rel="noopener">GitHub Issues</a> を参照してください。</blockquote>
+<blockquote><p><strong>本課題の実装対象は Android のみです。</strong>iOS や他フレームワークに関する記述は、実際の製品を想定した設計として残しています。実装スコープは <a class="lnk" href="04_実装仕様.md" data-doc="04_実装仕様.md">実装仕様</a> と <a class="lnk ext" href="https://github.com/sghh02/pokedex-android-kadai/issues" target="_blank" rel="noopener">GitHub Issues</a> を参照してください。</p></blockquote>
 <h2 id="1-はじめに">1. はじめに</h2>
 <p>この基本設計書は、「ポケモン図鑑アプリケーション」のシステム全体像や主要機能の概要を示すものです。システム設計の基礎となる部分であり、今後の開発作業を進めるための指針となります。</p>
 <hr>
@@ -1498,7 +1540,7 @@ CREATE INDEX idx_cache_last_accessed ON pokemon_detail_cache(last_accessed);</co
 <hr>
 <h3 id="2-2-画面設計">2.2 画面設計</h3>
 <h4 id="2-2-1-画面一覧">2.2.1 画面一覧</h4>
-<div class="table-wrap"><table><thead><tr><th>No.</th><th><strong>画面名</strong></th><th><strong>機能</strong></th><th><strong>操作内容</strong></th></tr></thead><tbody><tr><td>1</td><td><strong>スプラッシュ画面</strong></td><td>・ポケモン基本情報更新機能開始</td><td>・なし</td></tr><tr><td>2</td><td><strong>ポケモン一覧画面</strong></td><td>・ポケモンのリスト表示<br>・検索機能<br>・ソート機能（図鑑番号順）<br>・タイプ別絞り込み機能</td><td>・ポケモンをリストからスクロールして選択<br>・名前または図鑑番号で検索<br>・図鑑番号でソート<br>・タイプで絞り込み</td></tr><tr><td>3</td><td><strong>ポケモン詳細画面</strong></td><td>・ポケモンの詳細情報表示（進化情報、進化条件など）<br>・オフライン表示のためのキャッシュ機能</td><td>・進化等の情報を確認<br>・詳細はオフライン時でもキャッシュから閲覧可能</td></tr><tr><td>4</td><td><strong>設定画面</strong></td><td>・手動でのデータ更新</td><td>・データを手動で更新文字サイズ調整</td></tr></tbody></table></div>
+<div class="table-wrap"><table><thead><tr><th>No.</th><th><strong>画面名</strong></th><th><strong>機能</strong></th><th><strong>操作内容</strong></th></tr></thead><tbody><tr><td>1</td><td><strong>スプラッシュ画面</strong></td><td>・ポケモン基本情報更新機能開始</td><td>・なし</td></tr><tr><td>2</td><td><strong>ポケモン一覧画面</strong></td><td>・ポケモンのリスト表示<br>・検索機能<br>・ソート機能（図鑑番号順）<br>・タイプ別絞り込み機能</td><td>・ポケモンをリストからスクロールして選択<br>・名前または図鑑番号で検索<br>・図鑑番号でソート<br>・タイプで絞り込み</td></tr><tr><td>3</td><td><strong>ポケモン詳細画面</strong></td><td>・ポケモンの詳細情報表示（進化情報、進化条件など）<br>・オフライン表示のためのキャッシュ機能</td><td>・進化等の情報を確認<br>・詳細はオフライン時でもキャッシュから閲覧可能</td></tr><tr><td>4</td><td><strong>設定画面</strong></td><td>・手動でのデータ更新</td><td>・データを手動で更新</td></tr></tbody></table></div>
 <h4 id="2-2-2-画面遷移図">2.2.2 画面遷移図</h4>
 <figure class="diagram"><pre class="mermaid">graph LR
   subgraph "アプリケーション画面遷移"
@@ -1594,7 +1636,7 @@ CREATE INDEX idx_cache_last_accessed ON pokemon_detail_cache(last_accessed);</co
 </li></ol>
 <h4 id="2-3-3-外部インターフェース定義">2.3.3 外部インターフェース定義</h4>
 <p><strong>1. PokeAPI</strong></p>
-<p>以下を参照Swaggerで作成する</p>
+<p>利用するエンドポイントと、レスポンスから取り出す項目は<a class="lnk" href="03_詳細設計.md" data-doc="03_詳細設計.md">詳細設計 3. API設計</a>にまとめています。公式の仕様は <a class="lnk ext" href="https://pokeapi.co/docs/v2" target="_blank" rel="noopener">PokeAPI ドキュメント</a> を参照してください。</p>
 <h5 id="エラー処理">エラー処理</h5>
 <p>PokeAPIを利用する際のエラー処理は、以下の通り定義します。</p>
 <ol>
@@ -1659,7 +1701,7 @@ CREATE INDEX idx_cache_last_accessed ON pokemon_detail_cache(last_accessed);</co
     B[SQLiteデータベース]
 
     subgraph "テーブル構造"
-      T1[pokemon_basic_info]
+      T1[pokemon]
       T2[pokemon_detail_cache]
     end
   end
@@ -1701,10 +1743,11 @@ CREATE INDEX idx_cache_last_accessed ON pokemon_detail_cache(last_accessed);</co
 </li></ul>
 </li></ol>
 <h4 id="2-4-3-テーブル構成">2.4.3 テーブル構成</h4>
-<p><strong>1. テーブル名: pokemon_basic_info</strong></p>
-<div class="table-wrap"><table><thead><tr><th>カラム名</th><th>データ型</th><th>説明</th></tr></thead><tbody><tr><td><strong>id</strong></td><td><code>INT</code> （自動インクリメント）</td><td>主キー。ポケモンの一意識別用。</td></tr><tr><td><strong>pokedex_number</strong></td><td><code>INT</code></td><td>ポケモンの図鑑番号（例：001, 002, ...）。ユニーク制約。</td></tr><tr><td><strong>name</strong></td><td><code>VARCHAR(255)</code></td><td>ポケモンの名前（例：ピカチュウ、リザードン）。</td></tr><tr><td><strong>type_1</strong></td><td><code>VARCHAR(50)</code></td><td>主タイプ（例：でんき、ほのお、みず）。</td></tr><tr><td><strong>type_2</strong></td><td><code>VARCHAR(50)</code></td><td>サブタイプ（例：ふゆう、ひこう）。NULLも許容。</td></tr><tr><td><strong>image_url</strong></td><td><code>VARCHAR(255)</code></td><td>ポケモンの画像URL（外部リンク）。</td></tr><tr><td><strong>last_updated</strong></td><td><code>TIMESTAMP</code></td><td>最終更新日時。データ鮮度の確認用。</td></tr></tbody></table></div>
-<p><strong>2. テーブル名: pokemon_detail_cache</strong></p>
-<div class="table-wrap"><table><thead><tr><th>カラム名</th><th>データ型</th><th>説明</th></tr></thead><tbody><tr><td><strong>id</strong></td><td><code>INT</code> （自動インクリメント）</td><td>主キー。キャッシュエントリの一意識別用。</td></tr><tr><td><strong>pokedex_number</strong></td><td><code>INT</code></td><td>ポケモンの図鑑番号。pokemon_basic_infoの外部キー。</td></tr><tr><td><strong>evolution_chain</strong></td><td><code>TEXT</code></td><td>進化情報をJSON形式で保存。</td></tr><tr><td><strong>moves</strong></td><td><code>TEXT</code></td><td>技情報をJSON形式で保存。</td></tr><tr><td><strong>last_viewed</strong></td><td><code>TIMESTAMP</code></td><td>最後に閲覧した日時。古いキャッシュ削除用。</td></tr><tr><td><strong>cached_on</strong></td><td><code>TIMESTAMP</code></td><td>キャッシュした日時。データ鮮度の確認用。</td></tr></tbody></table></div>
+<blockquote><p>物理スキーマの正は<a class="lnk" href="04_実装仕様.md" data-doc="04_実装仕様.md">実装仕様 4. データベース設計</a>です。ここでは持つ情報の種類だけを示します。</p></blockquote>
+<p><strong>1. テーブル名: pokemon</strong>（ポケモンの基本情報）</p>
+<div class="table-wrap"><table><thead><tr><th>カラム名</th><th>データ型</th><th>説明</th></tr></thead><tbody><tr><td><strong>id</strong></td><td><code>INTEGER</code></td><td>主キー。図鑑番号をそのまま使う。</td></tr><tr><td><strong>name</strong></td><td><code>TEXT</code></td><td>英語名。一覧APIから取得。</td></tr><tr><td><strong>name_ja</strong></td><td><code>TEXT</code></td><td>日本語名。pokemon-species から取得（Phase 2）。</td></tr><tr><td><strong>image_url</strong></td><td><code>TEXT</code></td><td>画像のURL。</td></tr><tr><td><strong>height</strong></td><td><code>INTEGER</code></td><td>身長。APIの生値（デシメートル）。</td></tr><tr><td><strong>weight</strong></td><td><code>INTEGER</code></td><td>体重。APIの生値（ヘクトグラム）。</td></tr><tr><td><strong>type1</strong></td><td><code>TEXT</code></td><td>主タイプ。</td></tr><tr><td><strong>type2</strong></td><td><code>TEXT</code></td><td>副タイプ。単タイプのポケモンは NULL。</td></tr><tr><td><strong>created_at</strong></td><td><code>INTEGER</code></td><td>保存日時（エポックミリ秒）。</td></tr></tbody></table></div>
+<p><strong>2. テーブル名: pokemon_detail_cache</strong>（詳細情報のキャッシュ・直近10件）</p>
+<div class="table-wrap"><table><thead><tr><th>カラム名</th><th>データ型</th><th>説明</th></tr></thead><tbody><tr><td><strong>id</strong></td><td><code>INTEGER</code></td><td>主キー。<code>pokemon.id</code> への外部キー。</td></tr><tr><td><strong>detail_json</strong></td><td><code>TEXT</code></td><td>特性・進化などの詳細をJSONで保存。</td></tr><tr><td><strong>cached_at</strong></td><td><code>INTEGER</code></td><td>キャッシュした日時。鮮度の判定用。</td></tr><tr><td><strong>last_accessed</strong></td><td><code>INTEGER</code></td><td>最後に参照した日時。古い順に削除するため。</td></tr></tbody></table></div>
 <hr>
 <h3 id="2-5-パフォーマンス設計">2.5 パフォーマンス設計</h3>
 <p>パフォーマンス設計では、アプリが効率的に動作するための性能基準を定義します。</p>
@@ -1789,7 +1832,7 @@ CREATE INDEX idx_cache_last_accessed ON pokemon_detail_cache(last_accessed);</co
 </li></ul>
 <hr>
 <h2 id="付録-基本設計とは">付録: 基本設計とは</h2>
-<blockquote>設計工程そのものの解説です。アプリの仕様ではありません。</blockquote>
+<blockquote><p>設計工程そのものの解説です。アプリの仕様ではありません。</p></blockquote>
 <h3 id="開発プロジェクトとは">開発プロジェクトとは</h3>
 <p>開発プロジェクトとは、ソフトウェアやシステムを作成するための組織的な取り組みです。これは単にプログラムを書くだけではなく、計画から実装、テスト、リリースまでの全工程を含みます。</p>
 <h3 id="基本設計の位置づけ">基本設計の位置づけ</h3>
@@ -1878,6 +1921,7 @@ CREATE INDEX idx_cache_last_accessed ON pokemon_detail_cache(last_accessed);</co
 <h2 id="2-データ構造設計">2. データ構造設計</h2>
 <h3 id="2-1-pokemon基本情報">2.1 Pokemon基本情報</h3>
 <figure class="code"><div class="code-head"><span>kotlin</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-kotlin">// domain/model/Pokemon.kt — 画面が扱うモデル
+@Serializable
 data class Pokemon(
     val id: Int,
     val name: String,        // 英語名。一覧APIから取得
@@ -1913,6 +1957,9 @@ data class PokemonEntity(
 fun PokemonEntity.toDomain() = Pokemon(id, name, nameJa, imageUrl, type1, type2, height, weight)</code></pre></figure>
 <h3 id="2-2-pokemon詳細情報">2.2 Pokemon詳細情報</h3>
 <figure class="code"><div class="code-head"><span>kotlin</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-kotlin">// domain/model/PokemonDetail.kt
+// DetailCache が JSON 化してキャッシュするため、@Serializable が必要。
+// get() の計算プロパティはシリアライズ対象にならないので、そのままでよい。
+@Serializable
 data class PokemonDetail(
     val pokemon: Pokemon,
     val abilities: List&lt;Ability&gt;,
@@ -1921,11 +1968,13 @@ data class PokemonDetail(
     val flavorTextJa: String?,   // pokemon-species の日本語説明文
 )
 
+@Serializable
 data class Ability(
     val name: String,
     val isHidden: Boolean,       // 隠れ特性かどうか
 )
 
+@Serializable
 data class Stat(
     val name: String,            // hp / attack / defense ...
     val value: Int,
@@ -1933,6 +1982,7 @@ data class Stat(
     companion object { const val MAX_VALUE = 255 }
 }
 
+@Serializable
 data class Evolution(
     val fromId: Int,
     val toId: Int,
@@ -1974,9 +2024,9 @@ CREATE INDEX idx_cache_last_accessed ON pokemon_detail_cache(last_accessed);</co
 <h3 id="3-1-pokeapi-エンドポイント仕様">3.1 PokeAPI エンドポイント仕様</h3>
 <h4 id="3-1-1-ポケモン一覧取得">3.1.1 ポケモン一覧取得</h4>
 <figure class="code"><div class="code-head"><span>text</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-text">GET https://pokeapi.co/api/v2/pokemon/?limit=151&amp;offset=0</code></pre></figure>
-<p><strong>レスポンス例:</strong></p>
+<p><strong>レスポンス例:</strong>（<code>count</code> は全世代の総数。<code>limit</code> で絞った件数は <code>results</code> の長さで見る）</p>
 <figure class="code"><div class="code-head"><span>json</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-json">{
-  &quot;count&quot;: 151,
+  &quot;count&quot;: 1351,
   &quot;results&quot;: [
     {
       &quot;name&quot;: &quot;bulbasaur&quot;,
@@ -2005,6 +2055,9 @@ interface PokemonRepository {
 
     /** 最終更新日時（エポックミリ秒）。未更新なら null。 */
     suspend fun lastUpdatedAt(): Long?
+
+    /** ローカルDBが空か。初回起動の判定に使う。 */
+    suspend fun isEmpty(): Boolean
 }</code></pre></figure>
 <hr>
 <h2 id="4-機能詳細設計">4. 機能詳細設計</h2>
@@ -2050,9 +2103,10 @@ fun SplashScreen(
     viewModel: SplashViewModel = viewModel(factory = LocalAppContainer.current.viewModelFactory),
 ) {
     LaunchedEffect(Unit) {
-        // 初期化の成否にかかわらず一覧へ進む。起動を止めないことを優先する。
-        val elapsed = measureTimeMillis { viewModel.initialize() }
-        delay((MINIMUM_DISPLAY_MS - elapsed).coerceAtLeast(0L))
+        // 取得の完了は待たない。151匹ぶんの通信は数十秒かかるため、
+        // ここで await すると要件の「0.5〜1秒で遷移」を満たせなくなる。
+        viewModel.startInitialLoad()
+        delay(MINIMUM_DISPLAY_MS)
         onFinished()
     }
 
@@ -2064,10 +2118,28 @@ fun SplashScreen(
     }
 }
 
-class SplashViewModel(private val repository: PokemonRepository) : ViewModel() {
-    suspend fun initialize() {
-        repository.refresh()
-            .onFailure { Log.w(TAG, &quot;初期データの取得に失敗。保存済みデータで継続する&quot;, it) }
+class SplashViewModel(
+    private val repository: PokemonRepository,
+    private val policy: AutoUpdatePolicy,
+    private val applicationScope: CoroutineScope,   // 画面が消えても続くスコープ
+) : ViewModel() {
+
+    /**
+     * 取得を開始するだけで、完了は待たない。
+     *
+     * viewModelScope ではなく applicationScope を使う。スプラッシュは遷移直後に
+     * バックスタックから外れ、その時点で viewModelScope はキャンセルされるため、
+     * 「バックグラウンドで取得を続ける」が成立しなくなる。
+     */
+    fun startInitialLoad() {
+        applicationScope.launch {
+            // 毎起動で151回叩かない。DBが空か、その日まだ更新していないときだけ取得する。
+            if (repository.isEmpty() || policy.shouldUpdate()) {
+                repository.refresh()
+                    .onSuccess { policy.recordSuccess() }
+                    .onFailure { Log.w(TAG, &quot;初期データの取得に失敗。保存済みデータで継続する&quot;, it) }
+            }
+        }
     }
 
     private companion object { const val TAG = &quot;SplashViewModel&quot; }
@@ -2115,6 +2187,9 @@ class AppContainer(context: Context) {
         .create(PokeApiService::class.java)
 
     val networkMonitor = NetworkMonitor(context)
+
+    /** 画面のライフサイクルから独立して走らせたい処理に使う */
+    val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     val pokemonRepository: PokemonRepository = DefaultPokemonRepository(
         api = api,
@@ -2651,7 +2726,11 @@ class UpdateService(
         repeat(MAX_RETRIES) { attempt -&gt;
             try {
                 return api.getPokemon(id).toEntity()
-            } catch (e: IOException) {
+            } catch (e: Exception) {
+                // 再試行して意味があるものだけ待つ。4xx はもう一度叩いても同じ。
+                val retryable = e is IOException ||
+                    (e is HttpException &amp;&amp; (e.code() == 429 || e.code() &gt;= 500))
+                if (!retryable) throw e
                 lastError = e
                 if (attempt &lt; MAX_RETRIES - 1) delay(RETRY_INTERVAL_MS)
             }
@@ -2811,7 +2890,14 @@ class DefaultPokemonRepository(
         if (!networkMonitor.isOnline.first()) {
             return Result.failure(OfflineException())
         }
-        return runCatching { updateService.update(onProgress) }.map { }
+        return runCatching { updateService.update(onProgress) }
+            .mapCatching { result -&gt;
+                // 1件も取れなければ失敗として返す。成功扱いにすると
+                // エラーが表示されず、自動更新も「済み」として記録されてしまう。
+                if (result.updated == 0 &amp;&amp; result.failed &gt; 0) {
+                    throw AppUpdateFailedException(result.failed)
+                }
+            }
     }
 
     override suspend fun getPokemonDetail(id: Int): Result&lt;PokemonDetail&gt; {
@@ -2849,7 +2935,9 @@ fun OfflineBanner(visible: Boolean, modifier: Modifier = Modifier) {
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
             ) {
                 Icon(
-                    // CloudOff は material-icons-extended が必要。core に含まれる Warning で代用する
+                    // CloudOff は material-icons-extended が必要なので Warning で代用する。
+                    // material3 1.4.0 以降、material-icons-core は推移依存に含まれないため、
+                    // 依存への明示的な追加が必要（環境構築ガイド 4 を参照）。
                     imageVector = Icons.Filled.Warning,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.onErrorContainer,
@@ -2891,6 +2979,12 @@ class DatabaseException(message: String, cause: Throwable?) : AppException(messa
     override val isRetryable = false
 }
 
+/** 更新を試みたが1件も取得できなかった */
+class AppUpdateFailedException(val failed: Int) :
+    AppException(&quot;データを取得できませんでした（%d件すべて失敗）&quot;.format(failed)) {
+    override val isRetryable = true
+}
+
 /** Retrofit / OkHttp の例外をアプリの例外に変換する */
 suspend fun &lt;T&gt; apiCall(block: suspend () -&gt; T): Result&lt;T&gt; =
     try {
@@ -2915,6 +3009,7 @@ fun Throwable.toUserMessage(): String = when (this) {
     }
     is SocketTimeoutException -&gt; &quot;通信がタイムアウトしました。再試行してください。&quot;
     is DatabaseException -&gt; &quot;データの読み書きに失敗しました。アプリを再起動してください。&quot;
+    is AppUpdateFailedException -&gt; &quot;データを取得できませんでした。通信環境を確認して再試行してください。&quot;
     else -&gt; &quot;予期しないエラーが発生しました。&quot;
 }</code></pre></figure>
 <h4 id="5-1-2-データベースエラー">5.1.2 データベースエラー</h4>
@@ -3027,7 +3122,7 @@ CREATE INDEX idx_cache_last_accessed ON pokemon_detail_cache(last_accessed);</co
     indices = [Index(&quot;name&quot;), Index(&quot;name_ja&quot;), Index(&quot;type1&quot;), Index(&quot;type2&quot;)],
 )
 data class PokemonEntity(/* ... */)</code></pre></figure>
-<blockquote>タイプを <code>type1</code> / <code>type2</code> に分けているのは、検索を等価比較にしてインデックスを効かせるためです。 JSON配列で持つと <code>LIKE &#x27;%&quot;grass&quot;%&#x27;</code> が必要になり、全件走査になります。</blockquote>
+<blockquote><p>タイプを <code>type1</code> / <code>type2</code> に分けているのは、検索を等価比較にしてインデックスを効かせるためです。JSON配列で持つと <code>LIKE &#x27;%&quot;grass&quot;%&#x27;</code> が必要になり、全件走査になります。</p></blockquote>
 <h4 id="6-2-2-バッチ処理最適化">6.2.2 バッチ処理最適化</h4>
 <figure class="code"><div class="code-head"><span>kotlin</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-kotlin">// 1件ずつ insert すると 151回のトランザクションになり、桁違いに遅くなる。
 // リストごと渡せば Room が1トランザクションにまとめる。
@@ -3187,7 +3282,8 @@ function highlight(code, lang){
   const marks = [];
   /* 退避用の番兵。コード中に現れない私用領域の文字を実行時に作る。 */
   const S0 = String.fromCharCode(0xE000), S1 = String.fromCharCode(0xE001);
-  const stash = (cls, txt) => S0 + (marks.push([cls, txt]) - 1) + S1;
+  // 番号の前に文字を置く。そうしないと数値の色付けが退避番号自体を拾ってしまう
+  const stash = (cls, txt) => S0 + "t" + (marks.push([cls, txt]) - 1) + S1;
   let s = code
     .replace(/(\/\/[^\n]*|--[^\n]*)/g, m => stash("tok-c", m))
     .replace(/("(?:[^"\\\n]|\\.)*"|'(?:[^'\\\n]|\\.)*')/g, m => stash("tok-s", m))
@@ -3195,7 +3291,7 @@ function highlight(code, lang){
   const kw = KEYWORDS[lang];
   if (kw) s = s.replace(kw, m => stash("tok-k", m));
   s = s.replace(/\b\d[\d_]*(?:\.\d+)?\b/g, m => stash("tok-n", m));
-  return s.replace(new RegExp(S0 + "(\\d+)" + S1, "g"), (_, i) => {
+  return s.replace(new RegExp(S0 + "t(\\d+)" + S1, "g"), (_, i) => {
     const [cls, txt] = marks[Number(i)];
     return '<span class="' + cls + '">' + txt + "</span>";
   });
@@ -3371,11 +3467,29 @@ applyHash();
     docs.forEach(d => { if (d.hidden) { d.hidden = false; d.classList.add("measuring"); } });
     try { await mermaid.run({nodes: blocks}); }
     catch (e) { console.warn("図の描画に失敗しました", e); }
+
+    // mermaid は width:100% を付けるため、横長の図が枠に合わせて潰れて読めなくなる。
+    // viewBox の実寸を与え直し、はみ出す分は figure 側で横スクロールさせる。
+    document.querySelectorAll("figure.diagram svg").forEach(svg => {
+      const vb = (svg.getAttribute("viewBox") || "").split(/\s+/);
+      const w = parseFloat(vb[2]);
+      if (!w) return;
+      svg.style.width = Math.round(w) + "px";
+      svg.style.maxWidth = "none";
+    });
     docs.forEach((d, i) => { d.classList.remove("measuring"); d.hidden = hiddenBefore[i]; });
 
     resettleAnchor();
   };
   script.onerror = () => {};   // 読み込めない環境では素のテキストのまま
   document.head.appendChild(script);
+
+  // OS のライト/ダーク切り替えに図の配色を追従させる
+  const mq = window.matchMedia("(prefers-color-scheme: dark)");
+  const onThemeChange = () => location.reload();
+  if (mq.addEventListener) mq.addEventListener("change", onThemeChange);
 })();
 </script>
+
+</body>
+</html>

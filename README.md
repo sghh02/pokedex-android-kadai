@@ -23,7 +23,7 @@
 
 1. このリポジトリを **Fork** する
 2. [環境構築ガイド](https://sghh02.github.io/pokedex-android-kadai/#05_環境構築ガイド) に沿って、clone からビルドが通るまで進める
-3. [Issues](../../issues) を `#1` から順に実装する
+3. [Issues](https://github.com/sghh02/pokedex-android-kadai/issues) を `#1` から順に実装する
 4. Issue ごとにブランチを切り、プルリクエストを作成する
 5. メンターに PR の URL を添えてレビューを依頼する
 6. LGTM をもらったら、その Issue は完了
@@ -32,7 +32,7 @@
 
 > **Issue は Fork にコピーされません**（GitHub の仕様です）。
 > 自分の Fork の Issues タブは空のままで問題ありません。実装タスクは
-> [このリポジトリの Issues](../../issues) を見てください。
+> [このリポジトリの Issues](https://github.com/sghh02/pokedex-android-kadai/issues) を見てください。
 >
 > また、Fork から PR を作ると **base repository は初期状態でこのリポジトリ**になります。
 > **自分の Fork に変更してから** Create pull request を押してください。
