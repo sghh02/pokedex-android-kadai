@@ -352,7 +352,7 @@ li.task input:checked+span{
 <li>LGTM をもらったら、その Issue は完了
 </li></ol>
 <p>各 Issue には受け入れ条件が付いています。すべて満たしてからレビューを依頼してください。</p>
-<div class="table-wrap"><table><thead><tr><th>週</th><th>Issue</th><th>やること</th></tr></thead><tbody><tr><td>1週目</td><td>#1 〜 #2</td><td>環境構築</td></tr><tr><td>2週目</td><td>#3 〜 #5</td><td>データレイヤー</td></tr><tr><td>3週目</td><td>#6 〜 #10</td><td>UIレイヤー（ここまでで必須要件を満たす）</td></tr><tr><td>4週目</td><td>#11 〜 #16</td><td>機能拡張・提出</td></tr></tbody></table></div>
+<div class="table-wrap"><table><thead><tr><th>週</th><th>Issue</th><th>やること</th></tr></thead><tbody><tr><td>1週目</td><td>#1 〜 #5</td><td>環境構築（1〜2日）とデータレイヤー</td></tr><tr><td>2週目</td><td>#6 〜 #10</td><td>UIレイヤー（ここまでで必須要件を満たす）</td></tr><tr><td>3週目</td><td>#11 〜 #14</td><td>機能拡張</td></tr><tr><td>4週目</td><td>#15 〜 #16</td><td>テストと提出物</td></tr></tbody></table></div>
 <p><code>#1</code> 〜 <code>#10</code> が必須要件（70点）、<code>#11</code> 〜 <code>#14</code> が加点要件（+30点）、<code>#15</code> がボーナス、<code>#16</code> が提出物です。</p>
 <h2 id="素材">素材</h2>
 <ul>
@@ -364,9 +364,8 @@ li.task input:checked+span{
 </li></ul>
 <p>01・02 の末尾には、要件定義・基本設計という工程そのものの解説を付録として収録しています。</p></section>
 <section class="doc" id="doc-1" data-file="05_環境構築ガイド.md" hidden><h1 id="環境構築ガイド">環境構築ガイド</h1>
-<p><a class="lnk ext" href="https://github.com/sghh02/pokedex-android-kadai/issues" target="_blank" rel="noopener">Issue</a> の <code>#1</code> と <code>#2</code> を進めるための手順です。ここまで通れば、以降の Issue は実装に集中できます。</p>
+<p><a class="lnk ext" href="https://github.com/sghh02/pokedex-android-kadai/issues" target="_blank" rel="noopener">Issue</a> の <code>#1</code> と <code>#2</code> を進めるための手順です。<strong>1〜2日で終わります。</strong> プロジェクトの雛形とビルド設定は同梱済みなので、Fork してビルドを通し、PokeAPI に繋がることを確かめるところまでです。</p>
 <h2 id="1-前提">1. 前提</h2>
-<blockquote><p>この構成は実際にビルドして確認しています（Gradle 9.4.1 / AGP 9.2.1 / Kotlin 2.2.10 /KSP 2.2.10-2.0.2 / Room 2.8.4 / Retrofit 3.0.0 / Coil 3.3.0、<code>compileDebugKotlin</code> 成功）。</p></blockquote>
 <div class="table-wrap"><table><thead><tr><th>項目</th><th>要件</th></tr></thead><tbody><tr><td>Android Studio</td><td>最新の安定版</td></tr><tr><td>JDK</td><td>Android Studio 同梱の JDK（17以上）</td></tr><tr><td>確認端末</td><td>エミュレータ（API 26 以上）または実機</td></tr></tbody></table></div>
 <h2 id="2-リポジトリを-fork-して手元に置く">2. リポジトリを Fork して手元に置く</h2>
 <h3 id="2-1-fork-とは">2.1 Fork とは</h3>
@@ -429,190 +428,42 @@ git config --global user.email &quot;you@example.com&quot;</code></pre></figure>
 <figure class="code"><div class="code-head"><span>bash</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-bash">git switch -c feature/1-setup</code></pre></figure>
 <p>ブランチ名は <code>feature/&lt;Issue番号&gt;-&lt;内容&gt;</code> の形にすると、どの Issue の作業か一目で分かります。<code>feature/3-room</code>、<code>feature/7-list-screen</code> のように。</p>
 <p>以降は <strong>1 Issue = 1 ブランチ = 1 プルリクエスト</strong>で進めます。<code>.gitignore</code> は用意済みなので、ビルド成果物や署名鍵は自動的に除外されます。</p>
-<h2 id="3-プロジェクトを作る">3. プロジェクトを作る</h2>
-<p>Android Studio の <strong>New Project</strong> は空のディレクトリにしか作れません。別の場所に作ってから、clone したディレクトリへ移します。</p>
+<h2 id="3-ビルドを通す">3. ビルドを通す</h2>
+<p><strong>プロジェクトの雛形はリポジトリに同梱済みです。</strong> 作る必要はありません。</p>
 <ol>
-<li>Android Studio で <strong>New Project → Empty Activity</strong>（Compose のテンプレート）を選ぶ
+<li>Android Studio で <strong>Open</strong> を選び、clone したディレクトリを開く
 </li>
-<li>設定値
+<li>Gradle の同期が終わるまで待つ（初回は依存のダウンロードで数分かかります）
+</li>
+<li><strong>Run</strong> を押してエミュレータまたは実機で起動する
+</li></ol>
+<p><code>Pokédex</code> とだけ表示された画面が出れば成功です。ここから作り始めます。</p>
+<p>同期でつまずいたら、コマンドラインでも同じことができます。</p>
+<figure class="code"><div class="code-head"><span>bash</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-bash">./gradlew assembleDebug</code></pre></figure>
+<blockquote><p><strong><code>local.properties</code> は作られていますか。</strong> Android Studio で開けば自動生成されます。コマンドラインだけで進める場合は、自分で作って SDK の場所を書いてください。</p>
+<figure class="code"><div class="code-head"><span>text</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-text">sdk.dir=/Users/&lt;自分のユーザー名&gt;/Library/Android/sdk</code></pre></figure></blockquote>
+<h2 id="4-同梱されている設定">4. 同梱されている設定</h2>
+<p>自分で書く必要はありませんが、何が入っているかは知っておいてください。<code>gradle/libs.versions.toml</code> と <code>app/build.gradle.kts</code> にまとまっています。</p>
+<div class="table-wrap"><table><thead><tr><th>ライブラリ</th><th>何に使うか</th><th>使う Issue</th></tr></thead><tbody><tr><td>Room</td><td>ローカルDB。<code>room-compiler</code> は KSP 経由</td><td>#3 以降</td></tr><tr><td>Retrofit + OkHttp</td><td>PokeAPI との通信。ログは <code>logging-interceptor</code></td><td>#2 以降</td></tr><tr><td>Kotlinx Serialization</td><td>JSON の変換</td><td>#2 以降</td></tr><tr><td>Coil</td><td>画像の読み込み。<code>coil-compose</code> と <code>coil-network-okhttp</code> の<strong>両方</strong>が要る</td><td>#7</td></tr><tr><td>Navigation Compose</td><td>画面遷移</td><td>#9</td></tr><tr><td>Lifecycle（ViewModel / runtime-compose）</td><td>ViewModel と <code>collectAsStateWithLifecycle</code></td><td>#7 以降</td></tr><tr><td>DataStore</td><td>最終更新日の保存</td><td>#14</td></tr><tr><td>material-icons-core</td><td><code>Icons.Filled</code> など</td><td>#8, #10</td></tr><tr><td>Robolectric ほか</td><td>JVM 上でのテスト</td><td>#3, #5, #15</td></tr></tbody></table></div>
+<h3 id="バージョンを触るときの注意">バージョンを触るときの注意</h3>
+<p>3つが互いに噛み合っている構成です。動いているうちは変えないでください。</p>
 <ul>
-<li>Name: <code>Pokedex</code>
-</li>
-<li>Package name: <code>com.example.pokedex</code>
-</li>
-<li>Language: Kotlin
-</li>
-<li><strong>Minimum SDK: API 26（Android 8.0）</strong> — 要件定義の対応OSに合わせる
-</li>
-<li>Location: 一時的な場所でよい（例: <code>~/tmp/Pokedex</code>）
+<li><strong>KSP は Kotlin と対</strong>です。<code>2.2.10-2.0.2</code> のように <code>&lt;Kotlinのバージョン&gt;-&lt;KSPのビルド番号&gt;</code> の形で、
 </li></ul>
-</li>
-<li>生成されたファイルを、clone したディレクトリの直下へ移す
-</li></ol>
-<p><strong>macOS / Linux</strong></p>
-<figure class="code"><div class="code-head"><span>bash</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-bash"># clone したディレクトリで実行する。.git と .gitignore は上書きしない
-rsync -a --exclude .git --exclude .gitignore ~/tmp/Pokedex/ .
-rm -rf ~/tmp/Pokedex</code></pre></figure>
-<p><strong>Windows（PowerShell）</strong></p>
-<figure class="code"><div class="code-head"><span>powershell</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-powershell"># clone したディレクトリで実行する
-Get-ChildItem &quot;$HOME\tmp\Pokedex&quot; -Force |
-  Where-Object { $_.Name -ne &quot;.git&quot; -and $_.Name -ne &quot;.gitignore&quot; } |
-  Copy-Item -Destination . -Recurse -Force
-Remove-Item &quot;$HOME\tmp\Pokedex&quot; -Recurse -Force</code></pre></figure>
-<p>エクスプローラや Finder で手作業でコピーしても構いません。その場合も <strong><code>.git</code> と <code>.gitignore</code> は上書きしない</strong>でください。<code>.gitignore</code> はこのリポジトリ用に用意したもので、Android Studio が生成する版より除外設定が広く、署名鍵の混入を防ぎます。</p>
-<ol>
-<li>Android Studio で clone したディレクトリを <strong>Open</strong> し直し、ビルドが通ることを確認する
-</li></ol>
-<blockquote><p><code>minSdk</code> を 26 にすることで <code>java.time</code>（<code>LocalDate</code> / <code>LocalTime</code>）がdesugaring なしで使えます。</p></blockquote>
-<h2 id="4-依存の追加">4. 依存の追加</h2>
-<h3 id="バージョンの扱い">バージョンの扱い</h3>
-<p><strong>Kotlin / AGP / Compose のバージョンは、ウィザードが生成したものをそのまま使ってください。</strong>この3つは互いに強く結合しており、手で差し替えると噛み合わなくなります。</p>
-<p>一方、以下に挙げるライブラリは比較的独立しているので、明示的に追加します。記載のバージョンは執筆時点の安定版です。Android Studio が更新を提案してきたら従って構いません。</p>
-<blockquote><p><strong>KSP のバージョンは Kotlin と対で決まります。</strong> <code>2.2.10-2.0.2</code> のように<code>&lt;Kotlinのバージョン&gt;-&lt;KSPのビルド番号&gt;</code> の形です。前半をウィザードが生成した<code>kotlin</code> に合わせてください。単独の採番（<code>2.3.11</code> など）を指定すると、Kotlin と噛み合わずビルドが通りません。対応表は<a class="lnk ext" href="https://github.com/google/ksp/releases" target="_blank" rel="noopener">KSP のリリース一覧</a>にあります。</p></blockquote>
-<h3 id="gradle-libs-versions-toml"><code>gradle/libs.versions.toml</code></h3>
-<blockquote><p><strong>既存のファイルへの「追記」です。</strong> ウィザードが生成した <code>agp</code> / <code>kotlin</code> /<code>composeBom</code> などの行は消さずに残してください。消すとビルドが通らなくなります。</p></blockquote>
-<figure class="code"><div class="code-head"><span>toml</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-toml">[versions]
-# ↓ 既存の行はそのまま。以下を追記する
-# ksp は kotlin と対で決まる。前半をウィザードが書いた kotlin に合わせること
-ksp = &quot;2.2.10-2.0.2&quot;
-room = &quot;2.8.4&quot;
-coroutines = &quot;1.10.2&quot;
-androidxTest = &quot;1.7.0&quot;
-robolectric = &quot;4.16&quot;
-retrofit = &quot;3.0.0&quot;
-okhttp = &quot;5.5.0&quot;
-kotlinxSerialization = &quot;1.11.0&quot;
-coil = &quot;3.3.0&quot;
-navigation = &quot;2.10.0&quot;
-lifecycle = &quot;2.11.0&quot;
-datastore = &quot;1.2.1&quot;
-
-[libraries]
-room-runtime  = { module = &quot;androidx.room:room-runtime&quot;,  version.ref = &quot;room&quot; }
-room-ktx      = { module = &quot;androidx.room:room-ktx&quot;,      version.ref = &quot;room&quot; }
-room-compiler = { module = &quot;androidx.room:room-compiler&quot;, version.ref = &quot;room&quot; }
-room-testing  = { module = &quot;androidx.room:room-testing&quot;,  version.ref = &quot;room&quot; }
-
-retrofit                 = { module = &quot;com.squareup.retrofit2:retrofit&quot;, version.ref = &quot;retrofit&quot; }
-retrofit-serialization   = { module = &quot;com.squareup.retrofit2:converter-kotlinx-serialization&quot;, version.ref = &quot;retrofit&quot; }
-okhttp-logging           = { module = &quot;com.squareup.okhttp3:logging-interceptor&quot;, version.ref = &quot;okhttp&quot; }
-kotlinx-serialization-json = { module = &quot;org.jetbrains.kotlinx:kotlinx-serialization-json&quot;, version.ref = &quot;kotlinxSerialization&quot; }
-
-coil-compose        = { module = &quot;io.coil-kt.coil3:coil-compose&quot;,        version.ref = &quot;coil&quot; }
-coil-network-okhttp = { module = &quot;io.coil-kt.coil3:coil-network-okhttp&quot;, version.ref = &quot;coil&quot; }
-
-navigation-compose        = { module = &quot;androidx.navigation:navigation-compose&quot;, version.ref = &quot;navigation&quot; }
-lifecycle-viewmodel-compose = { module = &quot;androidx.lifecycle:lifecycle-viewmodel-compose&quot;, version.ref = &quot;lifecycle&quot; }
-lifecycle-runtime-compose   = { module = &quot;androidx.lifecycle:lifecycle-runtime-compose&quot;,   version.ref = &quot;lifecycle&quot; }
-datastore-preferences       = { module = &quot;androidx.datastore:datastore-preferences&quot;,       version.ref = &quot;datastore&quot; }
-
-# アイコン。material3 1.4.0 以降、これは推移依存に含まれないので明示的に追加する
-compose-material-icons-core = { module = &quot;androidx.compose.material:material-icons-core&quot; }
-
-# テスト（Issue #3 / #5 / #15 の受け入れ条件で使う）
-kotlinx-coroutines-test = { module = &quot;org.jetbrains.kotlinx:kotlinx-coroutines-test&quot;, version.ref = &quot;coroutines&quot; }
-androidx-test-core      = { module = &quot;androidx.test:core&quot;,   version.ref = &quot;androidxTest&quot; }
-robolectric             = { module = &quot;org.robolectric:robolectric&quot;, version.ref = &quot;robolectric&quot; }
-
-[plugins]
-# android-application / kotlin-compose はウィザードが生成済みなのでそのまま残す。
-# 追記するのは次の2つだけ。
-# version.ref = &quot;kotlin&quot; は、ウィザードが [versions] に書いた kotlin を参照する。
-kotlin-serialization = { id = &quot;org.jetbrains.kotlin.plugin.serialization&quot;, version.ref = &quot;kotlin&quot; }
-ksp                  = { id = &quot;com.google.devtools.ksp&quot;,                   version.ref = &quot;ksp&quot; }</code></pre></figure>
-<blockquote><p><strong>Coil 3 は artifact が2つに分かれています。</strong> <code>coil-compose</code> だけではネットワーク画像を読み込めません。<code>coil-network-okhttp</code> も必ず追加してください。ここを忘れて「画像が表示されない」で止まる人が多い箇所です。</p>
-<p><strong>Coil のバージョンは Kotlin を選びます。</strong> 新しい Coil ほど新しい Kotlin を要求します。ウィザードが生成した Kotlin が 2.2 系なら 3.3.0、2.3 系なら 3.4.0 まで。合っていないと <code>Module was compiled with an incompatible version of Kotlin</code> という分かりにくいエラーで止まります。</p></blockquote>
-<h3 id="ルートの-build-gradle-kts">ルートの <code>build.gradle.kts</code></h3>
-<p>追加した2つのプラグインを、ルートで宣言します（<code>apply false</code> を付けるのがポイントです）。</p>
-<figure class="code"><div class="code-head"><span>kotlin</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-kotlin">plugins {
-    // ↓ ウィザードが生成した行はそのまま
-    alias(libs.plugins.android.application) apply false
-    alias(libs.plugins.kotlin.compose) apply false
-
-    // ↓ ここから追記
-    alias(libs.plugins.kotlin.serialization) apply false
-    alias(libs.plugins.ksp) apply false
-}</code></pre></figure>
-<h3 id="app-build-gradle-kts"><code>app/build.gradle.kts</code></h3>
-<blockquote><p>ここも<strong>追記</strong>です。ウィザードが生成した <code>compileSdk</code> / <code>targetSdk</code> /<code>composeOptions</code> などの行はそのまま残してください。</p>
-<p><code>plugins</code> ブロックも<strong>追記</strong>です。ウィザードが書いた行はそのまま残し、下2行だけを足してください。<strong><code>kotlin.android</code> を自分で足さないこと。</strong>AGP 9 以降は Kotlin を内蔵しており、重ねて適用すると<code>Cannot add extension with name &#x27;kotlin&#x27;</code> で失敗します。</p></blockquote>
-<figure class="code"><div class="code-head"><span>kotlin</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-kotlin">plugins {
-    // ↓ ウィザードが生成した行（環境によって内容が違う。触らない）
-    alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.compose)
-
-    // ↓ ここから追記
-    alias(libs.plugins.kotlin.serialization)   // JSON の変換に必要
-    alias(libs.plugins.ksp)                    // Room のコード生成に必要
-}
-
-android {
-    namespace = &quot;com.example.pokedex&quot;
-
-    testOptions {
-        unitTests.isIncludeAndroidResources = true   // Robolectric に必要
-    }
-    defaultConfig {
-        minSdk = 26
-    }
-    buildFeatures {
-        compose = true
-        buildConfig = true      // BuildConfig.DEBUG でログ出力を切り替えるために必要
-    }
-}
-
-dependencies {
-    implementation(libs.room.runtime)
-    implementation(libs.room.ktx)
-    ksp(libs.room.compiler)
-
-    implementation(libs.retrofit)
-    implementation(libs.retrofit.serialization)
-    implementation(libs.okhttp.logging)
-    implementation(libs.kotlinx.serialization.json)
-
-    implementation(libs.coil.compose)
-    implementation(libs.coil.network.okhttp)
-
-    implementation(libs.navigation.compose)
-    implementation(libs.lifecycle.viewmodel.compose)
-    implementation(libs.lifecycle.runtime.compose)      // collectAsStateWithLifecycle
-    implementation(libs.datastore.preferences)
-    implementation(libs.compose.material.icons.core)   // Icons.Filled / Icons.AutoMirrored
-
-    // テスト。Room の in-memory テストは Android の Context が要るため
-    // Robolectric を使い、JVM 上（./gradlew test）で実行できるようにする。
-    testImplementation(libs.room.testing)
-    testImplementation(libs.kotlinx.coroutines.test)
-    testImplementation(libs.androidx.test.core)
-    testImplementation(libs.robolectric)
-}</code></pre></figure>
-<p><code>libs.plugins.ksp</code> は <code>[plugins]</code> に宣言した ID から解決されます。<code>Plugin [id: &#x27;com.google.devtools.ksp&#x27;] was not found</code> と出たら、ルートの <code>build.gradle.kts</code> への <code>apply false</code> 付きの宣言を忘れていないか確認してください。</p>
+<p>前半が Kotlin と一致している必要があります。</p>
+<ul>
+<li><strong>Coil は Kotlin のバージョンを選びます。</strong> Kotlin 2.2 系なら Coil 3.3.0 まで、2.3 系なら 3.4.0 まで。
+</li></ul>
+<p>合っていないと <code>Module was compiled with an incompatible version of Kotlin</code> で止まります。</p>
+<ul>
+<li><strong><code>compileSdk</code> は 37 以上</strong>が必要です。Navigation Compose 2.10.0 が要求します。
+</li></ul>
+<blockquote><p>この構成は実際にビルドして確認しています（Gradle 9.4.1 / AGP 9.2.1 / Kotlin 2.2.10 / KSP 2.2.10-2.0.2 / Room 2.8.4 /Retrofit 3.0.0 / Coil 3.3.0 → <code>assembleDebug</code> 成功、<code>test</code> 成功）。</p></blockquote>
 <h2 id="5-androidmanifest-xml">5. <code>AndroidManifest.xml</code></h2>
-<figure class="code"><div class="code-head"><span>xml</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-xml">&lt;manifest xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;&gt;
-
-    &lt;!-- PokeAPI との通信に必要 --&gt;
-    &lt;uses-permission android:name=&quot;android.permission.INTERNET&quot; /&gt;
-    &lt;!-- オフライン判定（NetworkMonitor）に必要 --&gt;
-    &lt;uses-permission android:name=&quot;android.permission.ACCESS_NETWORK_STATE&quot; /&gt;
-
-    &lt;application
-        android:name=&quot;.PokedexApplication&quot;
-        android:icon=&quot;@mipmap/ic_launcher&quot;
-        android:label=&quot;@string/app_name&quot;
-        android:theme=&quot;@style/Theme.Pokedex&quot;&gt;
-
-        &lt;activity
-            android:name=&quot;.MainActivity&quot;
-            android:exported=&quot;true&quot;&gt;
-            &lt;intent-filter&gt;
-                &lt;action android:name=&quot;android.intent.action.MAIN&quot; /&gt;
-                &lt;category android:name=&quot;android.intent.category.LAUNCHER&quot; /&gt;
-            &lt;/intent-filter&gt;
-        &lt;/activity&gt;
-    &lt;/application&gt;
-&lt;/manifest&gt;</code></pre></figure>
-<p><code>android:name=&quot;.PokedexApplication&quot;</code> の指定を忘れると、<code>AppContainer</code> が生成されず<code>lateinit property container has not been initialized</code> で落ちます。</p>
+<p>同梱済みです。通信とオフライン判定に必要な権限は最初から入っています。</p>
+<figure class="code"><div class="code-head"><span>xml</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-xml">&lt;uses-permission android:name=&quot;android.permission.INTERNET&quot; /&gt;
+&lt;uses-permission android:name=&quot;android.permission.ACCESS_NETWORK_STATE&quot; /&gt;</code></pre></figure>
+<p><strong>1箇所だけ、後で自分で足します。</strong> Issue <code>#5</code> で <code>AppContainer</code> を用意するとき、<code>&lt;application&gt;</code> タグに <code>android:name=&quot;.PokedexApplication&quot;</code> を追加してください。忘れると <code>lateinit property container has not been initialized</code> で落ちます。</p>
 <h2 id="6-パッケージ構成">6. パッケージ構成</h2>
 <figure class="code"><div class="code-head"><span>text</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-text">com.example.pokedex
 ├── MainActivity.kt
@@ -861,16 +712,15 @@ CREATE INDEX idx_cache_last_accessed ON pokemon_detail_cache(last_accessed);</co
 <p>具体的な依存の書き方は<a class="lnk" href="#05_環境構築ガイド" data-doc="05_環境構築ガイド.md">環境構築ガイド</a>にあります。</p>
 <h2 id="7-実装手順">7. 実装手順</h2>
 <p>4週間で完成する構成です。各週の作業は <a class="lnk ext" href="https://github.com/sghh02/pokedex-android-kadai/issues" target="_blank" rel="noopener">GitHub Issues</a> の Issue に対応します。</p>
-<div class="table-wrap"><table><thead><tr><th>週</th><th>作業</th><th>Issue</th></tr></thead><tbody><tr><td>1週目</td><td>環境構築</td><td>#1 〜 #2</td></tr><tr><td>2週目</td><td>データレイヤー実装</td><td>#3 〜 #5</td></tr><tr><td>3週目</td><td>UIレイヤー実装</td><td>#6 〜 #10</td></tr><tr><td>4週目</td><td>機能拡張・提出</td><td>#11 〜 #16</td></tr></tbody></table></div>
-<h3 id="7-1-step-1-環境構築-1週目">7.1 Step 1: 環境構築（1週目）</h3>
+<div class="table-wrap"><table><thead><tr><th>週</th><th>作業</th><th>Issue</th></tr></thead><tbody><tr><td>1週目</td><td>環境構築（1〜2日）とデータレイヤー</td><td>#1 〜 #5</td></tr><tr><td>2週目</td><td>UIレイヤー</td><td>#6 〜 #10</td></tr><tr><td>3週目</td><td>機能拡張</td><td>#11 〜 #14</td></tr><tr><td>4週目</td><td>テストと提出物</td><td>#15 〜 #16</td></tr></tbody></table></div>
+<h3 id="7-1-step-1-環境構築-1週目・1-2日">7.1 Step 1: 環境構築（1週目・1〜2日）</h3>
+<p>プロジェクトの雛形とビルド設定はリポジトリに同梱済みです。</p>
 <ol>
-<li>Android Studio で Empty Compose Activity プロジェクトを作成（<code>minSdk</code> 26）
-</li>
-<li>Room / Retrofit / Coil / Navigation の依存を追加し、ビルドを通す
+<li>Fork して clone し、Android Studio で開いてビルドを通す
 </li>
 <li>Retrofit で PokeAPI の一覧エンドポイントを叩き、レスポンスをログ出力して疎通確認
 </li></ol>
-<h3 id="7-2-step-2-データレイヤー実装-2週目">7.2 Step 2: データレイヤー実装（2週目）</h3>
+<h3 id="7-2-step-2-データレイヤー実装-1週目の残り">7.2 Step 2: データレイヤー実装（1週目の残り）</h3>
 <ol>
 <li>Room の Entity / DAO / Database を実装
 </li>
@@ -878,7 +728,7 @@ CREATE INDEX idx_cache_last_accessed ON pokemon_detail_cache(last_accessed);</co
 </li>
 <li><code>PokemonRepository</code> を実装（API取得 → DB保存 → DBから読み出し）
 </li></ol>
-<h3 id="7-3-step-3-uiレイヤー実装-3週目">7.3 Step 3: UIレイヤー実装（3週目）</h3>
+<h3 id="7-3-step-3-uiレイヤー実装-2週目">7.3 Step 3: UIレイヤー実装（2週目）</h3>
 <ol>
 <li>スプラッシュ画面（初期化とデータ取得の起点）
 </li>
@@ -886,7 +736,7 @@ CREATE INDEX idx_cache_last_accessed ON pokemon_detail_cache(last_accessed);</co
 </li>
 <li>詳細画面と Navigation Compose による画面遷移
 </li></ol>
-<h3 id="7-4-step-4-機能拡張-4週目">7.4 Step 4: 機能拡張（4週目）</h3>
+<h3 id="7-4-step-4-機能拡張-3週目">7.4 Step 4: 機能拡張（3週目）</h3>
 <ol>
 <li>ローディング表示・エラーハンドリング・Pull to refresh（#11）
 </li>
@@ -895,6 +745,12 @@ CREATE INDEX idx_cache_last_accessed ON pokemon_detail_cache(last_accessed);</co
 <li>詳細情報の拡張（日本語名・特性・進化チェーン）（#13）
 </li>
 <li>設定画面・起動時の自動更新・手動更新（#14）
+</li></ol>
+<h3 id="7-5-step-5-テストと提出-4週目">7.5 Step 5: テストと提出（4週目）</h3>
+<ol>
+<li>ユニットテスト（#15）
+</li>
+<li>README・実行動画・振り返りレポート（#16）
 </li></ol>
 <h2 id="8-評価基準">8. 評価基準</h2>
 <h3 id="8-1-必須要件-70点">8.1 必須要件（70点）</h3>
@@ -3217,7 +3073,7 @@ suspend fun replaceAll(pokemon: List&lt;PokemonEntity&gt;) {
 </div>
 
 <script>
-const NAV = [{"id": "doc-0", "file": "README.md", "label": "はじめに", "blurb": "課題の全体像と進め方", "toc": [{"lv": 2, "text": "何を作るのか", "id": "何を作るのか"}, {"lv": 2, "text": "どう作るのか", "id": "どう作るのか"}, {"lv": 2, "text": "今回どこまで作るのか", "id": "今回どこまで作るのか"}, {"lv": 2, "text": "手を動かす", "id": "手を動かす"}, {"lv": 2, "text": "実装する", "id": "実装する"}, {"lv": 2, "text": "素材", "id": "素材"}]}, {"id": "doc-1", "file": "05_環境構築ガイド.md", "label": "環境構築", "blurb": "プロジェクト作成から疎通確認まで", "toc": [{"lv": 2, "text": "1. 前提", "id": "1-前提"}, {"lv": 2, "text": "2. リポジトリを Fork して手元に置く", "id": "2-リポジトリを-fork-して手元に置く"}, {"lv": 3, "text": "2.1 Fork とは", "id": "2-1-fork-とは"}, {"lv": 3, "text": "2.2 Fork する", "id": "2-2-fork-する"}, {"lv": 3, "text": "2.3 clone して手元に持ってくる", "id": "2-3-clone-して手元に持ってくる"}, {"lv": 3, "text": "2.4 push できるようにする", "id": "2-4-push-できるようにする"}, {"lv": 3, "text": "2.5 コミットに使う名前を設定する", "id": "2-5-コミットに使う名前を設定する"}, {"lv": 3, "text": "2.6 作業ブランチを切る", "id": "2-6-作業ブランチを切る"}, {"lv": 2, "text": "3. プロジェクトを作る", "id": "3-プロジェクトを作る"}, {"lv": 2, "text": "4. 依存の追加", "id": "4-依存の追加"}, {"lv": 3, "text": "バージョンの扱い", "id": "バージョンの扱い"}, {"lv": 3, "text": "gradle/libs.versions.toml", "id": "gradle-libs-versions-toml"}, {"lv": 3, "text": "ルートの build.gradle.kts", "id": "ルートの-build-gradle-kts"}, {"lv": 3, "text": "app/build.gradle.kts", "id": "app-build-gradle-kts"}, {"lv": 2, "text": "5. AndroidManifest.xml", "id": "5-androidmanifest-xml"}, {"lv": 2, "text": "6. パッケージ構成", "id": "6-パッケージ構成"}, {"lv": 2, "text": "7. 疎通確認（#2）", "id": "7-疎通確認-2"}, {"lv": 2, "text": "8. プルリクエストを出す", "id": "8-プルリクエストを出す"}, {"lv": 3, "text": "8.1 コミットして push する", "id": "8-1-コミットして-push-する"}, {"lv": 3, "text": "8.2 プルリクエストを作る", "id": "8-2-プルリクエストを作る"}, {"lv": 3, "text": "8.3 本文を書く", "id": "8-3-本文を書く"}, {"lv": 3, "text": "8.4 レビューを依頼する", "id": "8-4-レビューを依頼する"}, {"lv": 2, "text": "9. テストの書き方", "id": "9-テストの書き方"}, {"lv": 2, "text": "10. よくあるつまずき", "id": "10-よくあるつまずき"}]}, {"id": "doc-2", "file": "04_実装仕様.md", "label": "実装仕様", "blurb": "スコープ・技術スタック・評価基準", "toc": [{"lv": 2, "text": "1. 学習目標", "id": "1-学習目標"}, {"lv": 2, "text": "2. アーキテクチャ", "id": "2-アーキテクチャ"}, {"lv": 3, "text": "2.1 レイヤー構成", "id": "2-1-レイヤー構成"}, {"lv": 3, "text": "2.2 主要コンポーネント", "id": "2-2-主要コンポーネント"}, {"lv": 3, "text": "2.3 実装の共通ルール", "id": "2-3-実装の共通ルール"}, {"lv": 2, "text": "3. 機能仕様", "id": "3-機能仕様"}, {"lv": 3, "text": "3.1 Phase 1: 基本機能（必須）", "id": "3-1-phase-1-基本機能-必須"}, {"lv": 3, "text": "3.2 Phase 2: 拡張機能（加点）", "id": "3-2-phase-2-拡張機能-加点"}, {"lv": 2, "text": "4. データベース設計", "id": "4-データベース設計"}, {"lv": 2, "text": "5. PokeAPI の実装上の注意", "id": "5-pokeapi-の実装上の注意"}, {"lv": 2, "text": "6. 技術スタック", "id": "6-技術スタック"}, {"lv": 3, "text": "6.1 加点対象（任意）", "id": "6-1-加点対象-任意"}, {"lv": 3, "text": "6.2 ビルド設定", "id": "6-2-ビルド設定"}, {"lv": 2, "text": "7. 実装手順", "id": "7-実装手順"}, {"lv": 3, "text": "7.1 Step 1: 環境構築（1週目）", "id": "7-1-step-1-環境構築-1週目"}, {"lv": 3, "text": "7.2 Step 2: データレイヤー実装（2週目）", "id": "7-2-step-2-データレイヤー実装-2週目"}, {"lv": 3, "text": "7.3 Step 3: UIレイヤー実装（3週目）", "id": "7-3-step-3-uiレイヤー実装-3週目"}, {"lv": 3, "text": "7.4 Step 4: 機能拡張（4週目）", "id": "7-4-step-4-機能拡張-4週目"}, {"lv": 2, "text": "8. 評価基準", "id": "8-評価基準"}, {"lv": 3, "text": "8.1 必須要件（70点）", "id": "8-1-必須要件-70点"}, {"lv": 3, "text": "8.2 高評価要件（+30点）", "id": "8-2-高評価要件-30点"}, {"lv": 3, "text": "8.3 ボーナス要件（+α）", "id": "8-3-ボーナス要件-α"}, {"lv": 2, "text": "9. 提出要件", "id": "9-提出要件"}, {"lv": 2, "text": "関連リソース", "id": "関連リソース"}]}, {"id": "doc-3", "file": "01_要件定義.md", "label": "要件定義", "blurb": "目的・機能要件・非機能要件", "toc": [{"lv": 2, "text": "1. 目的・ターゲットユーザー・スコープ", "id": "1-目的・ターゲットユーザー・スコープ"}, {"lv": 3, "text": "目的", "id": "目的"}, {"lv": 3, "text": "ターゲットユーザー", "id": "ターゲットユーザー"}, {"lv": 3, "text": "スコープ", "id": "スコープ"}, {"lv": 3, "text": "今回の開発で除外する機能", "id": "今回の開発で除外する機能"}, {"lv": 2, "text": "2. 機能要件", "id": "2-機能要件"}, {"lv": 3, "text": "2.1 ポケモン図鑑の機能", "id": "2-1-ポケモン図鑑の機能"}, {"lv": 3, "text": "2.2 オフライン機能", "id": "2-2-オフライン機能"}, {"lv": 3, "text": "2.3 新情報掲示板（次フェーズの開発スコープ）", "id": "2-3-新情報掲示板-次フェーズの開発スコープ"}, {"lv": 2, "text": "3. UI/UX要件", "id": "3-ui-ux要件"}, {"lv": 2, "text": "4. データ要件", "id": "4-データ要件"}, {"lv": 2, "text": "5. パフォーマンス要件", "id": "5-パフォーマンス要件"}, {"lv": 2, "text": "6. セキュリティ要件", "id": "6-セキュリティ要件"}, {"lv": 2, "text": "7. 非機能要件", "id": "7-非機能要件"}, {"lv": 2, "text": "8. スケジュールとマイルストーン", "id": "8-スケジュールとマイルストーン"}, {"lv": 2, "text": "9. フェーズ2開発計画（参考情報）", "id": "9-フェーズ2開発計画-参考情報"}, {"lv": 2, "text": "付録: 要件定義とは", "id": "付録-要件定義とは"}, {"lv": 3, "text": "要件定義の目的", "id": "要件定義の目的"}, {"lv": 3, "text": "要件定義のプロセス", "id": "要件定義のプロセス"}, {"lv": 3, "text": "要件定義書に含まれる内容", "id": "要件定義書に含まれる内容"}, {"lv": 3, "text": "要件定義の重要性", "id": "要件定義の重要性"}, {"lv": 3, "text": "未経験者が知っておくべきポイント", "id": "未経験者が知っておくべきポイント"}]}, {"id": "doc-4", "file": "02_基本設計.md", "label": "基本設計", "blurb": "システム構成・画面設計・IF設計", "toc": [{"lv": 2, "text": "1. はじめに", "id": "1-はじめに"}, {"lv": 2, "text": "2. 機能設計", "id": "2-機能設計"}, {"lv": 3, "text": "2.1 システム方式設計", "id": "2-1-システム方式設計"}, {"lv": 3, "text": "2.2 画面設計", "id": "2-2-画面設計"}, {"lv": 3, "text": "2.3 外部インターフェース設計", "id": "2-3-外部インターフェース設計"}, {"lv": 3, "text": "2.4 内部インターフェース定義", "id": "2-4-内部インターフェース定義"}, {"lv": 3, "text": "2.5 パフォーマンス設計", "id": "2-5-パフォーマンス設計"}, {"lv": 3, "text": "2.6 テスト計画", "id": "2-6-テスト計画"}, {"lv": 3, "text": "2.7 セキュリティ設計", "id": "2-7-セキュリティ設計"}, {"lv": 3, "text": "2.8 運用・保守計画", "id": "2-8-運用・保守計画"}, {"lv": 2, "text": "付録: 基本設計とは", "id": "付録-基本設計とは"}, {"lv": 3, "text": "開発プロジェクトとは", "id": "開発プロジェクトとは"}, {"lv": 3, "text": "基本設計の位置づけ", "id": "基本設計の位置づけ"}, {"lv": 3, "text": "基本設計のプロセス", "id": "基本設計のプロセス"}, {"lv": 3, "text": "基本設計の成果物", "id": "基本設計の成果物"}, {"lv": 3, "text": "基本設計の重要性", "id": "基本設計の重要性"}, {"lv": 3, "text": "まとめ", "id": "まとめ"}]}, {"id": "doc-5", "file": "03_詳細設計.md", "label": "詳細設計", "blurb": "型定義・シーケンス図・実装例", "toc": [{"lv": 2, "text": "はじめに", "id": "はじめに"}, {"lv": 3, "text": "設計原則", "id": "設計原則"}, {"lv": 3, "text": "この文書の構成", "id": "この文書の構成"}, {"lv": 2, "text": "1. 全体アーキテクチャ", "id": "1-全体アーキテクチャ"}, {"lv": 3, "text": "1.1 レイヤー構成", "id": "1-1-レイヤー構成"}, {"lv": 3, "text": "1.2 主要コンポーネント", "id": "1-2-主要コンポーネント"}, {"lv": 2, "text": "2. データ構造設計", "id": "2-データ構造設計"}, {"lv": 3, "text": "2.1 Pokemon基本情報", "id": "2-1-pokemon基本情報"}, {"lv": 3, "text": "2.2 Pokemon詳細情報", "id": "2-2-pokemon詳細情報"}, {"lv": 3, "text": "2.3 SQLiteテーブル設計", "id": "2-3-sqliteテーブル設計"}, {"lv": 2, "text": "3. API設計", "id": "3-api設計"}, {"lv": 3, "text": "3.1 PokeAPI エンドポイント仕様", "id": "3-1-pokeapi-エンドポイント仕様"}, {"lv": 3, "text": "3.2 内部API設計", "id": "3-2-内部api設計"}, {"lv": 2, "text": "4. 機能詳細設計", "id": "4-機能詳細設計"}, {"lv": 3, "text": "4.1 アプリ起動・初期化機能", "id": "4-1-アプリ起動・初期化機能"}, {"lv": 3, "text": "4.2 ポケモン一覧表示機能", "id": "4-2-ポケモン一覧表示機能"}, {"lv": 3, "text": "4.3 ポケモン検索機能", "id": "4-3-ポケモン検索機能"}, {"lv": 3, "text": "4.4 ポケモン詳細表示機能", "id": "4-4-ポケモン詳細表示機能"}, {"lv": 3, "text": "4.5 データ更新機能", "id": "4-5-データ更新機能"}, {"lv": 3, "text": "4.6 オフライン機能", "id": "4-6-オフライン機能"}, {"lv": 2, "text": "5. エラーハンドリング", "id": "5-エラーハンドリング"}, {"lv": 3, "text": "5.1 エラー分類と対応", "id": "5-1-エラー分類と対応"}, {"lv": 3, "text": "5.2 エラーの伝え方", "id": "5-2-エラーの伝え方"}, {"lv": 2, "text": "6. パフォーマンス設計", "id": "6-パフォーマンス設計"}, {"lv": 3, "text": "6.1 レンダリング最適化", "id": "6-1-レンダリング最適化"}, {"lv": 3, "text": "6.2 データベース最適化", "id": "6-2-データベース最適化"}]}];
+const NAV = [{"id": "doc-0", "file": "README.md", "label": "はじめに", "blurb": "課題の全体像と進め方", "toc": [{"lv": 2, "text": "何を作るのか", "id": "何を作るのか"}, {"lv": 2, "text": "どう作るのか", "id": "どう作るのか"}, {"lv": 2, "text": "今回どこまで作るのか", "id": "今回どこまで作るのか"}, {"lv": 2, "text": "手を動かす", "id": "手を動かす"}, {"lv": 2, "text": "実装する", "id": "実装する"}, {"lv": 2, "text": "素材", "id": "素材"}]}, {"id": "doc-1", "file": "05_環境構築ガイド.md", "label": "環境構築", "blurb": "プロジェクト作成から疎通確認まで", "toc": [{"lv": 2, "text": "1. 前提", "id": "1-前提"}, {"lv": 2, "text": "2. リポジトリを Fork して手元に置く", "id": "2-リポジトリを-fork-して手元に置く"}, {"lv": 3, "text": "2.1 Fork とは", "id": "2-1-fork-とは"}, {"lv": 3, "text": "2.2 Fork する", "id": "2-2-fork-する"}, {"lv": 3, "text": "2.3 clone して手元に持ってくる", "id": "2-3-clone-して手元に持ってくる"}, {"lv": 3, "text": "2.4 push できるようにする", "id": "2-4-push-できるようにする"}, {"lv": 3, "text": "2.5 コミットに使う名前を設定する", "id": "2-5-コミットに使う名前を設定する"}, {"lv": 3, "text": "2.6 作業ブランチを切る", "id": "2-6-作業ブランチを切る"}, {"lv": 2, "text": "3. ビルドを通す", "id": "3-ビルドを通す"}, {"lv": 2, "text": "4. 同梱されている設定", "id": "4-同梱されている設定"}, {"lv": 3, "text": "バージョンを触るときの注意", "id": "バージョンを触るときの注意"}, {"lv": 2, "text": "5. AndroidManifest.xml", "id": "5-androidmanifest-xml"}, {"lv": 2, "text": "6. パッケージ構成", "id": "6-パッケージ構成"}, {"lv": 2, "text": "7. 疎通確認（#2）", "id": "7-疎通確認-2"}, {"lv": 2, "text": "8. プルリクエストを出す", "id": "8-プルリクエストを出す"}, {"lv": 3, "text": "8.1 コミットして push する", "id": "8-1-コミットして-push-する"}, {"lv": 3, "text": "8.2 プルリクエストを作る", "id": "8-2-プルリクエストを作る"}, {"lv": 3, "text": "8.3 本文を書く", "id": "8-3-本文を書く"}, {"lv": 3, "text": "8.4 レビューを依頼する", "id": "8-4-レビューを依頼する"}, {"lv": 2, "text": "9. テストの書き方", "id": "9-テストの書き方"}, {"lv": 2, "text": "10. よくあるつまずき", "id": "10-よくあるつまずき"}]}, {"id": "doc-2", "file": "04_実装仕様.md", "label": "実装仕様", "blurb": "スコープ・技術スタック・評価基準", "toc": [{"lv": 2, "text": "1. 学習目標", "id": "1-学習目標"}, {"lv": 2, "text": "2. アーキテクチャ", "id": "2-アーキテクチャ"}, {"lv": 3, "text": "2.1 レイヤー構成", "id": "2-1-レイヤー構成"}, {"lv": 3, "text": "2.2 主要コンポーネント", "id": "2-2-主要コンポーネント"}, {"lv": 3, "text": "2.3 実装の共通ルール", "id": "2-3-実装の共通ルール"}, {"lv": 2, "text": "3. 機能仕様", "id": "3-機能仕様"}, {"lv": 3, "text": "3.1 Phase 1: 基本機能（必須）", "id": "3-1-phase-1-基本機能-必須"}, {"lv": 3, "text": "3.2 Phase 2: 拡張機能（加点）", "id": "3-2-phase-2-拡張機能-加点"}, {"lv": 2, "text": "4. データベース設計", "id": "4-データベース設計"}, {"lv": 2, "text": "5. PokeAPI の実装上の注意", "id": "5-pokeapi-の実装上の注意"}, {"lv": 2, "text": "6. 技術スタック", "id": "6-技術スタック"}, {"lv": 3, "text": "6.1 加点対象（任意）", "id": "6-1-加点対象-任意"}, {"lv": 3, "text": "6.2 ビルド設定", "id": "6-2-ビルド設定"}, {"lv": 2, "text": "7. 実装手順", "id": "7-実装手順"}, {"lv": 3, "text": "7.1 Step 1: 環境構築（1週目・1〜2日）", "id": "7-1-step-1-環境構築-1週目・1-2日"}, {"lv": 3, "text": "7.2 Step 2: データレイヤー実装（1週目の残り）", "id": "7-2-step-2-データレイヤー実装-1週目の残り"}, {"lv": 3, "text": "7.3 Step 3: UIレイヤー実装（2週目）", "id": "7-3-step-3-uiレイヤー実装-2週目"}, {"lv": 3, "text": "7.4 Step 4: 機能拡張（3週目）", "id": "7-4-step-4-機能拡張-3週目"}, {"lv": 3, "text": "7.5 Step 5: テストと提出（4週目）", "id": "7-5-step-5-テストと提出-4週目"}, {"lv": 2, "text": "8. 評価基準", "id": "8-評価基準"}, {"lv": 3, "text": "8.1 必須要件（70点）", "id": "8-1-必須要件-70点"}, {"lv": 3, "text": "8.2 高評価要件（+30点）", "id": "8-2-高評価要件-30点"}, {"lv": 3, "text": "8.3 ボーナス要件（+α）", "id": "8-3-ボーナス要件-α"}, {"lv": 2, "text": "9. 提出要件", "id": "9-提出要件"}, {"lv": 2, "text": "関連リソース", "id": "関連リソース"}]}, {"id": "doc-3", "file": "01_要件定義.md", "label": "要件定義", "blurb": "目的・機能要件・非機能要件", "toc": [{"lv": 2, "text": "1. 目的・ターゲットユーザー・スコープ", "id": "1-目的・ターゲットユーザー・スコープ"}, {"lv": 3, "text": "目的", "id": "目的"}, {"lv": 3, "text": "ターゲットユーザー", "id": "ターゲットユーザー"}, {"lv": 3, "text": "スコープ", "id": "スコープ"}, {"lv": 3, "text": "今回の開発で除外する機能", "id": "今回の開発で除外する機能"}, {"lv": 2, "text": "2. 機能要件", "id": "2-機能要件"}, {"lv": 3, "text": "2.1 ポケモン図鑑の機能", "id": "2-1-ポケモン図鑑の機能"}, {"lv": 3, "text": "2.2 オフライン機能", "id": "2-2-オフライン機能"}, {"lv": 3, "text": "2.3 新情報掲示板（次フェーズの開発スコープ）", "id": "2-3-新情報掲示板-次フェーズの開発スコープ"}, {"lv": 2, "text": "3. UI/UX要件", "id": "3-ui-ux要件"}, {"lv": 2, "text": "4. データ要件", "id": "4-データ要件"}, {"lv": 2, "text": "5. パフォーマンス要件", "id": "5-パフォーマンス要件"}, {"lv": 2, "text": "6. セキュリティ要件", "id": "6-セキュリティ要件"}, {"lv": 2, "text": "7. 非機能要件", "id": "7-非機能要件"}, {"lv": 2, "text": "8. スケジュールとマイルストーン", "id": "8-スケジュールとマイルストーン"}, {"lv": 2, "text": "9. フェーズ2開発計画（参考情報）", "id": "9-フェーズ2開発計画-参考情報"}, {"lv": 2, "text": "付録: 要件定義とは", "id": "付録-要件定義とは"}, {"lv": 3, "text": "要件定義の目的", "id": "要件定義の目的"}, {"lv": 3, "text": "要件定義のプロセス", "id": "要件定義のプロセス"}, {"lv": 3, "text": "要件定義書に含まれる内容", "id": "要件定義書に含まれる内容"}, {"lv": 3, "text": "要件定義の重要性", "id": "要件定義の重要性"}, {"lv": 3, "text": "未経験者が知っておくべきポイント", "id": "未経験者が知っておくべきポイント"}]}, {"id": "doc-4", "file": "02_基本設計.md", "label": "基本設計", "blurb": "システム構成・画面設計・IF設計", "toc": [{"lv": 2, "text": "1. はじめに", "id": "1-はじめに"}, {"lv": 2, "text": "2. 機能設計", "id": "2-機能設計"}, {"lv": 3, "text": "2.1 システム方式設計", "id": "2-1-システム方式設計"}, {"lv": 3, "text": "2.2 画面設計", "id": "2-2-画面設計"}, {"lv": 3, "text": "2.3 外部インターフェース設計", "id": "2-3-外部インターフェース設計"}, {"lv": 3, "text": "2.4 内部インターフェース定義", "id": "2-4-内部インターフェース定義"}, {"lv": 3, "text": "2.5 パフォーマンス設計", "id": "2-5-パフォーマンス設計"}, {"lv": 3, "text": "2.6 テスト計画", "id": "2-6-テスト計画"}, {"lv": 3, "text": "2.7 セキュリティ設計", "id": "2-7-セキュリティ設計"}, {"lv": 3, "text": "2.8 運用・保守計画", "id": "2-8-運用・保守計画"}, {"lv": 2, "text": "付録: 基本設計とは", "id": "付録-基本設計とは"}, {"lv": 3, "text": "開発プロジェクトとは", "id": "開発プロジェクトとは"}, {"lv": 3, "text": "基本設計の位置づけ", "id": "基本設計の位置づけ"}, {"lv": 3, "text": "基本設計のプロセス", "id": "基本設計のプロセス"}, {"lv": 3, "text": "基本設計の成果物", "id": "基本設計の成果物"}, {"lv": 3, "text": "基本設計の重要性", "id": "基本設計の重要性"}, {"lv": 3, "text": "まとめ", "id": "まとめ"}]}, {"id": "doc-5", "file": "03_詳細設計.md", "label": "詳細設計", "blurb": "型定義・シーケンス図・実装例", "toc": [{"lv": 2, "text": "はじめに", "id": "はじめに"}, {"lv": 3, "text": "設計原則", "id": "設計原則"}, {"lv": 3, "text": "この文書の構成", "id": "この文書の構成"}, {"lv": 2, "text": "1. 全体アーキテクチャ", "id": "1-全体アーキテクチャ"}, {"lv": 3, "text": "1.1 レイヤー構成", "id": "1-1-レイヤー構成"}, {"lv": 3, "text": "1.2 主要コンポーネント", "id": "1-2-主要コンポーネント"}, {"lv": 2, "text": "2. データ構造設計", "id": "2-データ構造設計"}, {"lv": 3, "text": "2.1 Pokemon基本情報", "id": "2-1-pokemon基本情報"}, {"lv": 3, "text": "2.2 Pokemon詳細情報", "id": "2-2-pokemon詳細情報"}, {"lv": 3, "text": "2.3 SQLiteテーブル設計", "id": "2-3-sqliteテーブル設計"}, {"lv": 2, "text": "3. API設計", "id": "3-api設計"}, {"lv": 3, "text": "3.1 PokeAPI エンドポイント仕様", "id": "3-1-pokeapi-エンドポイント仕様"}, {"lv": 3, "text": "3.2 内部API設計", "id": "3-2-内部api設計"}, {"lv": 2, "text": "4. 機能詳細設計", "id": "4-機能詳細設計"}, {"lv": 3, "text": "4.1 アプリ起動・初期化機能", "id": "4-1-アプリ起動・初期化機能"}, {"lv": 3, "text": "4.2 ポケモン一覧表示機能", "id": "4-2-ポケモン一覧表示機能"}, {"lv": 3, "text": "4.3 ポケモン検索機能", "id": "4-3-ポケモン検索機能"}, {"lv": 3, "text": "4.4 ポケモン詳細表示機能", "id": "4-4-ポケモン詳細表示機能"}, {"lv": 3, "text": "4.5 データ更新機能", "id": "4-5-データ更新機能"}, {"lv": 3, "text": "4.6 オフライン機能", "id": "4-6-オフライン機能"}, {"lv": 2, "text": "5. エラーハンドリング", "id": "5-エラーハンドリング"}, {"lv": 3, "text": "5.1 エラー分類と対応", "id": "5-1-エラー分類と対応"}, {"lv": 3, "text": "5.2 エラーの伝え方", "id": "5-2-エラーの伝え方"}, {"lv": 2, "text": "6. パフォーマンス設計", "id": "6-パフォーマンス設計"}, {"lv": 3, "text": "6.1 レンダリング最適化", "id": "6-1-レンダリング最適化"}, {"lv": 3, "text": "6.2 データベース最適化", "id": "6-2-データベース最適化"}]}];
 const KEY = "pokedex-kadai-progress";
 
 /* ---------- 目次の組み立て ---------- */
