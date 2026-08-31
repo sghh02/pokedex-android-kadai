@@ -119,8 +119,8 @@ h1,h2,h3,h4,h5,h6{font-family:"Zen Old Mincho",serif; text-wrap:balance; letter-
   padding-left:16px; border-left:5px solid var(--accent);
 }
 .doc h3{font-size:1.1rem; font-weight:700; margin:40px 0 14px; color:var(--ink)}
-/* 目次から飛んだとき、上に固定された進捗バーで見出しが隠れないようにする */
-.doc h2,.doc h3{scroll-margin-top:96px}
+/* 目次から飛んだとき、見出しが画面の上端に貼りつかないようにする */
+.doc h2,.doc h3{scroll-margin-top:24px}
 .doc h4{
   font-size:1rem; font-weight:700; margin:30px 0 10px; color:var(--ink-2);
   letter-spacing:.02em;
@@ -234,7 +234,7 @@ li.task input:checked+span{
 }
 
 .progress{
-  position:sticky; top:0; z-index:5; margin:0 0 2em;
+  margin:0 0 2em;
   background:var(--surface); border:1px solid var(--line); border-radius:10px;
   padding:14px 18px; box-shadow:var(--shadow);
 }
@@ -301,7 +301,6 @@ li.task input:checked+span{
   .main{grid-column:1}
   .doc{padding:80px 20px 120px}
   .table-wrap,figure.code,figure.diagram{width:calc(100vw - 40px)}
-  .progress{top:56px}   /* 固定の目次ボタンと重ならないよう下げる */
   .railtoggle{
     display:flex; align-items:center; gap:8px; position:fixed; top:12px; left:12px; z-index:30;
     font:inherit; font-size:.82rem; background:var(--surface); color:var(--ink);
@@ -3336,8 +3335,14 @@ document.querySelectorAll(".doc").forEach(doc => {
     '<div class="row" style="margin-top:10px"><span class="lbl">チェックはこの端末にのみ保存されます</span>' +
     '<button type="button">すべて解除</button></div>';
   panel.querySelector(".lbl").textContent = label;
-  const anchor = doc.querySelector(".issue-index") || doc.querySelector("h2");
-  if (anchor) doc.insertBefore(panel, anchor); else doc.appendChild(panel);
+
+  // 最初のチェック欄が属する節の見出しの直後に置く。
+  // 文書の先頭に固定すると、関係のない節を読んでいる間もずっと出てしまう。
+  const heads = Array.prototype.slice.call(doc.querySelectorAll("h2"));
+  const owner = heads.filter(h =>
+    h.compareDocumentPosition(boxes[0]) & Node.DOCUMENT_POSITION_FOLLOWING).pop();
+  if (owner) owner.insertAdjacentElement("afterend", panel);
+  else doc.appendChild(panel);
 
   const num = panel.querySelector(".num");
   const fill = panel.querySelector(".fill");
