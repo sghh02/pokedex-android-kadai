@@ -1,0 +1,150 @@
+{
+  "curriculumId": "pokedex-android-kadai",
+  "title": "最終課題: ポケモン図鑑（Android）",
+  "description": "カントー地方151匹の図鑑アプリを Kotlin + Jetpack Compose で作る最終課題。Issue ごとに実装してPRを出し、レビューを受けながら進めます。",
+  "chapters": [
+    {
+      "id": "kadai-intro",
+      "title": "はじめに",
+      "items": [
+        {
+          "id": "kadai-guide",
+          "title": "最終課題の進め方",
+          "path": "chapters/00-guide.md",
+          "estimatedMinutes": 30,
+          "hasAssignment": false
+        }
+      ]
+    },
+    {
+      "id": "phase1",
+      "title": "Phase 1: 必須要件",
+      "items": [
+        {
+          "id": "issue-01-setup",
+          "title": "Issue #1: 環境構築とビルド確認",
+          "path": "chapters/01-setup.md",
+          "estimatedMinutes": 360,
+          "hasAssignment": true
+        },
+        {
+          "id": "issue-02-api",
+          "title": "Issue #2: PokeAPI 疎通確認",
+          "path": "chapters/02-api.md",
+          "estimatedMinutes": 360,
+          "hasAssignment": true
+        },
+        {
+          "id": "issue-03-room",
+          "title": "Issue #3: Room データベース構築",
+          "path": "chapters/03-room.md",
+          "estimatedMinutes": 720,
+          "hasAssignment": true
+        },
+        {
+          "id": "issue-04-service-dto",
+          "title": "Issue #4: PokeApiService と DTO 実装",
+          "path": "chapters/04-service-dto.md",
+          "estimatedMinutes": 720,
+          "hasAssignment": true
+        },
+        {
+          "id": "issue-05-repository",
+          "title": "Issue #5: PokemonRepository 実装",
+          "path": "chapters/05-repository.md",
+          "estimatedMinutes": 1080,
+          "hasAssignment": true
+        },
+        {
+          "id": "issue-06-splash",
+          "title": "Issue #6: スプラッシュ画面",
+          "path": "chapters/06-splash.md",
+          "estimatedMinutes": 180,
+          "hasAssignment": true
+        },
+        {
+          "id": "issue-07-list",
+          "title": "Issue #7: ポケモン一覧画面",
+          "path": "chapters/07-list.md",
+          "estimatedMinutes": 720,
+          "hasAssignment": true
+        },
+        {
+          "id": "issue-08-detail",
+          "title": "Issue #8: ポケモン詳細画面",
+          "path": "chapters/08-detail.md",
+          "estimatedMinutes": 540,
+          "hasAssignment": true
+        },
+        {
+          "id": "issue-09-navigation",
+          "title": "Issue #9: 画面遷移（Navigation Compose）",
+          "path": "chapters/09-navigation.md",
+          "estimatedMinutes": 360,
+          "hasAssignment": true
+        },
+        {
+          "id": "issue-10-offline",
+          "title": "Issue #10: オフライン対応",
+          "path": "chapters/10-offline.md",
+          "estimatedMinutes": 720,
+          "hasAssignment": true
+        }
+      ]
+    },
+    {
+      "id": "phase2",
+      "title": "Phase 2: 加点要件",
+      "items": [
+        {
+          "id": "issue-11-loading-error",
+          "title": "Issue #11: ローディング表示とエラーハンドリング",
+          "path": "chapters/11-loading-error.md",
+          "estimatedMinutes": 540,
+          "hasAssignment": true
+        },
+        {
+          "id": "issue-12-search",
+          "title": "Issue #12: 検索機能",
+          "path": "chapters/12-search.md",
+          "estimatedMinutes": 540,
+          "hasAssignment": true
+        },
+        {
+          "id": "issue-13-detail-extend",
+          "title": "Issue #13: 詳細情報の拡張",
+          "path": "chapters/13-detail-extend.md",
+          "estimatedMinutes": 720,
+          "hasAssignment": true
+        },
+        {
+          "id": "issue-14-settings",
+          "title": "Issue #14: 設定画面と手動更新",
+          "path": "chapters/14-settings.md",
+          "estimatedMinutes": 540,
+          "hasAssignment": true
+        }
+      ]
+    },
+    {
+      "id": "phase3",
+      "title": "ボーナスと提出物",
+      "items": [
+        {
+          "id": "issue-15-unit-test",
+          "title": "Issue #15: ユニットテスト",
+          "path": "chapters/15-unit-test.md",
+          "estimatedMinutes": 720,
+          "hasAssignment": true
+        },
+        {
+          "id": "issue-16-submission",
+          "title": "Issue #16: 提出物の準備",
+          "path": "chapters/16-submission.md",
+          "estimatedMinutes": 360,
+          "hasAssignment": true
+        }
+      ]
+    }
+  ]
+}
