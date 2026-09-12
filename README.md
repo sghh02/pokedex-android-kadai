@@ -11,7 +11,7 @@
 app/                     Android アプリ本体（MainActivity だけの状態）
 gradle/libs.versions.toml  使うライブラリ一式（Room / Retrofit / Coil ほか）
 docs/                    設計書（下のリンク先の実体）
-素材/                    画面モックとアイコン
+素材/                    アプリアイコン
 ```
 
 ## 設計書
@@ -82,6 +82,5 @@ Kotlin / Jetpack Compose / ViewModel + StateFlow / Room / Retrofit / Coil / Navi
 
 ## 素材
 
-- [画面素材](素材/画面素材) — 画面モック（HTML）とスクリーンショット
 - [launcher_icon](素材/launcher_icon) — アプリアイコン
-- [Figma デザイン](https://www.figma.com/design/b0kI8aTikCubCeKQdcSKEC/%E3%83%9D%E3%82%B1%E3%83%A2%E3%83%B3%E5%9B%B3%E9%91%91%28%E3%82%AB%E3%83%B3%E3%83%88%E3%83%BC%E5%9C%B0%E6%96%B9%29%E3%83%87%E3%82%B6%E3%82%A4%E3%83%B3?node-id=3-40&t=c3mklPkvnhvy8Sp5-1) — 画面レイアウト
+- [Figma デザイン](https://www.figma.com/design/b0kI8aTikCubCeKQdcSKEC/%E3%83%9D%E3%82%B1%E3%83%A2%E3%83%B3%E5%9B%B3%E9%91%91%28%E3%82%AB%E3%83%B3%E3%83%88%E3%83%BC%E5%9C%B0%E6%96%B9%29%E3%83%87%E3%82%B6%E3%82%A4%E3%83%B3?node-id=3-40&t=c3mklPkvnhvy8Sp5-1) — 画面レイアウト（画面デザインはすべて Figma を参照）
