@@ -78,7 +78,6 @@ Coil / Navigation Compose。`minSdk` は 26（Android 8.0）です。
 
 ## 6. 素材
 
-- [画面モックとスクリーンショット](https://github.com/sghh02/pokedex-android-kadai/tree/main/素材/画面素材)
 - [アプリアイコン](https://github.com/sghh02/pokedex-android-kadai/tree/main/素材/launcher_icon)
 - [Figma デザイン](https://www.figma.com/design/b0kI8aTikCubCeKQdcSKEC/%E3%83%9D%E3%82%B1%E3%83%A2%E3%83%B3%E5%9B%B3%E9%91%91%28%E3%82%AB%E3%83%B3%E3%83%88%E3%83%BC%E5%9C%B0%E6%96%B9%29%E3%83%87%E3%82%B6%E3%82%A4%E3%83%B3?node-id=3-40&t=c3mklPkvnhvy8Sp5-1)
 
