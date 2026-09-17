@@ -41,6 +41,7 @@ API はDBを更新するためだけに使い、更新されれば `Flow` を通
 
 1. [Issue #5](https://github.com/sghh02/pokedex-android-kadai/issues/5) の受け入れ条件をすべて満たす
 2. Fork した自分のリポジトリで `feature/05-repository` ブランチを作成し、**自分の Fork の `main`** への PR を作成する（base が `sghh02/pokedex-android-kadai` のままになっていないか必ず確認する）
-3. [AIプログラムレビュー](https://ai.studio/apps/84d224cb-7de1-44fb-995b-9a5917d25603?fullscreenApplet=true) を実行して自己点検する
-4. メンターに PR の URL を添えてレビューを依頼する
-5. LGTM をもらったら、進捗ダッシュボードで **PR URL** と **完了日** を記録
+3. 以下の **PRレビュー** を実行する
+4. レビューコメントをすべてコピーして、PR のコメントに貼る
+5. メンターに PR の URL を添えてレビューを依頼する
+6. LGTM をもらったら、進捗ダッシュボードで **PR URL** と **完了日** を記録
