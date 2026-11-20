@@ -21,7 +21,7 @@ Coil / Navigation Compose。`minSdk` は 26（Android 8.0）です。
 
 ## 2. 設計書を先に読む
 
-実装を始める前に、設計書に目を通してください。
+最初に設計書トップの「課題の進め方」を開いて、完成像と Issue の流れを確認してください。各 Issue の「着手前に読む」からは、実装に使う節へ移動できます。
 
 ### 📘 [設計書を開く](https://sghh02.github.io/pokedex-android-kadai/)
 
@@ -34,7 +34,7 @@ Coil / Navigation Compose。`minSdk` は 26（Android 8.0）です。
 | [05 環境構築ガイド](https://sghh02.github.io/pokedex-android-kadai/#05_環境構築ガイド) | Fork から最初のビルド、PR の出し方まで |
 
 全部を暗記する必要はありません。ただし
-[実装仕様 2.3 実装の共通ルール](https://sghh02.github.io/pokedex-android-kadai/#04_実装仕様)
+[実装仕様 2.3 実装の共通ルール](https://sghh02.github.io/pokedex-android-kadai/#2-3-実装の共通ルール)
 だけは、どの Issue に着手するときも先に読み返してください。
 アーキテクチャ・状態の公開の仕方・エラーの扱い・DI の方針がここに集まっています。
 

@@ -14,7 +14,7 @@ Issue #3 と #5 で「テストが通ること」を受け入れ条件に入れ�
 ## 2. 着手前に読む
 
 - [Issue #15](https://github.com/sghh02/pokedex-android-kadai/issues/15) — **実装内容と受け入れ条件の正はこちら**。この章はそれを読む順番と、つまずきやすい点を補うものです
-- [実装仕様](https://sghh02.github.io/pokedex-android-kadai/#04_実装仕様) — 評価基準
+- [実装仕様](https://sghh02.github.io/pokedex-android-kadai/#8-評価基準) — 評価基準
 
 ## 3. つまずきどころ
 

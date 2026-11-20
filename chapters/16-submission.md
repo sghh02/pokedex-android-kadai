@@ -14,7 +14,7 @@
 ## 2. 着手前に読む
 
 - [Issue #16](https://github.com/sghh02/pokedex-android-kadai/issues/16) — **実装内容と受け入れ条件の正はこちら**。この章はそれを読む順番と、つまずきやすい点を補うものです
-- [実装仕様](https://sghh02.github.io/pokedex-android-kadai/#04_実装仕様) — 評価基準。提出前にすべて確認する
+- [実装仕様](https://sghh02.github.io/pokedex-android-kadai/#8-評価基準) — 評価基準。提出前にすべて確認する
 
 ## 3. つまずきどころ
 

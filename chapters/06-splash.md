@@ -14,7 +14,7 @@
 ## 2. 着手前に読む
 
 - [Issue #6](https://github.com/sghh02/pokedex-android-kadai/issues/6) — **実装内容と受け入れ条件の正はこちら**。この章はそれを読む順番と、つまずきやすい点を補うものです
-- [詳細設計](https://sghh02.github.io/pokedex-android-kadai/#03_詳細設計) — 画面遷移のシーケンス
+- [詳細設計](https://sghh02.github.io/pokedex-android-kadai/#4-1-アプリ起動・初期化機能) — 画面遷移のシーケンス
 
 ## 3. つまずきどころ
 

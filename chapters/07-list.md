@@ -16,8 +16,8 @@ Issue #5 の Repository ができていれば、画面は「ViewModel が公開�
 ## 2. 着手前に読む
 
 - [Issue #7](https://github.com/sghh02/pokedex-android-kadai/issues/7) — **実装内容と受け入れ条件の正はこちら**。この章はそれを読む順番と、つまずきやすい点を補うものです
-- [詳細設計](https://sghh02.github.io/pokedex-android-kadai/#03_詳細設計) — 一覧画面のシーケンスと実装例
-- [実装仕様](https://sghh02.github.io/pokedex-android-kadai/#04_実装仕様) — 2.3 実装の共通ルール。状態の公開の仕方
+- [詳細設計](https://sghh02.github.io/pokedex-android-kadai/#4-2-ポケモン一覧表示機能) — 一覧画面のシーケンスと実装例
+- [実装仕様](https://sghh02.github.io/pokedex-android-kadai/#2-3-実装の共通ルール) — 2.3 実装の共通ルール。状態の公開の仕方
 
 ## 3. つまずきどころ
 

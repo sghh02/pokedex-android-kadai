@@ -15,8 +15,8 @@ UI と通信を同時に作ると、表示が出ないときに「通信が失�
 ## 2. 着手前に読む
 
 - [Issue #2](https://github.com/sghh02/pokedex-android-kadai/issues/2) — **実装内容と受け入れ条件の正はこちら**。この章はそれを読む順番と、つまずきやすい点を補うものです
-- [環境構築ガイド](https://sghh02.github.io/pokedex-android-kadai/#05_環境構築ガイド) — 7. 疎通確認のコード例
-- [詳細設計](https://sghh02.github.io/pokedex-android-kadai/#03_詳細設計) — 4.1.3 Retrofit と OkHttp の組み立て（AppContainer）
+- [環境構築ガイド](https://sghh02.github.io/pokedex-android-kadai/#7-疎通確認-2) — 7. 疎通確認のコード例
+- [詳細設計](https://sghh02.github.io/pokedex-android-kadai/#application-と依存の組み立て) — 4.1.3 Retrofit と OkHttp の組み立て（AppContainer）
 
 ## 3. つまずきどころ
 

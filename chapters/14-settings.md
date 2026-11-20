@@ -15,7 +15,7 @@ Issue #9 で「設定画面とボトムナビは後回し」と言ったのは�
 ## 2. 着手前に読む
 
 - [Issue #14](https://github.com/sghh02/pokedex-android-kadai/issues/14) — **実装内容と受け入れ条件の正はこちら**。この章はそれを読む順番と、つまずきやすい点を補うものです
-- [詳細設計](https://sghh02.github.io/pokedex-android-kadai/#03_詳細設計) — 自動更新の判定ロジック
+- [詳細設計](https://sghh02.github.io/pokedex-android-kadai/#自動更新の判定) — 自動更新の判定ロジック
 
 ## 3. つまずきどころ
 

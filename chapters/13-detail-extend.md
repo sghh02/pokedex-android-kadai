@@ -16,7 +16,7 @@
 ## 2. 着手前に読む
 
 - [Issue #13](https://github.com/sghh02/pokedex-android-kadai/issues/13) — **実装内容と受け入れ条件の正はこちら**。この章はそれを読む順番と、つまずきやすい点を補うものです
-- [実装仕様](https://sghh02.github.io/pokedex-android-kadai/#04_実装仕様) — 5. PokeAPI の実装上の注意。日本語名の取り方
+- [実装仕様](https://sghh02.github.io/pokedex-android-kadai/#5-pokeapi-の実装上の注意) — 5. PokeAPI の実装上の注意。日本語名の取り方
 
 ## 3. つまずきどころ
 

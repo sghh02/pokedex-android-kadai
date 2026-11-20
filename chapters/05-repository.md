@@ -17,8 +17,8 @@ API はDBを更新するためだけに使い、更新されれば `Flow` を通
 ## 2. 着手前に読む
 
 - [Issue #5](https://github.com/sghh02/pokedex-android-kadai/issues/5) — **実装内容と受け入れ条件の正はこちら**。この章はそれを読む順番と、つまずきやすい点を補うものです
-- [詳細設計](https://sghh02.github.io/pokedex-android-kadai/#03_詳細設計) — シーケンス図と Kotlin の実装例
-- [実装仕様](https://sghh02.github.io/pokedex-android-kadai/#04_実装仕様) — 2.3 実装の共通ルール。エラーの扱いと状態の公開
+- [詳細設計](https://sghh02.github.io/pokedex-android-kadai/#4-5-データ更新機能) — シーケンス図と Kotlin の実装例
+- [実装仕様](https://sghh02.github.io/pokedex-android-kadai/#2-3-実装の共通ルール) — 2.3 実装の共通ルール。エラーの扱いと状態の公開
 
 ## 3. つまずきどころ
 

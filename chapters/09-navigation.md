@@ -13,7 +13,7 @@
 ## 2. 着手前に読む
 
 - [Issue #9](https://github.com/sghh02/pokedex-android-kadai/issues/9) — **実装内容と受け入れ条件の正はこちら**。この章はそれを読む順番と、つまずきやすい点を補うものです
-- [基本設計](https://sghh02.github.io/pokedex-android-kadai/#02_基本設計) — 画面遷移図
+- [基本設計](https://sghh02.github.io/pokedex-android-kadai/#2-2-2-画面遷移図) — 画面遷移図
 
 ## 3. つまずきどころ
 
