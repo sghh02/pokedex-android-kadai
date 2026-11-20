@@ -4,364 +4,89 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light dark">
-<meta name="description" content="ポケモン図鑑アプリ最終課題の設計書一式。要件定義・基本設計・詳細設計・実装仕様・環境構築ガイド。">
-<title>ポケモン図鑑アプリ 最終課題</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Old+Mincho:wght@500;700;900&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap">
-<style>
-:root{
-  --paper:#F2F5F1; --surface:#FFFFFF; --surface-2:#E8EDE6; --surface-3:#DFE6DC;
-  --ink:#16201A; --ink-2:#4C574E; --ink-3:#5E6960;
-  --line:#D2DACE; --line-soft:#E2E8DF;
-  --accent:#A81E36; --accent-ink:#8E1A2E; --accent-soft:#F5DFE3;
-  --lens:#1B6A80; --lens-soft:#DCEBEF;
-  --done:#4A7530; --done-soft:#E2EDD8;
-  --shadow:0 1px 2px rgba(22,32,26,.06), 0 8px 24px -12px rgba(22,32,26,.18);
-}
-@media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]){
-    --paper:#121711; --surface:#191F18; --surface-2:#212820; --surface-3:#2A322A;
-    --ink:#E7ECE5; --ink-2:#A9B4A7; --ink-3:#7E897D;
-    --line:#2E372D; --line-soft:#252D25;
-    --accent:#E8798D; --accent-ink:#F0A2B0; --accent-soft:#3B1F26;
-    --lens:#6FBACF; --lens-soft:#16303A;
-    --done:#93C765; --done-soft:#1E2C17;
-    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
-  }
-}
-:root[data-theme="dark"]{
-  --paper:#121711; --surface:#191F18; --surface-2:#212820; --surface-3:#2A322A;
-  --ink:#E7ECE5; --ink-2:#A9B4A7; --ink-3:#7E897D;
-  --line:#2E372D; --line-soft:#252D25;
-  --accent:#E8798D; --accent-ink:#F0A2B0; --accent-soft:#3B1F26;
-  --lens:#6FBACF; --lens-soft:#16303A;
-  --done:#93C765; --done-soft:#1E2C17;
-  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
-}
-
-*{box-sizing:border-box}
-body{
-  margin:0; background:var(--paper); color:var(--ink);
-  font-family:"Zen Kaku Gothic New","Hiragino Sans","Noto Sans JP",system-ui,sans-serif;
-  font-size:16px; line-height:1.95; -webkit-font-smoothing:antialiased;
-}
-a{color:var(--accent-ink)}
-:focus-visible{outline:2px solid var(--accent); outline-offset:2px; border-radius:3px}
-
-/* ---------- 骨格 ---------- */
-.shell{display:grid; grid-template-columns:288px minmax(0,1fr); min-height:100vh}
-.rail{
-  grid-column:1; border-right:1px solid var(--line); background:var(--surface);
-  position:sticky; top:0; height:100vh; overflow-y:auto; overscroll-behavior:contain;
-}
-.main{grid-column:2; min-width:0; display:flex; flex-direction:column; align-items:center}
-
-/* ---------- 銘板 ---------- */
-.plate{padding:26px 22px 20px; border-bottom:1px solid var(--line)}
-.plate .lens{display:flex; align-items:center; gap:10px; margin-bottom:14px}
-.lens i{
-  width:15px; height:15px; border-radius:50%; display:block;
-  background:radial-gradient(circle at 32% 30%, #fff 0 12%, var(--lens) 55%, #0d3a47 100%);
-  box-shadow:0 0 0 3px var(--lens-soft);
-}
-.lens b{width:7px; height:7px; border-radius:50%; display:block; background:var(--accent); opacity:.85}
-.lens b:nth-of-type(2){background:var(--done)}
-.lens b:nth-of-type(3){background:var(--lens)}
-.plate h1{
-  font-family:"Zen Old Mincho",serif; font-weight:900; font-size:1.32rem;
-  line-height:1.45; margin:0 0 4px; letter-spacing:.01em; text-wrap:balance;
-}
-.plate p{margin:0; font-size:.76rem; color:var(--ink-3); letter-spacing:.06em}
-
-/* ---------- 目次 ---------- */
-nav{padding:14px 12px 60px}
-.doclist{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:2px}
-.docbtn{
-  width:100%; text-align:left; background:none; border:0; cursor:pointer; color:inherit;
-  font-family:inherit; font-size:.9rem; padding:9px 12px 9px 13px; border-radius:7px;
-  display:grid; grid-template-columns:auto 1fr; gap:2px 10px; align-items:baseline;
-  border-left:3px solid transparent; transition:background .15s;
-}
-.docbtn:hover{background:var(--surface-2)}
-.docbtn .n{
-  font-family:"JetBrains Mono",monospace; font-size:.7rem; color:var(--ink-3);
-  font-variant-numeric:tabular-nums;
-}
-.docbtn .t{font-weight:500}
-.docbtn .b{grid-column:2; font-size:.72rem; color:var(--ink-3); line-height:1.5}
-.docbtn[aria-current="true"]{background:var(--accent-soft); border-left-color:var(--accent)}
-.docbtn[aria-current="true"] .t{color:var(--accent-ink); font-weight:700}
-.docbtn[aria-current="true"] .n{color:var(--accent-ink)}
-
-.toc{list-style:none; margin:4px 0 10px; padding:0 0 0 15px; border-left:1px solid var(--line-soft)}
-.toc a{
-  display:block; padding:4px 10px; font-size:.78rem; line-height:1.5;
-  color:var(--ink-2); text-decoration:none; border-radius:5px;
-  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
-}
-.toc a:hover{background:var(--surface-2); color:var(--ink)}
-.toc a.lv3{padding-left:22px; font-size:.74rem; color:var(--ink-3)}
-.toc a.here{color:var(--accent-ink); background:var(--accent-soft); font-weight:700}
-
-/* ---------- 本文 ---------- */
-.doc{width:100%; max-width:47rem; padding:56px 32px 140px}
-.doc[hidden]{display:none}
-.doc>*:first-child{margin-top:0}
-
-h1,h2,h3,h4,h5,h6{font-family:"Zen Old Mincho",serif; text-wrap:balance; letter-spacing:.01em}
-.doc h1{
-  font-size:clamp(1.85rem,1.3rem + 1.7vw,2.5rem); font-weight:900; line-height:1.4;
-  margin:0 0 34px; padding-bottom:20px; border-bottom:3px double var(--line);
-}
-.doc h2{
-  font-size:1.42rem; font-weight:700; line-height:1.5; margin:64px 0 20px;
-  padding-left:16px; border-left:5px solid var(--accent);
-}
-.doc h3{font-size:1.1rem; font-weight:700; margin:40px 0 14px; color:var(--ink)}
-/* 目次から飛んだとき、見出しが画面の上端に貼りつかないようにする */
-.doc h2,.doc h3{scroll-margin-top:24px}
-.doc h4{
-  font-size:1rem; font-weight:700; margin:30px 0 10px; color:var(--ink-2);
-  letter-spacing:.02em;
-}
-.doc h5,.doc h6{font-size:.9rem; font-weight:700; margin:22px 0 8px; color:var(--ink-2)}
-.doc p{margin:0 0 1.25em}
-hr{border:0; border-top:1px solid var(--line); margin:56px 0}
-
-.doc ul,.doc ol{margin:0 0 1.3em; padding-left:1.5em}
-.doc li{margin-bottom:.42em}
-.doc li>ul,.doc li>ol{margin:.45em 0 .1em}
-.doc ol{list-style:decimal}
-.doc ul{list-style:none}
-.doc ul>li{position:relative}
-.doc ul>li::before{
-  content:""; position:absolute; left:-1.05em; top:.82em;
-  width:5px; height:5px; background:var(--accent); opacity:.55; border-radius:1px;
-}
-.doc ul ul>li::before{background:var(--ink-3); opacity:.5; border-radius:50%}
-.doc li.task::before{display:none}
-
-blockquote{
-  margin:1.6em 0; padding:16px 20px; background:var(--lens-soft);
-  border-left:4px solid var(--lens); border-radius:0 8px 8px 0;
-  font-size:.92rem; line-height:1.85; color:var(--ink-2);
-}
-blockquote strong{color:var(--ink)}
-
-code{
-  font-family:"JetBrains Mono",ui-monospace,monospace; font-size:.85em;
-  background:var(--surface-2); padding:.14em .42em; border-radius:4px;
-  border:1px solid var(--line-soft); word-break:break-word;
-}
-
-/* ---------- 幅の要る要素（内側で横スクロールさせ、本文は横に流さない） ---------- */
-.table-wrap,figure.code,figure.diagram{margin:1.7em 0; width:100%}
-/* 余白のある画面でだけ、本文より少しはみ出させる */
-@media (min-width:1240px){
-  .table-wrap,figure.code,figure.diagram{width:calc(100% + 6rem); margin-left:-3rem}
-}
-.table-wrap{overflow-x:auto; border:1px solid var(--line); border-radius:10px; background:var(--surface)}
-table{border-collapse:collapse; width:100%; font-size:.87rem; line-height:1.7}
-th,td{padding:11px 15px; text-align:left; border-bottom:1px solid var(--line-soft); vertical-align:top}
-thead th{
-  background:var(--surface-2); font-weight:700; font-size:.76rem;
-  letter-spacing:.06em; color:var(--ink-2); white-space:nowrap;
-}
-tbody tr:last-child td{border-bottom:0}
-td code{font-size:.82em}
-
-figure.code{border:1px solid var(--line); border-radius:10px; overflow:hidden; background:var(--surface)}
-.code-head{
-  display:flex; justify-content:space-between; align-items:center;
-  padding:7px 14px; background:var(--surface-2); border-bottom:1px solid var(--line);
-  font-family:"JetBrains Mono",monospace; font-size:.68rem;
-  letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3);
-}
-.copy{
-  font:inherit; font-size:.68rem; letter-spacing:.08em; text-transform:uppercase;
-  background:none; border:1px solid var(--line); color:var(--ink-3);
-  padding:3px 10px; border-radius:5px; cursor:pointer; transition:.15s;
-}
-.copy:hover{border-color:var(--lens); color:var(--lens)}
-.copy.done{border-color:var(--done); color:var(--done)}
-figure.code pre{margin:0; padding:16px 18px; overflow-x:auto}
-figure.code code{
-  background:none; border:0; padding:0; font-size:.82rem; line-height:1.75;
-  display:block; white-space:pre;
-}
-.tok-c{color:var(--ink-3); font-style:italic}
-.tok-s{color:var(--done)}
-.tok-k{color:var(--accent-ink); font-weight:600}
-.tok-a{color:var(--lens)}
-.tok-n{color:var(--lens)}
-
-/* 図は両テーマとも明るい面に固定する。mermaid の配色を地色に合わせ込むより、
-   常に同じ条件で描くほうが読み違いがない。 */
-figure.diagram{
-  border:1px solid var(--line); border-radius:10px;
-  background:#EFF2EE; color:#16201A;
-  padding:20px; overflow-x:auto;
-}
-figure.diagram pre{margin:0}
-/* mermaid は display:none の中では採寸できないため、描画中だけ画面外に出す */
-.doc.measuring{
-  display:block !important; position:fixed !important;
-  left:-99999px !important; top:0 !important; width:47rem !important;
-}
-figure.diagram svg{height:auto}
-
-/* ---------- チェックリスト ---------- */
-li.task{list-style:none; margin-left:-1.5em; padding-left:0}
-li.task label{
-  display:flex; gap:11px; align-items:flex-start; cursor:pointer;
-  padding:5px 10px; border-radius:7px; transition:background .15s;
-}
-li.task label:hover{background:var(--surface-2)}
-li.task input{
-  appearance:none; flex:0 0 auto; width:17px; height:17px; margin-top:.42em;
-  border:2px solid var(--ink-3); border-radius:4px; cursor:pointer;
-  background:var(--surface); transition:.15s; position:relative;
-}
-li.task input:checked{background:var(--done); border-color:var(--done)}
-li.task input:checked::after{
-  content:""; position:absolute; left:4.5px; top:1px; width:4px; height:9px;
-  border:solid var(--surface); border-width:0 2.5px 2.5px 0; transform:rotate(42deg);
-}
-li.task input:checked+span{
-  color:var(--ink-3); text-decoration:line-through;
-  text-decoration-color:var(--ink-3); text-decoration-thickness:1px;
-}
-
-.progress{
-  margin:0 0 2em;
-  background:var(--surface); border:1px solid var(--line); border-radius:10px;
-  padding:14px 18px; box-shadow:var(--shadow);
-}
-.progress .row{display:flex; justify-content:space-between; align-items:baseline; gap:16px}
-.progress .lbl{font-size:.78rem; letter-spacing:.08em; color:var(--ink-3)}
-.progress .num{
-  font-family:"JetBrains Mono",monospace; font-size:.95rem; font-weight:600;
-  font-variant-numeric:tabular-nums; color:var(--accent-ink);
-}
-.progress .bar{height:6px; background:var(--surface-3); border-radius:3px; margin-top:10px; overflow:hidden}
-.progress .fill{height:100%; background:var(--done); width:0; transition:width .35s ease; border-radius:3px}
-.progress button{
-  font:inherit; font-size:.72rem; background:none; border:1px solid var(--line);
-  color:var(--ink-3); padding:3px 10px; border-radius:5px; cursor:pointer;
-}
-.progress button:hover{border-color:var(--accent); color:var(--accent-ink)}
-
-/* ---------- Issue のフェーズ表示 ---------- */
-.badge{
-  display:inline-block; vertical-align:.18em; margin-left:12px;
-  font-family:"Zen Kaku Gothic New",sans-serif; font-size:.66rem; font-weight:700;
-  letter-spacing:.08em; padding:3px 9px; border-radius:99px; white-space:nowrap;
-  background:var(--accent-soft); color:var(--accent-ink); border:1px solid transparent;
-}
-.badge.p2{background:var(--lens-soft); color:var(--lens)}
-.badge.bonus{background:var(--done-soft); color:var(--done)}
-.badge.submit{background:var(--surface-3); color:var(--ink-2)}
-
-/* Issue の索引 */
-.issue-index{margin:0 0 2.4em}
-.issue-index .cap{
-  font-size:.78rem; letter-spacing:.08em; color:var(--ink-3); margin:0 0 10px;
-}
-.issue-index .grid{
-  display:grid; grid-template-columns:repeat(auto-fill, minmax(168px,1fr)); gap:6px;
-}
-.issue-index a{
-  display:flex; align-items:center; gap:7px; text-decoration:none;
-  padding:7px 10px; border:1px solid var(--line); border-radius:7px;
-  background:var(--surface); color:var(--ink-2); font-size:.76rem; line-height:1.35;
-  transition:border-color .15s, background .15s;
-}
-.issue-index a:hover{border-color:var(--accent); background:var(--surface-2)}
-.issue-index .no{
-  font-family:"JetBrains Mono",monospace; font-weight:600; font-size:.72rem;
-  color:var(--accent-ink); font-variant-numeric:tabular-nums; flex:0 0 auto;
-}
-.issue-index a.p2 .no{color:var(--lens)}
-.issue-index a.bonus .no{color:var(--done)}
-.issue-index a.submit .no{color:var(--ink-3)}
-.issue-index .nm{overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
-.issue-index a.complete{background:var(--done-soft); border-color:var(--done)}
-.issue-index a.complete .no,.issue-index a.complete .nm{color:var(--done)}
-
-/* ---------- モバイル ---------- */
-.railtoggle{display:none}
-@media (max-width:900px){
-  .shell{grid-template-columns:1fr}
-  .rail{
-    position:fixed; inset:0 auto 0 0; width:288px; z-index:20;
-    transform:translateX(-100%); transition:transform .25s ease;
-  }
-  .rail.open{transform:none; box-shadow:0 0 0 100vw rgba(0,0,0,.4)}
-  .main{grid-column:1}
-  .doc{padding:80px 20px 120px}
-  .table-wrap,figure.code,figure.diagram{width:calc(100vw - 40px)}
-  .railtoggle{
-    display:flex; align-items:center; gap:8px; position:fixed; top:12px; left:12px; z-index:30;
-    font:inherit; font-size:.82rem; background:var(--surface); color:var(--ink);
-    border:1px solid var(--line); border-radius:8px; padding:8px 14px;
-    cursor:pointer; box-shadow:var(--shadow);
-  }
-}
-@media (prefers-reduced-motion:reduce){*{transition:none !important; animation:none !important}}
-</style>
+<meta name="description" content="Android 最終課題「ポケモン図鑑アプリ」の学習ガイド。実装の進め方、設計書、環境構築と評価基準を確認できます。">
+<title>ポケモン図鑑アプリ | Android カリキュラム</title>
+<link rel="stylesheet" href="./guide.css">
+<script defer src="./guide.js"></script>
 </head>
 <body>
-<button class="railtoggle" type="button" aria-expanded="false">目次</button>
-
+<header class="masthead">
+  <a class="brand" href="#README"><span class="brand-icon" aria-hidden="true"></span>Android カリキュラム</a>
+  <span class="course-name">モバイルアプリ開発</span>
+  <button class="menu" type="button" aria-controls="sidebar" aria-expanded="false">目次</button>
+</header>
 <div class="shell">
-  <aside class="rail">
-    <div class="plate">
-      <div class="lens"><i></i><b></b><b></b><b></b></div>
-      <h1>ポケモン図鑑アプリ<br>最終課題</h1>
-      <p>ANDROID / KOTLIN · KANTO 151</p>
-    </div>
-    <nav><ul class="doclist" id="doclist"></ul></nav>
+  <aside id="sidebar" class="sidebar">
+    <nav aria-label="教材ナビゲーション">
+      <h2>教材一覧</h2>
+      <div class="doc-links">
+          <a href="#README"><span class="nav-mark" aria-hidden="true">⌂</span>課題の進め方</a>
+          <a href="#01_要件定義"><span class="nav-mark" aria-hidden="true">01</span>要件定義</a>
+          <a href="#02_基本設計"><span class="nav-mark" aria-hidden="true">02</span>基本設計</a>
+          <a href="#03_詳細設計"><span class="nav-mark" aria-hidden="true">03</span>詳細設計</a>
+          <a href="#04_実装仕様"><span class="nav-mark" aria-hidden="true">04</span>実装仕様</a>
+          <a href="#05_環境構築ガイド"><span class="nav-mark" aria-hidden="true">05</span>環境構築ガイド</a>
+      </div>
+      <div class="outline">
+        <h2>このページの目次</h2>
+        <ul id="outline-links"></ul>
+      </div>
+    </nav>
   </aside>
-  <main class="main"><section class="doc" id="doc-0" data-file="README.md"><h1 id="モバイルアプリ開発-最終課題">モバイルアプリ開発 最終課題</h1>
-<p>カントー地方のポケモン図鑑アプリを <strong>Android ネイティブ（Kotlin + Jetpack Compose）</strong> で実装します。全16 Issue。必須要件までおよそ16日、加点と提出物まで含めて26日前後の想定です。</p>
-<p>上から順に読んでいけば、何を作るのか、どう作るのか、どこから手をつけるのかが分かります。</p>
-<h2 id="何を作るのか">何を作るのか</h2>
-<p>PokeAPI からカントー地方の151匹を取得して、一覧と詳細を表示する図鑑アプリです。一度取得したデータは端末に保存し、電波がなくても見られるようにします。</p>
-<p>なぜ作るのか、誰のためのものか、どこまでを対象にするのかは<a class="lnk" href="#01_要件定義" data-doc="01_要件定義.md">01 要件定義</a> に書いてあります。</p>
-<h2 id="どう作るのか">どう作るのか</h2>
-<p><a class="lnk" href="#02_基本設計" data-doc="02_基本設計.md">02 基本設計</a> が全体の骨組みです。画面の一覧と遷移図、PokeAPI とのやりとり、テーブル構成といった「形」が決まります。</p>
-<p>そのうえで <a class="lnk" href="#03_詳細設計" data-doc="03_詳細設計.md">03 詳細設計</a> が、機能ごとのシーケンス図とKotlin の実装例まで踏み込みます。分量があるので、実装する機能のところだけ読めば十分です。</p>
-<h2 id="今回どこまで作るのか">今回どこまで作るのか</h2>
-<p><a class="lnk" href="#04_実装仕様" data-doc="04_実装仕様.md">04 実装仕様</a> が課題としての範囲を決めます。必須機能と加点機能、実装の共通ルール、技術スタック、評価基準の配点、日数の目安。迷ったらこの文書が基準です。</p>
-<p>Kotlin / Jetpack Compose / ViewModel + StateFlow / Room / Retrofit / Coil / Navigation Compose、<code>minSdk</code> は 26（Android 8.0）を使います。</p>
-<h2 id="手を動かす">手を動かす</h2>
-<p><a class="lnk" href="#05_環境構築ガイド" data-doc="05_環境構築ガイド.md">05 環境構築ガイド</a> に沿って、Fork から最初のビルドまで通します。リポジトリを Fork して clone し、プロジェクトを作り、依存を追加して、PokeAPI に繋がるところまで。ここまでで Issue <code>#1</code> と <code>#2</code> が終わります。</p>
-<h2 id="実装する">実装する</h2>
-<p>あとは <a class="lnk ext" href="https://github.com/sghh02/pokedex-android-kadai/issues" target="_blank" rel="noopener">Issues</a> を <code>#1</code> から順に進めるだけです。</p>
-<ol>
-<li>Issue ごとにブランチを切る
-</li>
-<li>実装する
-</li>
-<li>プルリクエストを作成する
-</li>
-<li>メンターに PR の URL を添えてレビューを依頼する
-</li>
-<li>LGTM をもらったら、その Issue は完了
-</li></ol>
-<p>各 Issue には受け入れ条件が付いています。すべて満たしてからレビューを依頼してください。</p>
-<div class="table-wrap"><table><thead><tr><th>Issue</th><th>やること</th><th>目安</th><th>累計</th></tr></thead><tbody><tr><td>#1</td><td>環境構築</td><td>1日</td><td>1</td></tr><tr><td>#2</td><td>PokeAPI 疎通確認</td><td>1日</td><td>2</td></tr><tr><td>#3</td><td>Room データベース構築</td><td>2日</td><td>4</td></tr><tr><td>#4</td><td>PokeApiService と DTO 実装</td><td>2日</td><td>6</td></tr><tr><td>#5</td><td>PokemonRepository 実装</td><td>3日</td><td>9</td></tr><tr><td>#6</td><td>スプラッシュ画面</td><td>0.5日</td><td>9.5</td></tr><tr><td>#7</td><td>ポケモン一覧画面</td><td>2日</td><td>11.5</td></tr><tr><td>#8</td><td>ポケモン詳細画面</td><td>1.5日</td><td>13</td></tr><tr><td>#9</td><td>画面遷移</td><td>1日</td><td>14</td></tr><tr><td>#10</td><td>オフライン対応</td><td>2日</td><td>16</td></tr><tr><td>#11</td><td>ローディングとエラーハンドリング</td><td>1.5日</td><td>17.5</td></tr><tr><td>#12</td><td>検索機能</td><td>1.5日</td><td>19</td></tr><tr><td>#13</td><td>詳細情報の拡張</td><td>2日</td><td>21</td></tr><tr><td>#14</td><td>設定画面と更新</td><td>1.5日</td><td>22.5</td></tr><tr><td>#15</td><td>ユニットテスト</td><td>2日</td><td>24.5</td></tr><tr><td>#16</td><td>提出物の準備</td><td>1日</td><td>25.5</td></tr></tbody></table></div>
-<p><strong>必須要件（#1〜#10）まででおよそ16日</strong>、加点要件とテスト・提出物まで含めて26日前後です。<code>#5</code> の Repository が山場で、Flow の扱いと151件の並列取得をここで作り込みます。詰まったら早めに相談してください。</p>
-<p><code>#1</code> 〜 <code>#10</code> が必須要件（70点）、<code>#11</code> 〜 <code>#14</code> が加点要件（+30点）、<code>#15</code> がボーナス、<code>#16</code> が提出物です。</p>
+  <main>
+<section class="doc home" id="doc-0" data-file="README.md">
+  <span class="doc-start" id="README"></span>
+  <div class="hero" id="何を作るのか">
+    <div class="hero-copy">
+      <p class="eyebrow">モバイルアプリ開発・最終課題</p>
+      <h1 id="モバイルアプリ開発-最終課題">ポケモン図鑑アプリ</h1>
+      <p>PokeAPI からカントー地方の151匹を取得し、一覧と詳細を表示する Android アプリを作ります。取得したデータは端末に保存し、オフラインでも図鑑を開けるようにします。</p>
+      <a class="cta" href="#05_環境構築ガイド">環境構築から始める <span aria-hidden="true">→</span></a>
+    </div>
+    <div class="specimen" aria-hidden="true">
+      <div class="orbit"><i class="ball"></i></div>
+      <span>KANTO &nbsp; No.001–151</span>
+    </div>
+  </div>
+  <dl class="facts">
+    <div><dt>開発環境</dt><dd>Kotlin <small>+ Jetpack Compose</small></dd></div>
+    <div><dt>課題数</dt><dd>16 <small>Issue</small></dd></div>
+    <div><dt>必須要件の目安</dt><dd>約16 <small>日</small></dd></div>
+    <div><dt>提出までの目安</dt><dd>約26 <small>日</small></dd></div>
+  </dl>
+  <h2 id="どう作るのか">設計書の読み方</h2>
+  <p>最初に「要件定義」で完成像をつかみます。実装中は、いま取り組んでいる Issue に合わせて文書を選んでください。</p>
+  <div class="library">
+    <a href="#01_要件定義"><span class="doc-number">01</span><span><strong>要件定義</strong><small>目的と利用者、必要な機能を知る</small></span><span class="arrow" aria-hidden="true">→</span></a>
+    <a href="#02_基本設計"><span class="doc-number">02</span><span><strong>基本設計</strong><small>画面の遷移、API、テーブルのつながりを確認する</small></span><span class="arrow" aria-hidden="true">→</span></a>
+    <a href="#03_詳細設計"><span class="doc-number">03</span><span><strong>詳細設計</strong><small>担当する機能のシーケンス図と Kotlin の実装例を読む</small></span><span class="arrow" aria-hidden="true">→</span></a>
+    <a href="#04_実装仕様" id="今回どこまで作るのか"><span class="doc-number">04</span><span><strong>実装仕様</strong><small>必須・加点の範囲、共通ルール、配点を確認する</small></span><span class="arrow" aria-hidden="true">→</span></a>
+    <a href="#05_環境構築ガイド" id="手を動かす"><span class="doc-number">05</span><span><strong>環境構築ガイド</strong><small>雛形を Fork してビルドし、PokeAPI との通信を試す</small></span><span class="arrow" aria-hidden="true">→</span></a>
+  </div>
+  <p class="note">「要件定義」と「基本設計」の末尾には、それぞれの設計工程を解説した付録があります。</p>
+  <h2 id="実装する">Issue の進め方</h2>
+  <p><a href="https://github.com/sghh02/pokedex-android-kadai/issues">課題リポジトリの Issues</a> に、各課題の実装内容と受け入れ条件があります。</p>
+  <ol class="steps">
+    <li><strong>ブランチを作って実装する</strong><br>Issue #1 から番号順に進めます。Issue ごとに自分の Fork でブランチを作り、実装後に受け入れ条件をすべて確認してください。</li>
+    <li><strong>プルリクエストを出す</strong><br>自分の Fork の main に向けて PR を作り、URL を添えてメンターにレビューを依頼します。</li>
+    <li><strong>承認されたら次の Issue へ進む</strong><br>メンターから LGTM をもらったら、その Issue は完了です。</li>
+  </ol>
+  <h3 id="issue-schedule">16件の課題と日数の目安</h3>
+  <p>#1〜#10 は必須要件（70点）、#11〜#14 は加点要件（+30点）です。#15 はボーナスのユニットテスト、#16 で提出物を準備します。各 Issue の番号から受け入れ条件を開けます。</p>
+<div class="table-wrap"><table><thead><tr><th>Issue</th><th>やること</th><th>目安</th><th>累計（日）</th></tr></thead><tbody><tr><td><a href="https://github.com/sghh02/pokedex-android-kadai/issues/1">#1</a></td><td>環境構築</td><td>1日</td><td>1</td></tr><tr><td><a href="https://github.com/sghh02/pokedex-android-kadai/issues/2">#2</a></td><td>PokeAPI 疎通確認</td><td>1日</td><td>2</td></tr><tr><td><a href="https://github.com/sghh02/pokedex-android-kadai/issues/3">#3</a></td><td>Room データベース構築</td><td>2日</td><td>4</td></tr><tr><td><a href="https://github.com/sghh02/pokedex-android-kadai/issues/4">#4</a></td><td>PokeApiService と DTO 実装</td><td>2日</td><td>6</td></tr><tr><td><a href="https://github.com/sghh02/pokedex-android-kadai/issues/5">#5</a></td><td>PokemonRepository 実装</td><td>3日</td><td>9</td></tr><tr><td><a href="https://github.com/sghh02/pokedex-android-kadai/issues/6">#6</a></td><td>スプラッシュ画面</td><td>0.5日</td><td>9.5</td></tr><tr><td><a href="https://github.com/sghh02/pokedex-android-kadai/issues/7">#7</a></td><td>ポケモン一覧画面</td><td>2日</td><td>11.5</td></tr><tr><td><a href="https://github.com/sghh02/pokedex-android-kadai/issues/8">#8</a></td><td>ポケモン詳細画面</td><td>1.5日</td><td>13</td></tr><tr><td><a href="https://github.com/sghh02/pokedex-android-kadai/issues/9">#9</a></td><td>画面遷移</td><td>1日</td><td>14</td></tr><tr><td><a href="https://github.com/sghh02/pokedex-android-kadai/issues/10">#10</a></td><td>オフライン対応</td><td>2日</td><td>16</td></tr><tr><td><a href="https://github.com/sghh02/pokedex-android-kadai/issues/11">#11</a></td><td>ローディングとエラーハンドリング</td><td>1.5日</td><td>17.5</td></tr><tr><td><a href="https://github.com/sghh02/pokedex-android-kadai/issues/12">#12</a></td><td>検索機能</td><td>1.5日</td><td>19</td></tr><tr><td><a href="https://github.com/sghh02/pokedex-android-kadai/issues/13">#13</a></td><td>詳細情報の拡張</td><td>2日</td><td>21</td></tr><tr><td><a href="https://github.com/sghh02/pokedex-android-kadai/issues/14">#14</a></td><td>設定画面と更新</td><td>1.5日</td><td>22.5</td></tr><tr><td><a href="https://github.com/sghh02/pokedex-android-kadai/issues/15">#15</a></td><td>ユニットテスト</td><td>2日</td><td>24.5</td></tr><tr><td><a href="https://github.com/sghh02/pokedex-android-kadai/issues/16">#16</a></td><td>提出物の準備</td><td>1日</td><td>25.5</td></tr></tbody></table></div>
+  <blockquote><p><strong>Issue #5 の目安は3日です。</strong> Repository で Flow と151匹分の並列取得を扱います。詰まったら早めにメンターに相談してください。</p></blockquote>
+  <h3>使用する技術</h3>
+  <p>Kotlin、Jetpack Compose、ViewModel + StateFlow、Room、Retrofit、Coil、Navigation Compose を使います。最小対応バージョンは Android 8.0（API 26）です。</p>
 <h2 id="素材">素材</h2>
 <ul>
-<li><a class="lnk ext" href="https://github.com/sghh02/pokedex-android-kadai/tree/main/素材/launcher_icon" target="_blank" rel="noopener">launcher_icon</a> — アプリアイコン
+<li><a class="lnk ext" href="https://github.com/sghh02/pokedex-android-kadai/tree/main/素材/launcher_icon" target="_blank" rel="noopener">アプリアイコン</a>
 </li>
 <li><a class="lnk ext" href="https://www.figma.com/design/b0kI8aTikCubCeKQdcSKEC/%E3%83%9D%E3%82%B1%E3%83%A2%E3%83%B3%E5%9B%B3%E9%91%91%28%E3%82%AB%E3%83%B3%E3%83%88%E3%83%BC%E5%9C%B0%E6%96%B9%29%E3%83%87%E3%82%B6%E3%82%A4%E3%83%B3?node-id=3-40&amp;t=c3mklPkvnhvy8Sp5-1" target="_blank" rel="noopener">Figma デザイン</a> — 画面レイアウト
 </li></ul>
-<p>01・02 の末尾には、要件定義・基本設計という工程そのものの解説を付録として収録しています。</p></section>
-<section class="doc" id="doc-1" data-file="05_環境構築ガイド.md" hidden><h1 id="環境構築ガイド">環境構築ガイド</h1>
+</section>
+<section class="doc reader" id="doc-1" data-file="05_環境構築ガイド.md">
+  <span class="doc-start" id="05_環境構築ガイド"></span>
+<header class="reader-head"><p class="eyebrow">最終課題 / 教材 05</p><h1 id="環境構築ガイド">環境構築ガイド</h1><p>課題の雛形を手元で動かすところから、最初のプルリクエストまでを確認します。</p></header>
 <p><a class="lnk ext" href="https://github.com/sghh02/pokedex-android-kadai/issues" target="_blank" rel="noopener">Issue</a> の <code>#1</code> と <code>#2</code> を進めるための手順です。<strong>1〜2日で終わります。</strong> プロジェクトの雛形とビルド設定は同梱済みなので、Fork してビルドを通し、PokeAPI に繋がることを確かめるところまでです。</p>
 <h2 id="1-前提">1. 前提</h2>
 <div class="table-wrap"><table><thead><tr><th>項目</th><th>要件</th></tr></thead><tbody><tr><td>Android Studio</td><td>最新の安定版</td></tr><tr><td>JDK</td><td>Android Studio 同梱の JDK（17以上）</td></tr><tr><td>確認端末</td><td>エミュレータ（API 26 以上）または実機</td></tr></tbody></table></div>
@@ -371,7 +96,7 @@ li.task input:checked+span{
 <p>課題リポジトリに直接プッシュする権限はありません。必ず Fork してから作業します。</p>
 <h3 id="2-2-fork-する">2.2 Fork する</h3>
 <ol>
-<li>課題リポジトリ &lt;https://github.com/sghh02/pokedex-android-kadai&gt; を開く
+<li><a href="https://github.com/sghh02/pokedex-android-kadai">課題リポジトリ</a>を開く
 </li>
 <li>ページ右上の <strong>Fork</strong> ボタンを押す
 </li>
@@ -577,9 +302,11 @@ class PokemonDaoTest {
 <p>実行はこれだけです。エミュレータは要りません。</p>
 <figure class="code"><div class="code-head"><span>bash</span><button class="copy" type="button">コピー</button></div><pre><code class="lang-bash">./gradlew test</code></pre></figure>
 <h2 id="10-よくあるつまずき">10. よくあるつまずき</h2>
-<div class="table-wrap"><table><thead><tr><th>症状</th><th>原因と対処</th></tr></thead><tbody><tr><td><code>SecurityException: Permission denied</code></td><td><code>INTERNET</code> 権限が未指定</td></tr><tr><td>画像が表示されない</td><td>Coil 3 の <code>coil-network-okhttp</code> が未追加</td></tr><tr><td><code>lateinit property container has not been initialized</code></td><td>Manifest の <code>android:name=&quot;.PokedexApplication&quot;</code> が未指定</td></tr><tr><td><code>Unable to create converter for ...</code></td><td><code>@Serializable</code> の付け忘れ、または converter の未登録</td></tr><tr><td><code>Field &#x27;xxx&#x27; is required but was missing</code></td><td>API のレスポンスに null が入る。<code>Json { ignoreUnknownKeys = true }</code> と、DTO のフィールドを nullable にする</td></tr><tr><td>Room の <code>@Upsert</code> が見つからない</td><td>Room 2.5 未満。<code>libs.versions.toml</code> のバージョンを確認</td></tr><tr><td>ビルドが <code>ksp</code> で失敗する</td><td>KSP と Kotlin のバージョンが噛み合っていない。上記「バージョンの扱い」を参照</td></tr><tr><td><code>Cannot add extension with name &#x27;kotlin&#x27;</code></td><td><code>kotlin.android</code> プラグインを自分で足している。AGP 9 以降は不要</td></tr><tr><td><code>Module was compiled with an incompatible version of Kotlin</code></td><td>ライブラリが要求する Kotlin のほうが新しい。多くは Coil。バージョンを下げるか Kotlin を上げる</td></tr><tr><td><code>Unresolved reference: Icons</code></td><td><code>material-icons-core</code> が未追加。material3 1.4.0 以降は推移依存に含まれない</td></tr><tr><td><code>Serializer has not been found for type</code></td><td>ドメインモデルに <code>@Serializable</code> が付いていない</td></tr><tr><td>in-memory DB のテストが <code>Context</code> で落ちる</td><td>Robolectric が未追加、または <code>unitTests.isIncludeAndroidResources</code> が未設定</td></tr><tr><td>Robolectric が <code>targetSdk</code> に対応していないと言う</td><td>Robolectric の対応は Android の最新版より遅れる。<code>src/test/resources/robolectric.properties</code> に <code>sdk=36</code> のように対応済みの API を指定する</td></tr><tr><td><code>checkDebugAarMetadata</code> で失敗する</td><td><code>compileSdk</code> が足りない。Navigation Compose 2.10.0 は 37 以上を要求する</td></tr><tr><td>初回起動が終わらない</td><td>151回の詳細取得をスプラッシュで待っている、逐次実行している、または再試行の待機が長すぎる。取得の完了を待たずに遷移し、同時実行数を制限した並列取得にする（<a class="lnk" href="#5-pokeapi-の実装上の注意" data-doc="04_実装仕様.md">実装上の注意</a>）</td></tr></tbody></table></div></section>
-<section class="doc" id="doc-2" data-file="04_実装仕様.md" hidden><h1 id="実装仕様-ポケモン図鑑アプリ">実装仕様 — ポケモン図鑑アプリ</h1>
-<p>実装するスコープ、使用する技術、評価の基準を定めます。何を作るかはこの文書が基準になります。背景は<a class="lnk" href="#01_要件定義" data-doc="01_要件定義.md">要件定義</a>、設計の詳細は<a class="lnk" href="#02_基本設計" data-doc="02_基本設計.md">基本設計</a>・<a class="lnk" href="#03_詳細設計" data-doc="03_詳細設計.md">詳細設計</a>を参照してください。</p>
+<div class="table-wrap"><table><thead><tr><th>症状</th><th>原因と対処</th></tr></thead><tbody><tr><td><code>SecurityException: Permission denied</code></td><td><code>INTERNET</code> 権限が未指定</td></tr><tr><td>画像が表示されない</td><td>Coil 3 の <code>coil-network-okhttp</code> が未追加</td></tr><tr><td><code>lateinit property container has not been initialized</code></td><td>Manifest の <code>android:name=&quot;.PokedexApplication&quot;</code> が未指定</td></tr><tr><td><code>Unable to create converter for ...</code></td><td><code>@Serializable</code> の付け忘れ、または converter の未登録</td></tr><tr><td><code>Field &#x27;xxx&#x27; is required but was missing</code></td><td>API のレスポンスに null が入る。<code>Json { ignoreUnknownKeys = true }</code> と、DTO のフィールドを nullable にする</td></tr><tr><td>Room の <code>@Upsert</code> が見つからない</td><td>Room 2.5 未満。<code>libs.versions.toml</code> のバージョンを確認</td></tr><tr><td>ビルドが <code>ksp</code> で失敗する</td><td>KSP と Kotlin のバージョンが噛み合っていない。上記「バージョンの扱い」を参照</td></tr><tr><td><code>Cannot add extension with name &#x27;kotlin&#x27;</code></td><td><code>kotlin.android</code> プラグインを自分で足している。AGP 9 以降は不要</td></tr><tr><td><code>Module was compiled with an incompatible version of Kotlin</code></td><td>ライブラリが要求する Kotlin のほうが新しい。多くは Coil。バージョンを下げるか Kotlin を上げる</td></tr><tr><td><code>Unresolved reference: Icons</code></td><td><code>material-icons-core</code> が未追加。material3 1.4.0 以降は推移依存に含まれない</td></tr><tr><td><code>Serializer has not been found for type</code></td><td>ドメインモデルに <code>@Serializable</code> が付いていない</td></tr><tr><td>in-memory DB のテストが <code>Context</code> で落ちる</td><td>Robolectric が未追加、または <code>unitTests.isIncludeAndroidResources</code> が未設定</td></tr><tr><td>Robolectric が <code>targetSdk</code> に対応していないと言う</td><td>Robolectric の対応は Android の最新版より遅れる。<code>src/test/resources/robolectric.properties</code> に <code>sdk=36</code> のように対応済みの API を指定する</td></tr><tr><td><code>checkDebugAarMetadata</code> で失敗する</td><td><code>compileSdk</code> が足りない。Navigation Compose 2.10.0 は 37 以上を要求する</td></tr><tr><td>初回起動が終わらない</td><td>151回の詳細取得をスプラッシュで待っている、逐次実行している、または再試行の待機が長すぎる。取得の完了を待たずに遷移し、同時実行数を制限した並列取得にする（<a class="lnk" href="#5-pokeapi-の実装上の注意">実装上の注意</a>）</td></tr></tbody></table></div></section>
+<section class="doc reader" id="doc-2" data-file="04_実装仕様.md">
+  <span class="doc-start" id="04_実装仕様"></span>
+<header class="reader-head"><p class="eyebrow">最終課題 / 教材 04</p><h1 id="実装仕様-ポケモン図鑑アプリ">実装仕様</h1><p>各 Issue に着手するときは<a href="#2-3-実装の共通ルール">実装の共通ルール</a>を、提出前には<a href="#8-評価基準">評価基準</a>を確認してください。</p></header>
+<p>実装するスコープ、使用する技術、評価の基準を定めます。何を作るかはこの文書が基準になります。背景は<a class="lnk" href="#01_要件定義">要件定義</a>、設計の詳細は<a class="lnk" href="#02_基本設計">基本設計</a>・<a class="lnk" href="#03_詳細設計">詳細設計</a>を参照してください。</p>
 <h2 id="1-学習目標">1. 学習目標</h2>
 <p>この課題を通じて次のスキルを習得します。</p>
 <div class="table-wrap"><table><thead><tr><th>領域</th><th>身につけること</th></tr></thead><tbody><tr><td>REST API連携</td><td>Retrofit による PokeAPI との通信</td></tr><tr><td>ローカルデータベース</td><td>Room（SQLite）によるデータ永続化</td></tr><tr><td>状態管理</td><td>ViewModel + StateFlow による MVVM</td></tr><tr><td>宣言的UI</td><td>Jetpack Compose による画面実装</td></tr><tr><td>非同期処理</td><td>Kotlin Coroutines / Flow の実践</td></tr><tr><td>エラーハンドリング</td><td>ネットワークエラーとユーザーへのフィードバック</td></tr></tbody></table></div>
@@ -598,31 +325,20 @@ class PokemonDaoTest {
 <h3 id="2-2-主要コンポーネント">2.2 主要コンポーネント</h3>
 <div class="table-wrap"><table><thead><tr><th>コンポーネント</th><th>役割</th></tr></thead><tbody><tr><td><code>PokemonRepository</code></td><td>API とローカルDBを束ね、画面に単一の入口を提供する</td></tr><tr><td><code>PokeApiService</code></td><td>PokeAPI との通信（Retrofit インターフェース）</td></tr><tr><td><code>PokemonDao</code> / <code>AppDatabase</code></td><td>Room によるローカル永続化</td></tr><tr><td><code>DetailCache</code></td><td>詳細情報のキャッシュ（直近10件）</td></tr><tr><td><code>UpdateService</code></td><td>151匹ぶんの取得と再試行の制御</td></tr><tr><td><code>NetworkMonitor</code></td><td>ネットワーク状態の監視</td></tr><tr><td><code>*ViewModel</code></td><td>画面ごとの状態保持（<code>StateFlow</code> で公開）</td></tr></tbody></table></div>
 <h3 id="2-3-実装の共通ルール">2.3 実装の共通ルール</h3>
-<p>Issue をまたいで守るルールです。レビューでも見ます。</p>
+<p>すべての Issue に共通するレビュー項目です。実装に入る前と、PR を出す前に確認してください。</p>
 <ul>
-<li><strong>アーキテクチャ</strong> — UI / ViewModel / Repository / DataSource の4層。
-</li></ul>
-<p>Composable から Repository や API を直接呼ばない。</p>
-<ul>
-<li><strong>状態の公開</strong> — ViewModel は <code>StateFlow</code> で UI 状態を公開し、
-</li></ul>
-<p>画面は <code>collectAsStateWithLifecycle()</code> で購読する。</p>
-<ul>
-<li><strong>単一の情報源</strong> — 一覧データはローカルDBを唯一の情報源とする。
-</li></ul>
-<p>API の結果は DB を経由して画面へ届ける。</p>
-<ul>
-<li><strong>エラーの扱い</strong> — Repository より下では例外を投げず <code>Result</code> で返す。
-</li></ul>
-<p>例外の分類とユーザー向け文言への変換は <a class="lnk" href="#03_詳細設計" data-doc="03_詳細設計.md">詳細設計 5. エラーハンドリング</a> の<code>AppException</code> / <code>toUserMessage()</code> に従う。画面はメッセージ文字列だけを扱う。</p>
-<ul>
-<li><strong>DI</strong> — Phase 1 は <code>PokedexApplication</code> が持つ <code>AppContainer</code> による手動DIとする。
-</li></ul>
-<p>Hilt の導入は任意（加点対象）。<strong>Phase 1 の途中で切り替えないこと。</strong></p>
-<ul>
-<li><strong>命名</strong> — 詳細設計のシーケンス図とクラス名を一致させる
-</li></ul>
-<p>（<code>PokemonRepository</code> / <code>PokeApiService</code> / <code>PokemonDao</code> / <code>DetailCache</code> / <code>NetworkMonitor</code>）。</p>
+<li><strong>アーキテクチャ</strong> — UI / ViewModel / Repository / DataSource の4層。Composable から Repository や API を直接呼ばない。</li>
+
+<li><strong>状態の公開</strong> — ViewModel は <code>StateFlow</code> で UI 状態を公開し、画面は <code>collectAsStateWithLifecycle()</code> で購読する。</li>
+
+<li><strong>単一の情報源</strong> — 一覧データはローカルDBを唯一の情報源とする。API の結果は DB を経由して画面へ届ける。</li>
+
+<li><strong>エラーの扱い</strong> — Repository より下では例外を投げず <code>Result</code> で返す。例外の分類とユーザー向け文言への変換は <a class="lnk" href="#5-エラーハンドリング">詳細設計 5. エラーハンドリング</a> の<code>AppException</code> / <code>toUserMessage()</code> に従う。画面はメッセージ文字列だけを扱う。</li>
+
+<li><strong>DI</strong> — Phase 1 は <code>PokedexApplication</code> が持つ <code>AppContainer</code> による手動DIとする。Hilt の導入は任意（加点対象）。<strong>Phase 1 の途中で切り替えないこと。</strong></li>
+
+<li><strong>命名</strong> — 詳細設計のシーケンス図とクラス名を一致させる（<code>PokemonRepository</code> / <code>PokeApiService</code> / <code>PokemonDao</code> / <code>DetailCache</code> / <code>NetworkMonitor</code>）。</li>
+</ul>
 <h2 id="3-機能仕様">3. 機能仕様</h2>
 <p>Phase 1 が必須、Phase 2 が加点対象です。Phase 1 を終えてから Phase 2 に進みます。</p>
 <h3 id="3-1-phase-1-基本機能-必須">3.1 Phase 1: 基本機能（必須）</h3>
@@ -707,7 +423,7 @@ CREATE INDEX idx_cache_last_accessed ON pokemon_detail_cache(last_accessed);</co
 </li>
 <li>Android Studio は最新の安定版を使用する
 </li></ul>
-<p>具体的な依存の書き方は<a class="lnk" href="#05_環境構築ガイド" data-doc="05_環境構築ガイド.md">環境構築ガイド</a>にあります。</p>
+<p>具体的な依存の書き方は<a class="lnk" href="#05_環境構築ガイド">環境構築ガイド</a>にあります。</p>
 <h2 id="7-実装手順">7. 実装手順</h2>
 <p>作業は <a class="lnk ext" href="https://github.com/sghh02/pokedex-android-kadai/issues" target="_blank" rel="noopener">GitHub Issues</a> の Issue に対応します。日数は着手から完了までの目安で、初めて触る前提の見積もりです。</p>
 <div class="table-wrap"><table><thead><tr><th>Issue</th><th>やること</th><th>目安</th><th>累計</th></tr></thead><tbody><tr><td>#1</td><td>環境構築</td><td>1日</td><td>1</td></tr><tr><td>#2</td><td>PokeAPI 疎通確認</td><td>1日</td><td>2</td></tr><tr><td>#3</td><td>Room データベース構築</td><td>2日</td><td>4</td></tr><tr><td>#4</td><td>PokeApiService と DTO 実装</td><td>2日</td><td>6</td></tr><tr><td>#5</td><td>PokemonRepository 実装</td><td>3日</td><td>9</td></tr><tr><td>#6</td><td>スプラッシュ画面</td><td>0.5日</td><td>9.5</td></tr><tr><td>#7</td><td>ポケモン一覧画面</td><td>2日</td><td>11.5</td></tr><tr><td>#8</td><td>ポケモン詳細画面</td><td>1.5日</td><td>13</td></tr><tr><td>#9</td><td>画面遷移</td><td>1日</td><td>14</td></tr><tr><td>#10</td><td>オフライン対応</td><td>2日</td><td>16</td></tr><tr><td>#11</td><td>ローディングとエラーハンドリング</td><td>1.5日</td><td>17.5</td></tr><tr><td>#12</td><td>検索機能</td><td>1.5日</td><td>19</td></tr><tr><td>#13</td><td>詳細情報の拡張</td><td>2日</td><td>21</td></tr><tr><td>#14</td><td>設定画面と更新</td><td>1.5日</td><td>22.5</td></tr><tr><td>#15</td><td>ユニットテスト</td><td>2日</td><td>24.5</td></tr><tr><td>#16</td><td>提出物の準備</td><td>1日</td><td>25.5</td></tr></tbody></table></div>
@@ -808,36 +524,24 @@ CREATE INDEX idx_cache_last_accessed ON pokemon_detail_cache(last_accessed);</co
 </li>
 <li><a class="lnk ext" href="https://coil-kt.github.io/coil/compose/" target="_blank" rel="noopener">Coil（画像読み込み）</a>
 </li></ul></section>
-<section class="doc" id="doc-3" data-file="01_要件定義.md" hidden><h1 id="要件定義書-ポケモン図鑑アプリ-カントー地方">要件定義書 — ポケモン図鑑アプリ（カントー地方）</h1>
-<blockquote><p><strong>本課題の実装対象は Android のみです。</strong>iOS や他フレームワークに関する記述は、実際の製品を想定した設計として残しています。実装スコープは <a class="lnk" href="#04_実装仕様" data-doc="04_実装仕様.md">実装仕様</a> と <a class="lnk ext" href="https://github.com/sghh02/pokedex-android-kadai/issues" target="_blank" rel="noopener">GitHub Issues</a> を参照してください。</p></blockquote>
+<section class="doc reader" id="doc-3" data-file="01_要件定義.md">
+  <span class="doc-start" id="01_要件定義"></span>
+<header class="reader-head"><p class="eyebrow">最終課題 / 教材 01</p><h1 id="要件定義書-ポケモン図鑑アプリ-カントー地方">要件定義</h1><p>図鑑を誰が、何のために使うのかを読み、必要な機能と品質を把握します。</p></header>
+<blockquote><p><strong>本課題の実装対象は Android のみです。</strong>iOS や他フレームワークに関する記述は、実際の製品を想定した設計として残しています。実装スコープは <a class="lnk" href="#04_実装仕様">実装仕様</a> と <a class="lnk ext" href="https://github.com/sghh02/pokedex-android-kadai/issues" target="_blank" rel="noopener">GitHub Issues</a> を参照してください。</p></blockquote>
 <h2 id="1-目的・ターゲットユーザー・スコープ">1. 目的・ターゲットユーザー・スコープ</h2>
 <h3 id="目的">目的</h3>
 <ul>
-<li>ポケモン図鑑への協力を促進:
-<ul>
-<li>各町の住人やポケモン研究者にポケモン情報の収集をお願いするため、スマホを使ったアプリ化を進めることで、より多くの協力を得ることができる。
-</li>
-<li>住人やトレーナーに積極的に情報提供を促し、協力を得るための簡単なインターフェースを提供する。
-</li></ul>
-</li>
-<li>郵送の手間を省く:
-<ul>
-<li>これまで郵送で行われていたポケモン図鑑の申請作業をアプリ化し、物理的な手間を省き、即時に情報が送信される仕組みを作ることで、全体的な作業の効率化を図る。
-</li></ul>
-</li></ul>
-<h3 id="ターゲットユーザー">ターゲットユーザー</h3>
-<ul>
-<li>カントー地方のポケモン研究者
-</li></ul>
-<p>ポケモンの詳細な情報を求めている研究者たち。彼らはポケモンの分類や生息地に関するデータを集め、記録します。</p>
-<ul>
-<li>カントー地方を旅するトレーナー
-</li></ul>
-<p>ポケモンの捕獲や育成に興味があるトレーナー。捕まえたポケモンの情報を管理し、進化条件や生息地を知りたいと思っています。</p>
-<ul>
-<li>ポケモンに興味があるカントー地方の住人
-</li></ul>
-<p>カントー地方に住む、ポケモンに興味があるが研究者やトレーナーではない住民たち。日常生活の中でポケモンの情報を知りたいと考えています。</p>
+<li><strong>図鑑づくりに参加しやすくする。</strong> 各町の住人や研究者、旅先のトレーナーが、スマホから簡単にポケモンの情報を提供できるようにします。</li>
+<li><strong>申請をその場で送れるようにする。</strong> 郵送していた図鑑の申請をアプリで送り、情報が届くまでの時間と手間を減らします。</li>
+</ul>
+<h3 id="ターゲットユーザー">図鑑を使う人</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>カントー地方の利用者</th><th>図鑑でしたいこと</th></tr></thead>
+<tbody>
+<tr><td>ポケモン研究者</td><td>分類や生息地などの詳しい情報を集めて記録する。</td></tr>
+<tr><td>旅をするトレーナー</td><td>捕まえたポケモンを管理し、捕獲や育成に必要な生息地・進化条件を調べる。</td></tr>
+<tr><td>ポケモンに興味がある住人</td><td>日常生活で気になったポケモンを調べる。</td></tr>
+</tbody></table></div>
 <h3 id="スコープ">スコープ</h3>
 <ol>
 <li>ポケモン図鑑の機能
@@ -1244,10 +948,12 @@ CREATE INDEX idx_cache_last_accessed ON pokemon_detail_cache(last_accessed);</co
 <li><strong>優先順位づけ</strong>: すべての要件が同じ重要度ではありません。要件には優先順位をつけ、最も重要なものから対応していくことが大切です。
 </li></ol>
 <p>要件定義はプロジェクトの成功を左右する重要なプロセスです。十分な時間をかけて丁寧に行うことで、後の工程をスムーズに進めることができます。</p></section>
-<section class="doc" id="doc-4" data-file="02_基本設計.md" hidden><h1 id="基本設計書-ポケモン図鑑アプリ-カントー地方">基本設計書 — ポケモン図鑑アプリ（カントー地方）</h1>
-<blockquote><p><strong>本課題の実装対象は Android のみです。</strong>iOS や他フレームワークに関する記述は、実際の製品を想定した設計として残しています。実装スコープは <a class="lnk" href="#04_実装仕様" data-doc="04_実装仕様.md">実装仕様</a> と <a class="lnk ext" href="https://github.com/sghh02/pokedex-android-kadai/issues" target="_blank" rel="noopener">GitHub Issues</a> を参照してください。</p></blockquote>
+<section class="doc reader" id="doc-4" data-file="02_基本設計.md">
+  <span class="doc-start" id="02_基本設計"></span>
+<header class="reader-head"><p class="eyebrow">最終課題 / 教材 02</p><h1 id="基本設計書-ポケモン図鑑アプリ-カントー地方">基本設計</h1><p>画面・データ・外部 API のつながりを確認し、担当する機能がアプリ全体のどこにあるかをつかみます。</p></header>
+<blockquote><p><strong>本課題の実装対象は Android のみです。</strong>iOS や他フレームワークに関する記述は、実際の製品を想定した設計として残しています。実装スコープは <a class="lnk" href="#04_実装仕様">実装仕様</a> と <a class="lnk ext" href="https://github.com/sghh02/pokedex-android-kadai/issues" target="_blank" rel="noopener">GitHub Issues</a> を参照してください。</p></blockquote>
 <h2 id="1-はじめに">1. はじめに</h2>
-<p>この基本設計書は、「ポケモン図鑑アプリケーション」のシステム全体像や主要機能の概要を示すものです。システム設計の基礎となる部分であり、今後の開発作業を進めるための指針となります。</p>
+<p>画面を作るときは<a href="#2-2-画面設計">画面設計</a>を、データ取得を実装するときは<a href="#2-3-外部インターフェース設計">外部インターフェース設計</a>を参照してください。</p>
 <hr>
 <h2 id="2-機能設計">2. 機能設計</h2>
 <h3 id="2-1-システム方式設計">2.1 システム方式設計</h3>
@@ -1471,12 +1177,16 @@ CREATE INDEX idx_cache_last_accessed ON pokemon_detail_cache(last_accessed);</co
   class E configScreen;
   class B navElement;</pre></figure>
 <h5 id="画面遷移説明">画面遷移説明</h5>
-<p>スプラッシュ画面:アプリ起動後始めに表示される画面。ポケモン基本情報更新機能を開始する。表示時間は0.5秒〜1秒に収まるようにし、更新が終わるか関係なく「ポケモン一覧画面」に遷移する。</p>
-<p>ポケモン一覧画面:「ポケモン一覧画面」からは、選択したポケモンの詳細情報を表示するために「ポケモン詳細画面」へ遷移できます。また、ボトムナビゲーションバーを使って、「設定画面」へ遷移できます。</p>
-<p>ポケモン詳細画面:ユーザーはポケモンの詳細情報を確認後、ヘッダーの戻るボタンか戻るジェスチャーを使用して「ポケモン一覧画面」へ戻ることができます。詳細情報は自動的にキャッシュされ、最後に閲覧した10件はオフラインでも参照可能です。</p>
-<p>設定画面:ユーザーは「設定画面」で手動でデータ更新ができます。設定画面からもボトムナビゲーションバーを使用して「ポケモン一覧画面」に遷移可能です。</p>
+<div class="table-wrap"><table>
+<thead><tr><th>画面</th><th>表示中の動作と次の画面</th></tr></thead>
+<tbody>
+<tr><td>スプラッシュ</td><td>起動時に基本情報の更新を開始します。更新は裏で続け、0.5〜1秒で一覧に移ります。</td></tr>
+<tr><td>ポケモン一覧</td><td>ポケモンを選ぶと詳細画面が開きます。下部のナビゲーションから設定画面にも移れます。</td></tr>
+<tr><td>ポケモン詳細</td><td>戻るボタンまたは戻るジェスチャーで一覧に戻ります。閲覧した詳細は自動で保存し、直近10件をオフラインで参照できます。</td></tr>
+<tr><td>設定</td><td>手動でデータを更新できます。下部のナビゲーションから一覧に戻ります。</td></tr>
+</tbody></table></div>
 <h4 id="2-2-3-画面レイアウト">2.2.3 画面レイアウト</h4>
-<p>以下を参照</p>
+<p>各画面の配置や見た目は、Figma のデザインで確認してください。</p>
 <p><a class="lnk ext" href="https://www.figma.com/design/b0kI8aTikCubCeKQdcSKEC/%E3%83%9D%E3%82%B1%E3%83%A2%E3%83%B3%E5%9B%B3%E9%91%91%28%E3%82%AB%E3%83%B3%E3%83%88%E3%83%BC%E5%9C%B0%E6%96%B9%29%E3%83%87%E3%82%B6%E3%82%A4%E3%83%B3?node-id=3-40&amp;t=c3mklPkvnhvy8Sp5-1" target="_blank" rel="noopener">Figma: ポケモン図鑑(カントー地方)デザイン</a></p>
 <hr>
 <h3 id="2-3-外部インターフェース設計">2.3 外部インターフェース設計</h3>
@@ -1533,7 +1243,7 @@ CREATE INDEX idx_cache_last_accessed ON pokemon_detail_cache(last_accessed);</co
 </li></ol>
 <h4 id="2-3-3-外部インターフェース定義">2.3.3 外部インターフェース定義</h4>
 <p><strong>1. PokeAPI</strong></p>
-<p>利用するエンドポイントと、レスポンスから取り出す項目は<a class="lnk" href="#03_詳細設計" data-doc="03_詳細設計.md">詳細設計 3. API設計</a>にまとめています。公式の仕様は <a class="lnk ext" href="https://pokeapi.co/docs/v2" target="_blank" rel="noopener">PokeAPI ドキュメント</a> を参照してください。</p>
+<p>利用するエンドポイントと、レスポンスから取り出す項目は<a class="lnk" href="#3-api設計">詳細設計 3. API設計</a>にまとめています。公式の仕様は <a class="lnk ext" href="https://pokeapi.co/docs/v2" target="_blank" rel="noopener">PokeAPI ドキュメント</a> を参照してください。</p>
 <h5 id="エラー処理">エラー処理</h5>
 <p>PokeAPIを利用する際のエラー処理は、以下の通り定義します。</p>
 <ol>
@@ -1640,7 +1350,7 @@ CREATE INDEX idx_cache_last_accessed ON pokemon_detail_cache(last_accessed);</co
 </li></ul>
 </li></ol>
 <h4 id="2-4-3-テーブル構成">2.4.3 テーブル構成</h4>
-<blockquote><p>物理スキーマの正は<a class="lnk" href="#04_実装仕様" data-doc="04_実装仕様.md">実装仕様 4. データベース設計</a>です。ここでは持つ情報の種類だけを示します。</p></blockquote>
+<blockquote><p>物理スキーマの正は<a class="lnk" href="#4-データベース設計">実装仕様 4. データベース設計</a>です。ここでは持つ情報の種類だけを示します。</p></blockquote>
 <p><strong>1. テーブル名: pokemon</strong>（ポケモンの基本情報）</p>
 <div class="table-wrap"><table><thead><tr><th>カラム名</th><th>データ型</th><th>説明</th></tr></thead><tbody><tr><td><strong>id</strong></td><td><code>INTEGER</code></td><td>主キー。図鑑番号をそのまま使う。</td></tr><tr><td><strong>name</strong></td><td><code>TEXT</code></td><td>英語名。一覧APIから取得。</td></tr><tr><td><strong>name_ja</strong></td><td><code>TEXT</code></td><td>日本語名。pokemon-species から取得（Phase 2）。</td></tr><tr><td><strong>image_url</strong></td><td><code>TEXT</code></td><td>画像のURL。</td></tr><tr><td><strong>height</strong></td><td><code>INTEGER</code></td><td>身長。APIの生値（デシメートル）。</td></tr><tr><td><strong>weight</strong></td><td><code>INTEGER</code></td><td>体重。APIの生値（ヘクトグラム）。</td></tr><tr><td><strong>type1</strong></td><td><code>TEXT</code></td><td>主タイプ。</td></tr><tr><td><strong>type2</strong></td><td><code>TEXT</code></td><td>副タイプ。単タイプのポケモンは NULL。</td></tr><tr><td><strong>created_at</strong></td><td><code>INTEGER</code></td><td>保存日時（エポックミリ秒）。</td></tr></tbody></table></div>
 <p><strong>2. テーブル名: pokemon_detail_cache</strong>（詳細情報のキャッシュ・直近10件）</p>
@@ -1760,10 +1470,12 @@ CREATE INDEX idx_cache_last_accessed ON pokemon_detail_cache(last_accessed);</co
 <p>基本設計は後工程の詳細設計や実装の基盤となるため、ここでの判断ミスは後の大幅な修正につながる可能性があります。そのため、十分な検討と関係者間での合意形成が重要です。</p>
 <h3 id="まとめ">まとめ</h3>
 <p>基本設計とは、開発プロジェクトにおいて「何を」「どのように」作るかの骨組みを決める重要なプロセスです。明確で適切な基本設計があれば、後の工程がスムーズに進み、品質の高いシステムを効率的に開発することができます。</p></section>
-<section class="doc" id="doc-5" data-file="03_詳細設計.md" hidden><h1 id="詳細設計書-ポケモン図鑑アプリ-カントー地方">詳細設計書 — ポケモン図鑑アプリ（カントー地方）</h1>
+<section class="doc reader" id="doc-5" data-file="03_詳細設計.md">
+  <span class="doc-start" id="03_詳細設計"></span>
+<header class="reader-head"><p class="eyebrow">最終課題 / 教材 03</p><h1 id="詳細設計書-ポケモン図鑑アプリ-カントー地方">詳細設計</h1><p>いま実装する機能を目次から選び、処理の流れを図で追ってから Kotlin の例を読んでください。</p></header>
 <h2 id="はじめに">はじめに</h2>
-<p>この詳細設計書は、<a class="lnk" href="#01_要件定義" data-doc="01_要件定義.md">要件定義</a>と<a class="lnk" href="#02_基本設計" data-doc="02_基本設計.md">基本設計</a>に基づき、そのまま実装に着手できる粒度まで設計を具体化したものです。</p>
-<p>コード例は <strong>Kotlin + Jetpack Compose</strong> で記載しています。そのまま貼って動くものではなく、設計の意図を伝えるためのスケッチです。import 文とテーマ定義は省略しています。</p>
+<p>この詳細設計書は、<a class="lnk" href="#01_要件定義">要件定義</a>と<a class="lnk" href="#02_基本設計">基本設計</a>に基づき、そのまま実装に着手できる粒度まで設計を具体化したものです。</p>
+<p>コード例は <strong>Kotlin + Jetpack Compose</strong> で記載しています。各例は処理の流れとクラスの役割を示しています。手元で動かす際は、import 文とテーマ定義を補ってください。</p>
 <p>次のものは意図的に省いています。各 Issue で自分で実装してください。</p>
 <ul>
 <li>DTO からモデル・Entity への変換（<code>toEntity()</code> / <code>toDetail()</code>）
@@ -1772,7 +1484,7 @@ CREATE INDEX idx_cache_last_accessed ON pokemon_detail_cache(last_accessed);</co
 </li>
 <li>画面遷移の定義（<code>PokedexNavHost</code>）
 </li></ul>
-<p>実装するスコープと評価の基準は<a class="lnk" href="#04_実装仕様" data-doc="04_実装仕様.md">実装仕様</a>、作業の単位は <a class="lnk ext" href="https://github.com/sghh02/pokedex-android-kadai/issues" target="_blank" rel="noopener">GitHub Issues</a> にまとめてあります。</p>
+<p>実装するスコープと評価の基準は<a class="lnk" href="#04_実装仕様">実装仕様</a>、作業の単位は <a class="lnk ext" href="https://github.com/sghh02/pokedex-android-kadai/issues" target="_blank" rel="noopener">GitHub Issues</a> にまとめてあります。</p>
 <h3 id="設計原則">設計原則</h3>
 <ul>
 <li><strong>レイヤードアーキテクチャ</strong>: Presentation / Business / Data / Infrastructure の4層構成
@@ -1810,7 +1522,7 @@ CREATE INDEX idx_cache_last_accessed ON pokemon_detail_cache(last_accessed);</co
 ├─────────────────────────────────────┤
 │      Infrastructure Layer           │ ← PokeApiService / Room / NetworkMonitor
 └─────────────────────────────────────┘</code></pre></figure>
-<p><a class="lnk" href="#04_実装仕様" data-doc="04_実装仕様.md">実装仕様</a>では同じ構造を Android の慣用名で「UI / ViewModel / Repository / Data Sources」と呼んでいます。対応は次のとおりです。</p>
+<p><a class="lnk" href="#04_実装仕様">実装仕様</a>では同じ構造を Android の慣用名で「UI / ViewModel / Repository / Data Sources」と呼んでいます。対応は次のとおりです。</p>
 <div class="table-wrap"><table><thead><tr><th>本書</th><th>実装仕様</th><th>実装上の型</th></tr></thead><tbody><tr><td>Presentation</td><td>UI Layer</td><td><code>@Composable fun *Screen</code></td></tr><tr><td>Business</td><td>ViewModel Layer</td><td><code>*ViewModel</code>（<code>StateFlow</code> で状態を公開）</td></tr><tr><td>Data</td><td>Repository Layer</td><td><code>PokemonRepository</code> / <code>UpdateService</code> / <code>DetailCache</code></td></tr><tr><td>Infrastructure</td><td>Data Sources Layer</td><td><code>PokeApiService</code> / <code>PokemonDao</code> / <code>NetworkMonitor</code></td></tr></tbody></table></div>
 <h3 id="1-2-主要コンポーネント">1.2 主要コンポーネント</h3>
 <div class="table-wrap"><table><thead><tr><th>コンポーネント</th><th>役割</th><th>層</th></tr></thead><tbody><tr><td><code>PokemonRepository</code></td><td>API とローカルDBを束ね、画面に単一の入口を提供する</td><td>Data</td></tr><tr><td><code>PokeApiService</code></td><td>PokeAPI との通信（Retrofit インターフェース）</td><td>Infrastructure</td></tr><tr><td><code>PokemonDao</code> / <code>AppDatabase</code></td><td>Room によるローカル永続化</td><td>Infrastructure</td></tr><tr><td><code>DetailCache</code></td><td>詳細情報のキャッシュ（直近10件・LRU）</td><td>Data</td></tr><tr><td><code>UpdateService</code></td><td>151匹ぶんの取得と再試行の制御</td><td>Data</td></tr><tr><td><code>NetworkMonitor</code></td><td>ネットワーク状態の監視</td><td>Infrastructure</td></tr><tr><td><code>*ViewModel</code></td><td>画面ごとの状態保持（StateFlow で公開）</td><td>Business</td></tr><tr><td><code>*Screen</code></td><td>Composable による画面描画</td><td>Presentation</td></tr></tbody></table></div>
@@ -3067,357 +2779,8 @@ suspend fun replaceAll(pokemon: List&lt;PokemonEntity&gt;) {
     deleteAll()
     upsertAll(pokemon)
 }</code></pre></figure>
-<hr>
-<p>この詳細設計書により、実装チームは各機能の具体的な実装方法、データフロー、エラーハンドリング、パフォーマンス要件を理解し、効率的に開発を進めることができます。</p></section></main>
+</section>
+</main>
 </div>
-
-<script>
-const NAV = [{"id": "doc-0", "file": "README.md", "label": "はじめに", "blurb": "課題の全体像と進め方", "toc": [{"lv": 2, "text": "何を作るのか", "id": "何を作るのか"}, {"lv": 2, "text": "どう作るのか", "id": "どう作るのか"}, {"lv": 2, "text": "今回どこまで作るのか", "id": "今回どこまで作るのか"}, {"lv": 2, "text": "手を動かす", "id": "手を動かす"}, {"lv": 2, "text": "実装する", "id": "実装する"}, {"lv": 2, "text": "素材", "id": "素材"}]}, {"id": "doc-1", "file": "05_環境構築ガイド.md", "label": "環境構築", "blurb": "プロジェクト作成から疎通確認まで", "toc": [{"lv": 2, "text": "1. 前提", "id": "1-前提"}, {"lv": 2, "text": "2. リポジトリを Fork して手元に置く", "id": "2-リポジトリを-fork-して手元に置く"}, {"lv": 3, "text": "2.1 Fork とは", "id": "2-1-fork-とは"}, {"lv": 3, "text": "2.2 Fork する", "id": "2-2-fork-する"}, {"lv": 3, "text": "2.3 clone して手元に持ってくる", "id": "2-3-clone-して手元に持ってくる"}, {"lv": 3, "text": "2.4 push できるようにする", "id": "2-4-push-できるようにする"}, {"lv": 3, "text": "2.5 コミットに使う名前を設定する", "id": "2-5-コミットに使う名前を設定する"}, {"lv": 3, "text": "2.6 作業ブランチを切る", "id": "2-6-作業ブランチを切る"}, {"lv": 2, "text": "3. ビルドを通す", "id": "3-ビルドを通す"}, {"lv": 2, "text": "4. 同梱されている設定", "id": "4-同梱されている設定"}, {"lv": 3, "text": "バージョンを触るときの注意", "id": "バージョンを触るときの注意"}, {"lv": 2, "text": "5. AndroidManifest.xml", "id": "5-androidmanifest-xml"}, {"lv": 2, "text": "6. パッケージ構成", "id": "6-パッケージ構成"}, {"lv": 2, "text": "7. 疎通確認（#2）", "id": "7-疎通確認-2"}, {"lv": 2, "text": "8. プルリクエストを出す", "id": "8-プルリクエストを出す"}, {"lv": 3, "text": "8.1 コミットして push する", "id": "8-1-コミットして-push-する"}, {"lv": 3, "text": "8.2 プルリクエストを作る", "id": "8-2-プルリクエストを作る"}, {"lv": 3, "text": "8.3 本文を書く", "id": "8-3-本文を書く"}, {"lv": 3, "text": "8.4 レビューを依頼する", "id": "8-4-レビューを依頼する"}, {"lv": 2, "text": "9. テストの書き方", "id": "9-テストの書き方"}, {"lv": 2, "text": "10. よくあるつまずき", "id": "10-よくあるつまずき"}]}, {"id": "doc-2", "file": "04_実装仕様.md", "label": "実装仕様", "blurb": "スコープ・技術スタック・評価基準", "toc": [{"lv": 2, "text": "1. 学習目標", "id": "1-学習目標"}, {"lv": 2, "text": "2. アーキテクチャ", "id": "2-アーキテクチャ"}, {"lv": 3, "text": "2.1 レイヤー構成", "id": "2-1-レイヤー構成"}, {"lv": 3, "text": "2.2 主要コンポーネント", "id": "2-2-主要コンポーネント"}, {"lv": 3, "text": "2.3 実装の共通ルール", "id": "2-3-実装の共通ルール"}, {"lv": 2, "text": "3. 機能仕様", "id": "3-機能仕様"}, {"lv": 3, "text": "3.1 Phase 1: 基本機能（必須）", "id": "3-1-phase-1-基本機能-必須"}, {"lv": 3, "text": "3.2 Phase 2: 拡張機能（加点）", "id": "3-2-phase-2-拡張機能-加点"}, {"lv": 2, "text": "4. データベース設計", "id": "4-データベース設計"}, {"lv": 2, "text": "5. PokeAPI の実装上の注意", "id": "5-pokeapi-の実装上の注意"}, {"lv": 2, "text": "6. 技術スタック", "id": "6-技術スタック"}, {"lv": 3, "text": "6.1 加点対象（任意）", "id": "6-1-加点対象-任意"}, {"lv": 3, "text": "6.2 ビルド設定", "id": "6-2-ビルド設定"}, {"lv": 2, "text": "7. 実装手順", "id": "7-実装手順"}, {"lv": 3, "text": "7.1 環境構築（#1〜#2・2日）", "id": "7-1-環境構築-1-2・2日"}, {"lv": 3, "text": "7.2 データレイヤー（#3〜#5・7日）", "id": "7-2-データレイヤー-3-5・7日"}, {"lv": 3, "text": "7.3 UIレイヤー（#6〜#10・7日）", "id": "7-3-uiレイヤー-6-10・7日"}, {"lv": 3, "text": "7.4 機能拡張（#11〜#14・6.5日）", "id": "7-4-機能拡張-11-14・6-5日"}, {"lv": 3, "text": "7.5 テストと提出（#15〜#16・3日）", "id": "7-5-テストと提出-15-16・3日"}, {"lv": 2, "text": "8. 評価基準", "id": "8-評価基準"}, {"lv": 3, "text": "8.1 必須要件（70点）", "id": "8-1-必須要件-70点"}, {"lv": 3, "text": "8.2 高評価要件（+30点）", "id": "8-2-高評価要件-30点"}, {"lv": 3, "text": "8.3 ボーナス要件（+α）", "id": "8-3-ボーナス要件-α"}, {"lv": 2, "text": "9. 提出要件", "id": "9-提出要件"}, {"lv": 2, "text": "関連リソース", "id": "関連リソース"}]}, {"id": "doc-3", "file": "01_要件定義.md", "label": "要件定義", "blurb": "目的・機能要件・非機能要件", "toc": [{"lv": 2, "text": "1. 目的・ターゲットユーザー・スコープ", "id": "1-目的・ターゲットユーザー・スコープ"}, {"lv": 3, "text": "目的", "id": "目的"}, {"lv": 3, "text": "ターゲットユーザー", "id": "ターゲットユーザー"}, {"lv": 3, "text": "スコープ", "id": "スコープ"}, {"lv": 3, "text": "今回の開発で除外する機能", "id": "今回の開発で除外する機能"}, {"lv": 2, "text": "2. 機能要件", "id": "2-機能要件"}, {"lv": 3, "text": "2.1 ポケモン図鑑の機能", "id": "2-1-ポケモン図鑑の機能"}, {"lv": 3, "text": "2.2 オフライン機能", "id": "2-2-オフライン機能"}, {"lv": 3, "text": "2.3 新情報掲示板（次フェーズの開発スコープ）", "id": "2-3-新情報掲示板-次フェーズの開発スコープ"}, {"lv": 2, "text": "3. UI/UX要件", "id": "3-ui-ux要件"}, {"lv": 2, "text": "4. データ要件", "id": "4-データ要件"}, {"lv": 2, "text": "5. パフォーマンス要件", "id": "5-パフォーマンス要件"}, {"lv": 2, "text": "6. セキュリティ要件", "id": "6-セキュリティ要件"}, {"lv": 2, "text": "7. 非機能要件", "id": "7-非機能要件"}, {"lv": 2, "text": "8. スケジュールとマイルストーン", "id": "8-スケジュールとマイルストーン"}, {"lv": 2, "text": "9. フェーズ2開発計画（参考情報）", "id": "9-フェーズ2開発計画-参考情報"}, {"lv": 2, "text": "付録: 要件定義とは", "id": "付録-要件定義とは"}, {"lv": 3, "text": "要件定義の目的", "id": "要件定義の目的"}, {"lv": 3, "text": "要件定義のプロセス", "id": "要件定義のプロセス"}, {"lv": 3, "text": "要件定義書に含まれる内容", "id": "要件定義書に含まれる内容"}, {"lv": 3, "text": "要件定義の重要性", "id": "要件定義の重要性"}, {"lv": 3, "text": "未経験者が知っておくべきポイント", "id": "未経験者が知っておくべきポイント"}]}, {"id": "doc-4", "file": "02_基本設計.md", "label": "基本設計", "blurb": "システム構成・画面設計・IF設計", "toc": [{"lv": 2, "text": "1. はじめに", "id": "1-はじめに"}, {"lv": 2, "text": "2. 機能設計", "id": "2-機能設計"}, {"lv": 3, "text": "2.1 システム方式設計", "id": "2-1-システム方式設計"}, {"lv": 3, "text": "2.2 画面設計", "id": "2-2-画面設計"}, {"lv": 3, "text": "2.3 外部インターフェース設計", "id": "2-3-外部インターフェース設計"}, {"lv": 3, "text": "2.4 内部インターフェース定義", "id": "2-4-内部インターフェース定義"}, {"lv": 3, "text": "2.5 パフォーマンス設計", "id": "2-5-パフォーマンス設計"}, {"lv": 3, "text": "2.6 テスト計画", "id": "2-6-テスト計画"}, {"lv": 3, "text": "2.7 セキュリティ設計", "id": "2-7-セキュリティ設計"}, {"lv": 3, "text": "2.8 運用・保守計画", "id": "2-8-運用・保守計画"}, {"lv": 2, "text": "付録: 基本設計とは", "id": "付録-基本設計とは"}, {"lv": 3, "text": "開発プロジェクトとは", "id": "開発プロジェクトとは"}, {"lv": 3, "text": "基本設計の位置づけ", "id": "基本設計の位置づけ"}, {"lv": 3, "text": "基本設計のプロセス", "id": "基本設計のプロセス"}, {"lv": 3, "text": "基本設計の成果物", "id": "基本設計の成果物"}, {"lv": 3, "text": "基本設計の重要性", "id": "基本設計の重要性"}, {"lv": 3, "text": "まとめ", "id": "まとめ"}]}, {"id": "doc-5", "file": "03_詳細設計.md", "label": "詳細設計", "blurb": "型定義・シーケンス図・実装例", "toc": [{"lv": 2, "text": "はじめに", "id": "はじめに"}, {"lv": 3, "text": "設計原則", "id": "設計原則"}, {"lv": 3, "text": "この文書の構成", "id": "この文書の構成"}, {"lv": 2, "text": "1. 全体アーキテクチャ", "id": "1-全体アーキテクチャ"}, {"lv": 3, "text": "1.1 レイヤー構成", "id": "1-1-レイヤー構成"}, {"lv": 3, "text": "1.2 主要コンポーネント", "id": "1-2-主要コンポーネント"}, {"lv": 2, "text": "2. データ構造設計", "id": "2-データ構造設計"}, {"lv": 3, "text": "2.1 Pokemon基本情報", "id": "2-1-pokemon基本情報"}, {"lv": 3, "text": "2.2 Pokemon詳細情報", "id": "2-2-pokemon詳細情報"}, {"lv": 3, "text": "2.3 SQLiteテーブル設計", "id": "2-3-sqliteテーブル設計"}, {"lv": 2, "text": "3. API設計", "id": "3-api設計"}, {"lv": 3, "text": "3.1 PokeAPI エンドポイント仕様", "id": "3-1-pokeapi-エンドポイント仕様"}, {"lv": 3, "text": "3.2 内部API設計", "id": "3-2-内部api設計"}, {"lv": 2, "text": "4. 機能詳細設計", "id": "4-機能詳細設計"}, {"lv": 3, "text": "4.1 アプリ起動・初期化機能", "id": "4-1-アプリ起動・初期化機能"}, {"lv": 3, "text": "4.2 ポケモン一覧表示機能", "id": "4-2-ポケモン一覧表示機能"}, {"lv": 3, "text": "4.3 ポケモン検索機能", "id": "4-3-ポケモン検索機能"}, {"lv": 3, "text": "4.4 ポケモン詳細表示機能", "id": "4-4-ポケモン詳細表示機能"}, {"lv": 3, "text": "4.5 データ更新機能", "id": "4-5-データ更新機能"}, {"lv": 3, "text": "4.6 オフライン機能", "id": "4-6-オフライン機能"}, {"lv": 2, "text": "5. エラーハンドリング", "id": "5-エラーハンドリング"}, {"lv": 3, "text": "5.1 エラー分類と対応", "id": "5-1-エラー分類と対応"}, {"lv": 3, "text": "5.2 エラーの伝え方", "id": "5-2-エラーの伝え方"}, {"lv": 2, "text": "6. パフォーマンス設計", "id": "6-パフォーマンス設計"}, {"lv": 3, "text": "6.1 レンダリング最適化", "id": "6-1-レンダリング最適化"}, {"lv": 3, "text": "6.2 データベース最適化", "id": "6-2-データベース最適化"}]}];
-const KEY = "pokedex-kadai-progress";
-
-/* ---------- 目次の組み立て ---------- */
-const list = document.getElementById("doclist");
-NAV.forEach((d, i) => {
-  const li = document.createElement("li");
-  const btn = document.createElement("button");
-  btn.className = "docbtn";
-  btn.type = "button";
-  btn.dataset.target = d.id;
-  btn.innerHTML = '<span class="n"></span><span class="t"></span><span class="b"></span>';
-  btn.querySelector(".n").textContent = String(i).padStart(2, "0");
-  btn.querySelector(".t").textContent = d.label;
-  btn.querySelector(".b").textContent = d.blurb;
-  li.appendChild(btn);
-
-  const toc = document.createElement("ul");
-  toc.className = "toc";
-  toc.hidden = true;
-  d.toc.forEach(h => {
-    const item = document.createElement("li");
-    const a = document.createElement("a");
-    a.href = "#" + h.id;
-    a.textContent = h.text;
-    if (h.lv === 3) a.className = "lv3";
-    a.addEventListener("click", e => {
-      e.preventDefault();
-      goToAnchor(h.id, true);
-      setHash(h.id);
-      closeRail();
-    });
-    item.appendChild(a);
-    toc.appendChild(item);
-  });
-  li.appendChild(toc);
-  list.appendChild(li);
-  btn.addEventListener("click", () => { show(d.id); setHash(stem(d.file)); });
-});
-
-function show(id, keepScroll){
-  document.querySelectorAll(".doc").forEach(s => { s.hidden = s.id !== id; });
-  document.querySelectorAll(".docbtn").forEach(b => {
-    const on = b.dataset.target === id;
-    b.setAttribute("aria-current", on ? "true" : "false");
-    b.parentElement.querySelector(".toc").hidden = !on;
-  });
-  if (!keepScroll) window.scrollTo({top: 0});
-  closeRail();
-  observeHeadings(id);
-}
-
-/* ---------- URL のハッシュで直接その節を開く ---------- */
-const stem = f => f.replace(/\.md$/, "");
-function setHash(value){
-  history.replaceState(null, "", "#" + encodeURIComponent(value));
-}
-
-/** 見出しIDから、それを含む文書を開いてスクロールする */
-function goToAnchor(anchor, smooth){
-  const el = document.getElementById(anchor);
-  const doc = el && el.closest(".doc");
-  if (!doc) return false;
-  show(doc.id, true);
-  el.scrollIntoView({behavior: smooth ? "smooth" : "auto", block: "start"});
-  return true;
-}
-
-let pendingAnchor = null;
-function applyHash(){
-  const raw = decodeURIComponent(location.hash.slice(1));
-  if (!raw) { show(NAV[0].id); return; }
-  if (goToAnchor(raw)) { pendingAnchor = raw; return; }
-  const doc = NAV.find(d => stem(d.file) === raw);      // 文書だけを指す形も許す
-  show(doc ? doc.id : NAV[0].id);
-}
-
-/** フォントや図の読み込みでレイアウトがずれるので、落ち着いてから位置を合わせ直す */
-function resettleAnchor(){
-  if (!pendingAnchor) return;
-  const el = document.getElementById(pendingAnchor);
-  if (el) el.scrollIntoView({block: "start"});
-}
-if (document.fonts && document.fonts.ready) document.fonts.ready.then(resettleAnchor);
-window.addEventListener("load", resettleAnchor);
-window.addEventListener("hashchange", applyHash);
-
-/* 文書間リンクを画面切り替えに繋ぐ */
-document.querySelectorAll("a[data-doc]").forEach(a => {
-  const target = NAV.find(d => d.file === a.dataset.doc);
-  if (!target) return;
-  a.addEventListener("click", e => {
-    e.preventDefault();
-    const frag = (a.getAttribute("href").split("#")[1] || "");
-    if (frag && goToAnchor(decodeURIComponent(frag), true)) setHash(decodeURIComponent(frag));
-    else { show(target.id); setHash(stem(target.file)); }
-  });
-});
-
-/* ---------- 現在地のハイライト ---------- */
-let io = null;
-function observeHeadings(docId){
-  if (io) io.disconnect();
-  const doc = document.getElementById(docId);
-  const btn = document.querySelector('.docbtn[data-target="' + docId + '"]');
-  if (!doc || !btn) return;
-  const links = new Map();
-  btn.parentElement.querySelectorAll(".toc a").forEach(a => {
-    links.set(a.getAttribute("href").slice(1), a);
-  });
-  const heads = doc.querySelectorAll("h2, h3");
-  if (!heads.length) return;
-  io = new IntersectionObserver(entries => {
-    entries.forEach(en => {
-      if (!en.isIntersecting) return;
-      links.forEach(a => a.classList.remove("here"));
-      const hit = links.get(en.target.id);
-      if (hit) hit.classList.add("here");
-    });
-  }, {rootMargin: "0px 0px -75% 0px", threshold: 0});
-  heads.forEach(h => io.observe(h));
-}
-
-/* ---------- コードの色付け ---------- */
-const KEYWORDS = {
-  kotlin: /\b(?:val|var|fun|class|object|interface|data|sealed|suspend|override|private|internal|return|if|else|when|for|while|try|catch|finally|import|package|companion|const|by|in|is|as|null|true|false|this|super|enum|abstract|lateinit|init|throw|do|it)\b/g,
-  sql: /\b(?:CREATE|TABLE|INDEX|SELECT|FROM|WHERE|ORDER|BY|LIMIT|INSERT|INTO|VALUES|DELETE|UPDATE|SET|PRIMARY|KEY|FOREIGN|REFERENCES|NOT|NULL|DEFAULT|AUTOINCREMENT|INTEGER|TEXT|DATETIME|ON|AND|OR|IN|COUNT|MAX|CURRENT_TIMESTAMP)\b/g,
-  json: /\b(?:true|false|null)\b/g
-};
-
-function highlight(code, lang){
-  const marks = [];
-  /* 退避用の番兵。コード中に現れない私用領域の文字を実行時に作る。 */
-  const S0 = String.fromCharCode(0xE000), S1 = String.fromCharCode(0xE001);
-  // 番号の前に文字を置く。そうしないと数値の色付けが退避番号自体を拾ってしまう
-  const stash = (cls, txt) => S0 + "t" + (marks.push([cls, txt]) - 1) + S1;
-  // 文字列とコメントは1本の正規表現で、先に現れたほうを優先させる。
-  // 分けて処理すると "https://..." の // がコメント扱いになりコードが壊れる。
-  let s = code
-    .replace(
-      /"(?:[^"\\\n]|\\.)*"|'(?:[^'\\\n]|\\.)*'|\/\/[^\n]*|--[^\n]*/g,
-      m => stash(m[0] === '"' || m[0] === "'" ? "tok-s" : "tok-c", m)
-    )
-    .replace(/@\w+/g, m => stash("tok-a", m));
-  const kw = KEYWORDS[lang];
-  if (kw) s = s.replace(kw, m => stash("tok-k", m));
-  s = s.replace(/\b\d[\d_]*(?:\.\d+)?\b/g, m => stash("tok-n", m));
-  return s.replace(new RegExp(S0 + "t(\\d+)" + S1, "g"), (_, i) => {
-    const [cls, txt] = marks[Number(i)];
-    return '<span class="' + cls + '">' + txt + "</span>";
-  });
-}
-
-document.querySelectorAll("figure.code code").forEach(el => {
-  const m = el.className.match(/lang-(\w+)/);
-  const lang = m ? m[1] : "";
-  if (["kotlin", "sql", "json"].indexOf(lang) !== -1) {
-    el.innerHTML = highlight(el.innerHTML, lang);
-  }
-});
-
-/* ---------- コピー ---------- */
-document.querySelectorAll(".copy").forEach(btn => {
-  btn.addEventListener("click", () => {
-    const code = btn.closest("figure").querySelector("code");
-    navigator.clipboard.writeText(code.innerText).then(() => {
-      btn.textContent = "コピーしました";
-      btn.classList.add("done");
-      setTimeout(() => { btn.textContent = "コピー"; btn.classList.remove("done"); }, 1600);
-    }).catch(() => {
-      btn.textContent = "コピーできません";
-      setTimeout(() => { btn.textContent = "コピー"; }, 1600);
-    });
-  });
-});
-
-/* ---------- Issue のフェーズ表示と索引 ---------- */
-function phaseOf(n){
-  if (n <= 10) return {cls: "", text: "Phase 1 必須"};
-  if (n <= 14) return {cls: "p2", text: "Phase 2 加点"};
-  if (n === 15) return {cls: "bonus", text: "ボーナス"};
-  return {cls: "submit", text: "提出物"};
-}
-
-const issueDoc = document.querySelector('.doc[data-file*="Issue"]');
-let refreshIssueIndex = () => {};
-
-if (issueDoc) {
-  const entries = [];
-  issueDoc.querySelectorAll("h2").forEach(h => {
-    const m = h.textContent.match(/^#(\d+)\s+(.+)$/);
-    if (!m) return;
-    const num = Number(m[1]), phase = phaseOf(num);
-
-    const badge = document.createElement("span");
-    badge.className = "badge " + phase.cls;
-    badge.textContent = phase.text;
-    h.appendChild(badge);
-
-    // 見出しから次の見出しまでのチェックボックスを、この Issue のものとして数える
-    const boxes = [];
-    for (let el = h.nextElementSibling; el && el.tagName !== "H2"; el = el.nextElementSibling) {
-      el.querySelectorAll('li.task input').forEach(b => boxes.push(b));
-    }
-    entries.push({num: num, name: m[2], id: h.id, phase: phase, boxes: boxes});
-  });
-
-  if (entries.length) {
-    const index = document.createElement("div");
-    index.className = "issue-index";
-    index.innerHTML = '<p class="cap">Issue 索引 — 受け入れ条件をすべて満たすと色が変わります</p><div class="grid"></div>';
-    const grid = index.querySelector(".grid");
-
-    entries.forEach(e => {
-      const a = document.createElement("a");
-      a.href = "#" + e.id;
-      a.className = e.phase.cls;
-      a.innerHTML = '<span class="no"></span><span class="nm"></span>';
-      a.querySelector(".no").textContent = "#" + e.num;
-      a.querySelector(".nm").textContent = e.name;
-      a.title = e.name + "（" + e.phase.text + "）";
-      a.addEventListener("click", ev => {
-        ev.preventDefault();
-        document.getElementById(e.id).scrollIntoView({behavior: "smooth", block: "start"});
-      });
-      grid.appendChild(a);
-      e.cell = a;
-    });
-
-    const firstH2 = issueDoc.querySelector("h2");
-    if (firstH2) issueDoc.insertBefore(index, firstH2);
-
-    refreshIssueIndex = function(){
-      entries.forEach(e => {
-        const done = e.boxes.length > 0 && e.boxes.every(b => b.checked);
-        e.cell.classList.toggle("complete", done);
-      });
-    };
-  }
-}
-
-/* ---------- チェックリストの進捗（この端末にのみ保存） ---------- */
-document.querySelectorAll(".doc").forEach(doc => {
-  const boxes = Array.prototype.slice.call(doc.querySelectorAll("li.task input"));
-  if (!boxes.length) return;
-
-  const storeKey = KEY + ":" + doc.dataset.file;
-  const label = doc.dataset.file.indexOf("Issue") !== -1 ? "受け入れ条件の達成状況" : "評価基準の達成状況";
-
-  let saved = {};
-  try { saved = JSON.parse(localStorage.getItem(storeKey) || "{}"); } catch (e) { saved = {}; }
-  boxes.forEach((b, i) => { b.checked = !!saved[i]; });
-
-  const panel = document.createElement("div");
-  panel.className = "progress";
-  panel.innerHTML =
-    '<div class="row"><span class="lbl"></span><span class="num"></span></div>' +
-    '<div class="bar"><div class="fill"></div></div>' +
-    '<div class="row" style="margin-top:10px"><span class="lbl">チェックはこの端末にのみ保存されます</span>' +
-    '<button type="button">すべて解除</button></div>';
-  panel.querySelector(".lbl").textContent = label;
-
-  // 最初のチェック欄が属する節の見出しの直後に置く。
-  // 文書の先頭に固定すると、関係のない節を読んでいる間もずっと出てしまう。
-  const heads = Array.prototype.slice.call(doc.querySelectorAll("h2"));
-  const owner = heads.filter(h =>
-    h.compareDocumentPosition(boxes[0]) & Node.DOCUMENT_POSITION_FOLLOWING).pop();
-  if (owner) owner.insertAdjacentElement("afterend", panel);
-  else doc.appendChild(panel);
-
-  const num = panel.querySelector(".num");
-  const fill = panel.querySelector(".fill");
-
-  function render(){
-    const n = boxes.filter(b => b.checked).length;
-    num.textContent = n + " / " + boxes.length;
-    fill.style.width = (n / boxes.length * 100) + "%";
-    refreshIssueIndex();
-  }
-  function persist(){
-    const o = {};
-    boxes.forEach((b, i) => { if (b.checked) o[i] = 1; });
-    try { localStorage.setItem(storeKey, JSON.stringify(o)); } catch (e) {}
-  }
-  boxes.forEach(b => b.addEventListener("change", () => { persist(); render(); }));
-  panel.querySelector("button").addEventListener("click", () => {
-    boxes.forEach(b => { b.checked = false; });
-    persist();
-    render();
-  });
-  render();
-});
-
-/* ---------- モバイルの目次 ---------- */
-const rail = document.querySelector(".rail");
-const toggle = document.querySelector(".railtoggle");
-function closeRail(){
-  rail.classList.remove("open");
-  toggle.setAttribute("aria-expanded", "false");
-}
-toggle.addEventListener("click", () => {
-  const open = rail.classList.toggle("open");
-  toggle.setAttribute("aria-expanded", String(open));
-});
-
-applyHash();
-
-/* ---------- 図の描画 ----------
-   アーティファクト上では閲覧側が mermaid を描画するため、この読み込みは失敗してよい。
-   GitHub Pages では自前で読み込んで描画する。 */
-(function renderDiagrams(){
-  const blocks = document.querySelectorAll("pre.mermaid");
-  if (!blocks.length) return;
-
-  const script = document.createElement("script");
-  script.src = "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js";
-  script.onload = async () => {
-    if (document.querySelector("figure.diagram svg")) return;   // 既に描画済みなら何もしない
-    // 図の面は常に明るいので、テーマも既定（明るい配色）で固定する
-    mermaid.initialize({startOnLoad: false, theme: "default", securityLevel: "loose"});
-
-    // 非表示の文書は採寸できないので、描画のあいだだけ画面外に出す
-    const docs = Array.prototype.slice.call(document.querySelectorAll(".doc"));
-    const hiddenBefore = docs.map(d => d.hidden);
-    docs.forEach(d => { if (d.hidden) { d.hidden = false; d.classList.add("measuring"); } });
-    try { await mermaid.run({nodes: blocks}); }
-    catch (e) { console.warn("図の描画に失敗しました", e); }
-
-    // mermaid は width:100% を付けるため、横長の図が枠に合わせて潰れて読めなくなる。
-    // viewBox の実寸を与え直し、はみ出す分は figure 側で横スクロールさせる。
-    document.querySelectorAll("figure.diagram svg").forEach(svg => {
-      const vb = (svg.getAttribute("viewBox") || "").split(/\s+/);
-      const w = parseFloat(vb[2]);
-      if (!w) return;
-      svg.style.width = Math.round(w) + "px";
-      svg.style.maxWidth = "none";
-    });
-    docs.forEach((d, i) => { d.classList.remove("measuring"); d.hidden = hiddenBefore[i]; });
-
-    resettleAnchor();
-  };
-  script.onerror = () => {};   // 読み込めない環境では素のテキストのまま
-  document.head.appendChild(script);
-
-})();
-</script>
-
 </body>
 </html>

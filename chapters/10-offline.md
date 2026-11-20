@@ -17,7 +17,7 @@ Issue #5 で DB を唯一の情報源にしてあれば、大半はすでに動�
 ## 2. 着手前に読む
 
 - [Issue #10](https://github.com/sghh02/pokedex-android-kadai/issues/10) — **実装内容と受け入れ条件の正はこちら**。この章はそれを読む順番と、つまずきやすい点を補うものです
-- [詳細設計](https://sghh02.github.io/pokedex-android-kadai/#03_詳細設計) — オフライン時の振る舞い
+- [詳細設計](https://sghh02.github.io/pokedex-android-kadai/#4-6-オフライン機能) — オフライン時の振る舞い
 
 ## 3. つまずきどころ
 

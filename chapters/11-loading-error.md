@@ -16,7 +16,7 @@ Issue #7 でも簡易的なローディングとエラーは出しましたが�
 ## 2. 着手前に読む
 
 - [Issue #11](https://github.com/sghh02/pokedex-android-kadai/issues/11) — **実装内容と受け入れ条件の正はこちら**。この章はそれを読む順番と、つまずきやすい点を補うものです
-- [詳細設計](https://sghh02.github.io/pokedex-android-kadai/#03_詳細設計) — 状態の持ち方と実装例
+- [詳細設計](https://sghh02.github.io/pokedex-android-kadai/#pokemondetailviewmodel) — 状態の持ち方と実装例
 
 ## 3. つまずきどころ
 

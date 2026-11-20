@@ -16,7 +16,7 @@ Fork したプロジェクトがビルドでき、手元の端末で動くとこ
 
 - [Issue #1](https://github.com/sghh02/pokedex-android-kadai/issues/1) — **実装内容と受け入れ条件の正はこちら**。この章はそれを読む順番と、つまずきやすい点を補うものです
 - [環境構築ガイド](https://sghh02.github.io/pokedex-android-kadai/#05_環境構築ガイド) — Fork から最初のビルドまでの手順
-- [実装仕様](https://sghh02.github.io/pokedex-android-kadai/#04_実装仕様) — 2.3 実装の共通ルール。どの Issue でも先に読み返す
+- [実装仕様](https://sghh02.github.io/pokedex-android-kadai/#2-3-実装の共通ルール) — 2.3 実装の共通ルール。どの Issue でも先に読み返す
 
 ## 3. つまずきどころ
 

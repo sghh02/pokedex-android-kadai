@@ -16,7 +16,7 @@
 ## 2. 着手前に読む
 
 - [Issue #3](https://github.com/sghh02/pokedex-android-kadai/issues/3) — **実装内容と受け入れ条件の正はこちら**。この章はそれを読む順番と、つまずきやすい点を補うものです
-- [実装仕様](https://sghh02.github.io/pokedex-android-kadai/#04_実装仕様) — テーブル定義。カラム名と型はここに合わせる
+- [実装仕様](https://sghh02.github.io/pokedex-android-kadai/#4-データベース設計) — テーブル定義。カラム名と型はここに合わせる
 
 ## 3. つまずきどころ
 
